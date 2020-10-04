@@ -1,0 +1,48 @@
+.hidden {
+	display: none;
+}
+.split {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.upper {
+    top: 0;
+    height: 50%;
+}
+
+.lower {
+    bottom: 0;
+    height: 50%;  
+}
+
+.upper.separate {
+	border-bottom-style: solid;
+    border-bottom-width: 2px;
+}
+
+.lower.separate {
+	border-top-style: solid;
+    border-top-width: 2px;
+}
+
+/* If you want the content centered horizontally and vertically */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+/* Style the image inside the centered container, if needed */
+.centered img {
+  width: 150px;
+  border-radius: 50%;
+}
+	
+h1 {
+	color: dodgerblue;
+	font-size: 10em;
+}
