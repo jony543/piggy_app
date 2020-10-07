@@ -12,7 +12,7 @@ if (!window.jatos) {
 					return JSON.parse(x);
 				else 
 					return undefined;
-			}, // function () { return "NoDataYet"; },
+			},
 			set: function(i, v) { 
 				localStorage.setItem(i, JSON.stringify(v)) 
 				return Promise.resolve('finished saving mock batch session');

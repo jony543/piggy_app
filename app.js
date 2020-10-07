@@ -49,9 +49,18 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 	    	dom_helper.hide("lower_half");  
 			
 			dom_helper.show("welcome_msg");
+
+			// collect end time and save subject data as results
 			data_helper.set_subject_data({ subID: jatos.workerId, endTime: new Date(), time: 'end' })
 				.then(function () {
-					console.log('finished');
+					var subData = data_helper.get_subject_data(false);
+					var runData = subData[jatos.studyResultId];
+
+					// TODO - consider turning it to csv at this point
+					
+					jatos.appendResultData(runData).then(function () {
+						console.log('finished');
+					});
 				});
 		});
 	});
