@@ -26,6 +26,12 @@ function dateDiff(date1, date2) {
 	return diffDays;
 }
 
+function wait(delay) {
+    return new Promise(function(resolve) {
+        setTimeout(resolve, delay);
+    });
+}
+
 Array.prototype.multiIndexOf = function (el) {
 	var idxs = [];
 	for (var i = this.length - 1; i >= 0; i--) {
@@ -55,13 +61,21 @@ if (!window.jatos) {
 				localStorage.setItem(i, JSON.stringify(v)) 
 				return Promise.resolve('finished saving mock batch session');
 			}, 
-		},
-		onLoad: function () {
-			return Promise.resolve('jatos mock is running');
+		},		
+		onLoad: function(func) {
+			func();
 		},
 		workerId: 1,
 		studyResultId: Date.now(),
 	}
+};
+
+window.jatos.loaded = function () {
+	return new Promise((resolve, reject) => {
+		jatos.onLoad(function () {
+			resolve('jatos is ready');
+		});
+	});
 };
 
 var data_helper = {
