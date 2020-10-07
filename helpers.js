@@ -38,8 +38,6 @@ Array.prototype.multiIndexOf = function (el) {
 
 // for debug
 if (!window.jatos) {
-	window.mock_batchSession = {};
-
 	window.jatos = {
 		appendResultData: function(resultData) {
 			console.log('This results would have been sent to jatos server:')
@@ -53,7 +51,13 @@ if (!window.jatos) {
 				else 
 					return undefined;
 			}, // function () { return "NoDataYet"; },
-			set: function(i, v) { return localStorage.setItem(i, JSON.stringify(v)) }, //function () { return Promise.resolve('mock'); }
+			set: function(i, v) { 
+				localStorage.setItem(i, JSON.stringify(v)) 
+				return Promise.resolve('finished saving mock batch session');
+			}, 
+		},
+		onLoad: function () {
+			return Promise.resolve('jatos mock is running');
 		},
 		workerId: 1,
 		studyResultId: Date.now(),

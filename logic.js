@@ -175,9 +175,7 @@ var logic = {
       reward = Math.round(non_rounded_reward * 100) / 100; // just making it rounded to two decimal points.
 
       var dataToSave = { subID: jatos.workerId, context: backGroundStim, coin: coin, devalueToday: devalueToday, isDevalued: isDevalued, isWin: isWin, reward: reward, day: dayOfExperiment, startTime: new Date(), time: 'start', isFirstTime: false };
-      data_helper.set_subject_data(dataToSave);
-
-      return dataToSave;      
+      return dataToSave;                
     } else {
       // SET FIRST ENTRY STUFF (isWin, day, devaluation)
       // --------------------------
