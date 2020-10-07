@@ -39,7 +39,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 			document.getElementById('lower_half').onclick = undefined;
 			document.getElementById('upper_half').onclick = undefined;
 
-			if (!!window.isWin) {
+			if (isWin) {
 				dom_helper.set_text('welcome_msg_txt', "YESSSS");
 			} else {
 				dom_helper.set_text('welcome_msg_txt', "NOOOO");
@@ -57,7 +57,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 					var runData = subData[jatos.studyResultId];
 
 					// TODO - consider turning it to csv at this point
-					
+
 					jatos.appendResultData(runData).then(function () {
 						console.log('finished');
 					});

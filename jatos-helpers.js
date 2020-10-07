@@ -4,6 +4,7 @@ if (!window.jatos) {
 		appendResultData: function(resultData) {
 			console.log('This results would have been sent to jatos server:')
 			console.log(resultData);
+			return Promise.resolve(resultData);
 		},
 		batchSession: { 
 			get: function(v) { 
