@@ -10,7 +10,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 
 	    var lowerHalfClicked = false;    
 
-	    var p1 = new Promise((resolve, reject) => {    	
+	    var p1 = new Promise((resolve, reject) => {
 		    document.getElementById('lower_half').onclick = function() {
 		    	if (!lowerHalfClicked) {
 		    		// TODO - add click animation			    	    	
