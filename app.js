@@ -1,8 +1,14 @@
 Promise.all([jatos.loaded(), wait(2000)]).then(function() {
-	var subData = data_helper.get_subject_data(true);
-	var runData = logic.initialize(subData, 'A');
+	// get custom settings for component and batch
+	var settings = Object.assign({ }, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
 
-	data_helper.set_subject_data(runData).then(function () {
+	// get subject data from batch session
+	var subData = data_helper.get_subject_data(true);
+
+	// calculate run parameters
+	var runData = logic.initialize(subData, settings, 'A'); 
+
+	data_helper.append_subject_data(runData).then(function () {
 		dom_helper.hide("welcome_msg");
 
 	    dom_helper.show("upper_half");
@@ -14,7 +20,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 		    document.getElementById('lower_half').onclick = function() {
 		    	if (!lowerHalfClicked) {
 		    		// TODO - add click animation			    	    	
-		    		data_helper.set_subject_data({ subID: jatos.workerId, press1Time: new Date(), time: 'press1' })
+		    		data_helper.append_subject_data({ subID: jatos.workerId, press1Time: new Date(), time: 'press1' })
 		    			.then(function () { 
 	    					lowerHalfClicked = true;
 		    				resolve(); 
@@ -27,7 +33,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 		    document.getElementById('upper_half').onclick = function () {
 		    	if (lowerHalfClicked) {
 		    		// TODO - add click animation
-		    		data_helper.set_subject_data({ subID: jatos.workerId, press2Time: new Date(), time: 'press2' })
+		    		data_helper.append_subject_data({ subID: jatos.workerId, press2Time: new Date(), time: 'press2' })
 		    			.then(function () { 
 		    				resolve(); 
 		    			});
@@ -39,7 +45,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 			document.getElementById('lower_half').onclick = undefined;
 			document.getElementById('upper_half').onclick = undefined;
 
-			if (isWin) {
+			if (runData.isWin) {
 				dom_helper.set_text('welcome_msg_txt', "YESSSS");
 			} else {
 				dom_helper.set_text('welcome_msg_txt', "NOOOO");
@@ -51,7 +57,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 			dom_helper.show("welcome_msg");
 
 			// collect end time and save subject data as results
-			data_helper.set_subject_data({ subID: jatos.workerId, endTime: new Date(), time: 'end' })
+			data_helper.append_subject_data({ subID: jatos.workerId, endTime: new Date(), time: 'end' })
 				.then(function () {
 					var subData = data_helper.get_subject_data(false);
 					var runData = subData[jatos.studyResultId];

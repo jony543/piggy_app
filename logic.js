@@ -114,7 +114,7 @@ firstDevalDay = stimuliAssignment.firstDevalDay;
 lastDevalDay = stimuliAssignment.lastDevalDay;
 
 var logic = {
-	initialize: function(subData, backGroundStim) {
+	initialize: function(subData, settings, backGroundStim) {
     if (!!subData.length) { // if there is some data for this subject
       // CHECK IF WINNING
         // --------------------------
@@ -185,8 +185,5 @@ var logic = {
 
       return { isFirstTime: true }
     }
-  },
-	finish: function () {
-		return jatos.submitResultData(results);
-	}
+  }
 };

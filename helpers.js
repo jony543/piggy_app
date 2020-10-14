@@ -54,7 +54,7 @@ var data_helper = {
 			return (!!subjectData)? subjectData : {};
 		}
 	},
-	set_subject_data: function(data) { // returns promise
+	append_subject_data: function(data) { // returns promise
 		var subjectData = this.get_subject_data(false);
 			
 		if (!!subjectData[jatos.studyResultId]) {

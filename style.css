@@ -36,9 +36,17 @@
   text-align: center;
 }
 
+.stretched.horizontal {
+	width: 100%;
+}
+
+.stretched.vertical {
+	height: 100%;
+}
+
 /* Style the image inside the centered container, if needed */
 .centered img {
-  width: 150px;
+  width: 100%;
   border-radius: 50%;
 }
 	
