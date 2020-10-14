@@ -1,4 +1,10 @@
-if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+var isInWebAppiOS = window.navigator.standalone === true;
+var isInWebAppChrome =
+		window.matchMedia("(display-mode: fullscreen)").matches ||
+		window.matchMedia("(display-mode: standalone)").matches ||
+		window.matchMedia("(display-mode: minimal-ui)").matches;
+
+if ( isInWebAppiOS || isInWebAppChrome ) {
 	redirectToStudy();
 } else {
 	showInstallPromotion();
