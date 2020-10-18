@@ -161,7 +161,18 @@ var logic = {
     }
     let cost = InitializeCost(settings.cost)
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
-    var dataToSave = { subID: jatos.workerId, manipulationToday: whichManipulation, wasManipulationActivated: notifyManipulation, isUnderManipulation: isUnderManipulation, isWin: isWin, reward: reward, cost: cost, day: dayOfExperiment, startTime: startTime, isFirstTime: isFirstTime };
+    var dataToSave = { 
+      subID: jatos.workerId, 
+      manipulationToday: whichManipulation, 
+      wasManipulationActivated: notifyManipulation, 
+      isUnderManipulation: isUnderManipulation, 
+      isWin: isWin, 
+      reward: reward, 
+      cost: cost, 
+      day: dayOfExperiment, 
+      startTime: startTime, 
+      isFirstTime: isFirstTime 
+    };
     return dataToSave;
   }
 };

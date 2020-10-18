@@ -25,13 +25,25 @@ if (!window.jatos) {
 		workerId: '4',
 		batchId: '100',
 		studyResultId: Date.now(),
+		componentList: [{ title: "c1", id: 1 }, { title: "c2", id: 2 }],
+		startComponent: function (x) { console.log("should go to component " + x) },
 	}
 };
 
-window.jatos.loaded = function () {
-	return new Promise((resolve, reject) => {
-		jatos.onLoad(function () {
-			resolve('jatos is ready');
+Object.assign(jatos, {
+	loaded: function () {
+		return new Promise((resolve, reject) => {
+			jatos.onLoad(function () {
+				resolve('jatos is ready');
+			});
 		});
-	});
-};
+	},
+	goToComponent: function(name) {
+		console.log("going to component " + x);
+		for (c in jatos.componentList) {			
+			if (c.title == name) {
+				jatos.startComponent(c.id);
+			}
+		}		
+	}
+});

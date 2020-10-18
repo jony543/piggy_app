@@ -8,6 +8,11 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings); 
 
+	if (runData.isFirstTime) {
+		jatos.goToComponent("instructions");
+		return;
+	}
+
 	data_helper.append_subject_data(runData).then(function () {
 		dom_helper.hide("welcome_msg");
 
@@ -20,7 +25,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 		    document.getElementById('lower_half').onclick = function() {
 		    	if (!lowerHalfClicked) {
 		    		// TODO - add click animation			    	    	
-		    		data_helper.append_subject_data({ subID: jatos.workerId, press1Time: new Date(), time: 'press1' })
+		    		data_helper.append_subject_data({ press1Time: new Date() })
 		    			.then(function () { 
 	    					lowerHalfClicked = true;
 		    				resolve(); 
@@ -33,7 +38,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 		    document.getElementById('upper_half').onclick = function () {
 		    	if (lowerHalfClicked) {
 		    		// TODO - add click animation
-		    		data_helper.append_subject_data({ subID: jatos.workerId, press2Time: new Date(), time: 'press2' })
+		    		data_helper.append_subject_data({ press2Time: new Date() })
 		    			.then(function () { 
 		    				resolve(); 
 		    			});
