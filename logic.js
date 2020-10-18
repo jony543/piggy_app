@@ -107,7 +107,7 @@ var logic = {
     [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(jatos.workerId, app_settings);
     let isUnderManipulation = false;
     let whichManipulation = null;
-    let notifyManipulation = false;
+    let activateManipulation = false;
 
     let isFirstTime = !Object.keys(subData).length;
     if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
@@ -142,13 +142,13 @@ var logic = {
 
         // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
         const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation) // according to the median time in specified days
-
+debugger
         if (new Date() >= timeToManipulate) {
           // check if this is the first time the outcome should be devalued that day
           if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
-            (!subData.wasManipulationActivated[subData.wasManipulationActivated.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-            (subData.wasManipulationActivated[subData.wasManipulationActivated.length - 1] && !!subData.endTime[subData.endTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is an endTime to previous entry]
-            notifyManipulation = true;
+            (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
+            (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.endTime[subData.endTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is an endTime to previous entry]
+            activateManipulation = true;
             isWin = true; // On the devaluation indication time there is a certain win...
           } else {
             isUnderManipulation = true;
@@ -164,7 +164,7 @@ var logic = {
     var dataToSave = { 
       subID: jatos.workerId, 
       manipulationToday: whichManipulation, 
-      wasManipulationActivated: notifyManipulation, 
+      activateManipulation: activateManipulation, 
       isUnderManipulation: isUnderManipulation, 
       isWin: isWin, 
       reward: reward, 
@@ -176,3 +176,19 @@ var logic = {
     return dataToSave;
   }
 };
+
+/*
+// for Johnatan
+* manipulationToday -
+  null - do nothing special
+  devaluation - at some point of the day (when activateManipulation returns true) show a image of a full piggybank (in the middle of the screen) along with a message that the subject needs to confirm (and in future start a the coin collection task). This will happen after the participants will receive the coin (always the case the activateManipulation is true). It is best if there will be a small animation with the piggybank, say blinking a few times.
+  still_valued - The exact same as in ‘devaluation’ only the image will consist a half full piggy bank.
+* activateManipulation - when true do as described in manipulationToday (will never be true when manipulationToday is null)
+* isUnderManipulation - Currently nothin to do. in the future a curtain will probably cover the center of the screen to prevent from participants from seeing the results of their entry (the reason not to implement it yet is that we might put the curtain earlier on the days of manipulation.
+* isWin - if true show a coin and some text saying ‘you won’ (and the amount of the ‘reward’ variable). If false show a text message of not winning.
+* reward - use the amount for the text message in case of winning as pointed above.
+* cost - in case that app_settings.cost.isCost app_settings.cost.presentCost are set to true, show the cost amount in red in the upper right corner. The cost is set to be an array either of length 1 which imply a one time cost implemented after entering the app )before they can press it). The other option is 3 (as for now where the sequence includes 2 presses) and then in addition to the first indication of cost upon entry following each button press and indication of loss will be presented.
+* day - irrelevant for the flow. Maybe in future I’ll set an endDay variable and then if they are the same etc the participants will get noticed that the experiment is completed.
+* startTime - the time recorded on entry. Maybe useful to set stuff with respect to the startTime if it is necessary or convenient.
+* isFirstTime - boolean indicating the first time participants entered the app.
+*/

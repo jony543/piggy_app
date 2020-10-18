@@ -42,7 +42,7 @@ window.app_settings = {
 		devaluationNotificationText: 'הקופה מלאה, לא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.',
 		verifyBeginningText: 'לחצ/י אשר כדי להתחיל.',
 	},
-	dataVarList: ["serial", "subID", "manipulationToday", "wasManipulationActivated", "isUnderManipulation", "isWin", "reward", "cost", "day", "startTime", "time", "isFirstTime", "press1Time", "press2Time", "endTime"],
+	dataVarList: ["serial", "subID", "manipulationToday", "activateManipulation", "isUnderManipulation", "isWin", "reward", "cost", "day", "startTime", "time", "isFirstTime", "press1Time", "press2Time", "endTime"],
 }
 
 // contingency:
