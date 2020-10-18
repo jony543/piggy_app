@@ -3,8 +3,7 @@
 // ---------------------------------------------------------------
 
 window.app_settings = {
-	activateStep2: false, //just an example
-	pressesRequired = 2,
+	pressesRequired: 2,
 	isInstallation: false,
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
