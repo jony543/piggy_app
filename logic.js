@@ -142,7 +142,7 @@ var logic = {
 
         // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
         const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation) // according to the median time in specified days
-debugger
+
         if (new Date() >= timeToManipulate) {
           // check if this is the first time the outcome should be devalued that day
           if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
