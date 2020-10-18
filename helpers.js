@@ -5,16 +5,63 @@ var dom_helper = {
 	hide: function (id) {
 		this.add_css_class(id, "hidden");
 	},
-	add_css_class: function(id, css_class) {
+	add_css_class: function (id, css_class) {
 		document.getElementById(id).classList.add(css_class);
 	},
-	remove_css_class: function(id, css_class) {
+	remove_css_class: function (id, css_class) {
 		document.getElementById(id).classList.remove(css_class);
 	},
-	set_text: function(id, text) {
+	set_text: function (id, text) {
 		document.getElementById(id).innerHTML = text;
 	}
 };
+
+var data_helper = {
+	get_subject_data: function (asArray) {
+		var subjectData = jatos.batchSession.get(jatos.workerId + "_data");
+
+		if (!!asArray) {
+			//arr = []; for (v in subjectData) { arr.push(v); }
+			//return arr;
+			// ** COMMENTED (ABOVE) AND BY RANI AND CHANGED TO THE FOLLOWING: **
+			//initialize data
+			var data = {};
+			if (!!subjectData) {
+				// create one dictionnay for each line of data:
+				arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
+				// populate data variables:
+				app_settings.dataVarList.forEach(key => data[key] = []);
+				// fill dictionnary of arrays:
+				arrayOfObj.forEach(function (lineObject) {
+					for (const key of Object.keys(data)) {
+						data[key].push(lineObject[key]);
+					}
+				});
+			};
+			return data;
+
+		} else {
+			return (!!subjectData) ? subjectData : {};
+		}
+	},
+	append_subject_data: function (data) { // returns promise
+		var subjectData = this.get_subject_data(false);
+
+		if (!!subjectData[jatos.studyResultId]) {
+			var runData = subjectData[jatos.studyResultId];
+			Object.assign(runData, data);
+			subjectData[jatos.studyResultId] = runData;
+		} else {
+			subjectData[jatos.studyResultId] = data;
+		}
+
+		return jatos.batchSession.set(jatos.workerId + "_data", subjectData);
+	}
+};
+
+// ***************************************************************
+//                 Helper functions (by Rani):
+// ---------------------------------------------------------------
 
 function dateDiff(date1, date2) {
 	date1.setHours(0, 0, 0, 0);
@@ -27,44 +74,34 @@ function dateDiff(date1, date2) {
 }
 
 function wait(delay) {
-    return new Promise(function(resolve) {
-        setTimeout(resolve, delay);
-    });
+	return new Promise(function (resolve) {
+		setTimeout(resolve, delay);
+	});
 }
 
 Array.prototype.multiIndexOf = function (el) {
 	var idxs = [];
 	for (var i = this.length - 1; i >= 0; i--) {
-	  if (this[i] === el) {
-	    idxs.unshift(i);
-	  }
+		if (this[i] === el) {
+			idxs.unshift(i);
+		}
 	}
 	return idxs;
 };
 
-
-var data_helper = {
-	get_subject_data: function(asArray) {
-		var subjectData = jatos.batchSession.get(jatos.workerId + "_data");
-
-		if (!!asArray) {
-			arr = []; for (v in subjectData) { arr.push(v); }
-			return arr;
-		} else {
-			return (!!subjectData)? subjectData : {};
-		}
-	},
-	append_subject_data: function(data) { // returns promise
-		var subjectData = this.get_subject_data(false);
-			
-		if (!!subjectData[jatos.studyResultId]) {
-			var runData = subjectData[jatos.studyResultId];
-			Object.assign(runData, data);
-			subjectData[jatos.studyResultId] = runData;
-		} else {
-			subjectData[jatos.studyResultId] = data;
-		}		
-
-		return jatos.batchSession.set(jatos.workerId + "_data", subjectData);
+// A function to sort with indices I got from: https://stackoverflow.com/questions/3730510/javascript-sort-array-and-return-an-array-of-indicies-that-indicates-the-positi
+function sortWithIndices(toSort) {
+	for (var i = 0; i < toSort.length; i++) {
+		toSort[i] = [toSort[i], i];
 	}
-};
+	toSort.sort(function (left, right) {
+		return left[0] < right[0] ? -1 : 1;
+	});
+	toSort.sortIndices = [];
+	for (var j = 0; j < toSort.length; j++) {
+		toSort.sortIndices.push(toSort[j][1]);
+		toSort[j] = toSort[j][0];
+	}
+	return toSort;
+}
+

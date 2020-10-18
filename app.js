@@ -6,7 +6,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 	var subData = data_helper.get_subject_data(true);
 
 	// calculate run parameters
-	var runData = logic.initialize(subData, settings, 'A'); 
+	var runData = logic.initialize(subData, settings); 
 
 	data_helper.append_subject_data(runData).then(function () {
 		dom_helper.hide("welcome_msg");

@@ -22,7 +22,8 @@ if (!window.jatos) {
 		onLoad: function(func) {
 			func();
 		},
-		workerId: 1,
+		workerId: '4',
+		batchId: '100',
 		studyResultId: Date.now(),
 	}
 };
