@@ -24,7 +24,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 	    var p1 = new Promise((resolve, reject) => {
 		    document.getElementById('lower_half').onclick = function() {
 		    	if (!lowerHalfClicked) {
-		    		// TODO - add click animation			    	    	
+		    		dom_helper.remove_css_class('lower_half', 'blinkable');		    	    	
 		    		data_helper.append_subject_data({ press1Time: new Date() })
 		    			.then(function () { 
 	    					lowerHalfClicked = true;
@@ -37,7 +37,7 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 		var p2 = new Promise((resolve, reject) => {
 		    document.getElementById('upper_half').onclick = function () {
 		    	if (lowerHalfClicked) {
-		    		// TODO - add click animation
+		    		dom_helper.remove_css_class('upper_half', 'blinkable');
 		    		data_helper.append_subject_data({ press2Time: new Date() })
 		    			.then(function () { 
 		    				resolve(); 

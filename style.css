@@ -23,6 +23,22 @@
     height: 50%;  
 }
 
+.blinkable:after {
+  content: "";
+  display: block;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: #FFFFFF;
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 0.5s;
+}
+
+.blinkable:active:after {
+  opacity: 0.6;
+}
+
 .upper.separate {
 	border-bottom-style: solid;
     border-bottom-width: 2px;
