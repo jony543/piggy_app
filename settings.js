@@ -4,6 +4,7 @@
 
 window.app_settings = {
 	activateStep2: false, //just an example
+	pressesRequired = 2,
 	isInstallation: false,
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
@@ -24,6 +25,16 @@ window.app_settings = {
 		// for constant reward:
 		rewardConstantSum: 25,
 	},
+	cost: {
+		isCost: false,
+		isCostPerPress: false,
+		isVariableCost: false,
+		minCostSum: 1,
+		maxCostSum: 5,
+		// for constant cost:
+		costConstantSum: 1,
+		presentCost: false, // O'Doherty did not use visual feedback for the cost, Gillan did (in their MB-MF with devaluation study)
+	},
 	text: {
 		welcomeText: 'ששלום',
 		winningText: 'זכית ב- ',
@@ -32,7 +43,7 @@ window.app_settings = {
 		devaluationNotificationText: 'הקופה מלאה, לא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.',
 		verifyBeginningText: 'לחצ/י אשר כדי להתחיל.',
 	},
-	dataVarList: ["serial", "subID", "context", "coin", "manipulationToday", "wasManipulationActivated", "isUnderManipulation", "isWin", "reward", "day", "startTime", "time", "isFirstTime", "press1Time", "press2Time", "endTime"],
+	dataVarList: ["serial", "subID", "manipulationToday", "wasManipulationActivated", "isUnderManipulation", "isWin", "reward", "cost", "day", "startTime", "time", "isFirstTime", "press1Time", "press2Time", "endTime"],
 }
 
 // contingency:

@@ -80,6 +80,24 @@ function getManipulationStartingTime(subData, daysToBaseUponManipulation) {
   return timeToManipulate
 }
 
+function InitializeCost(cost_settings) {
+  if (cost_settings.isCost) { // the syntax is based on the assignReward function defined above.
+    if (!cost_settings.isVariableCost) {
+      return cost_settings.isCostPerPress ? new Array(app_settings.pressesRequired + 1).fill(cost_settings.costConstantSum) : [cost_settings.costConstantSum];
+    } else {
+      let cost = [];
+      const n_costs = cost_settings.isCostPerPress ? app_settings.pressesRequired + 1 : 1;
+      for (i = 0; i < n_costs; i++) {
+        let non_rounded_cost = Math.random() * (cost_settings.maxCostSum - cost_settings.minCostSum) + cost_settings.minCostSum;
+        cost.push(Math.round(non_rounded_cost * 100) / 100); // just making it rounded to two decimal points.  
+      }
+      return cost
+    }
+  } else {
+    return [0]
+  }
+}
+
 // ****************************************************************
 //           LOGIC / Run Data (calculate run parameters):
 // ----------------------------------------------------------------
@@ -104,12 +122,10 @@ var logic = {
       devalueToday = dayOfExperiment === firstDevalDay || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
       comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment    
       if (devalueToday || comparableValuedToday) {
-        whichManipulation=['devaluation', 'still_valued'].filter((item, i) => [devalueToday, comparableValuedToday][i])[0];
+        whichManipulation = ['devaluation', 'still_valued'].filter((item, i) => [devalueToday, comparableValuedToday][i])[0];
       };
 
       // OPERATE DEVALUATION DAY
-      devalueToday = true //************** TEMP TEMP TEMP */
-      dayOfExperiment=4
       // ---------------------------
       if (devalueToday || comparableValuedToday) {
         // resolving which days to base devaluation time on:
@@ -129,10 +145,9 @@ var logic = {
 
         if (new Date() >= timeToManipulate) {
           // check if this is the first time the outcome should be devalued that day
-          debugger
-          if (subData.day[subData.day.length-1] !== dayOfExperiment || // activate anyway if last entry was yesterday
-            (!subData.wasManipulationActivated[subData.wasManipulationActivated.length-1] && !subData.isUnderManipulation[subData.isUnderManipulation.length-1])|| // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-            (subData.wasManipulationActivated[subData.wasManipulationActivated.length-1] && !!subData.endTime[subData.endTime.length-1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is an endTime to previous entry]
+          if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
+            (!subData.wasManipulationActivated[subData.wasManipulationActivated.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
+            (subData.wasManipulationActivated[subData.wasManipulationActivated.length - 1] && !!subData.endTime[subData.endTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is an endTime to previous entry]
             notifyManipulation = true;
             isWin = true; // On the devaluation indication time there is a certain win...
           } else {
@@ -144,8 +159,9 @@ var logic = {
       isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit());
       dayOfExperiment = 1;
     }
+    let cost = InitializeCost(settings.cost)
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
-    var dataToSave = { subID: jatos.workerId, manipulationToday: whichManipulation, wasManipulationActivated: notifyManipulation, isUnderManipulation: isUnderManipulation, isWin: isWin, reward: reward, day: dayOfExperiment, startTime: startTime, isFirstTime: isFirstTime };
+    var dataToSave = { subID: jatos.workerId, manipulationToday: whichManipulation, wasManipulationActivated: notifyManipulation, isUnderManipulation: isUnderManipulation, isWin: isWin, reward: reward, cost: cost, day: dayOfExperiment, startTime: startTime, isFirstTime: isFirstTime };
     return dataToSave;
   }
 };
