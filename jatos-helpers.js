@@ -40,9 +40,9 @@ Object.assign(jatos, {
 	},
 	goToComponent: function(name) {
 		console.log("going to component " + name);
-		for (c in jatos.componentList) {			
-			if (c.title == name) {
-				jatos.startComponent(c.id);
+		for (compId in jatos.componentList) {			
+			if (jatos.componentList[compId].title == name) {
+				jatos.startComponent(jatos.componentList[compId].id);
 			}
 		}		
 	}

@@ -8,12 +8,12 @@ Promise.all([jatos.loaded(), wait(2000)]).then(function() {
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings); 
 
-	if (runData.isFirstTime) {
-		jatos.goToComponent("instructions");
-		return;
-	}
-
 	data_helper.append_subject_data(runData).then(function () {
+		if (runData.isFirstTime) {
+			jatos.goToComponent("instructions");
+			return;
+		}
+
 		dom_helper.hide("welcome_msg");
 
 	    dom_helper.show("upper_half");
