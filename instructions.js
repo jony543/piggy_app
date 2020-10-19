@@ -29,23 +29,23 @@ var test = {
 	timeline: [ 
 		{
 			stimulus: '<h1>Q 1</h1>',
-			choices: ['A', 'B', 'C', 'D'],
+			choices: () => shuffle(['A', 'B', 'C', 'D']),
 			on_finish: function (data) {
-				data.correct = data.button_pressed == 1; // option B
+				data.correct = data.button_pressed == this.choices.indexOf('B'); // option B
 			}
 		},
 		{
 			stimulus: '<h1>Q 2</h1>',
-			choices: ['A', 'B', 'C', 'D'],
+			choices: () => shuffle(['A', 'B', 'C', 'D']),
 			on_finish: function (data) {
-				data.correct = data.button_pressed == 3; // option D
+				data.correct = data.button_pressed == this.choices.indexOf('D'); // option D
 			}
 		},
 		{
 			stimulus: '<h1>Q 3</h1>',
-			choices: ['A', 'B', 'C', 'D'],
+			choices: () => shuffle(['A', 'B', 'C', 'D']),
 			on_finish: function (data) {
-				data.correct = data.button_pressed == 0; // option A
+				data.correct = data.button_pressed == this.choices.indexOf('A'); // option A
 			}
 		}
 	]
@@ -54,14 +54,16 @@ var test = {
 var instructionsLoop = {
     timeline: [instructions, test],
     loop_function: function(data) {
-    	// check if there is a single mistake return to start
-        if(jsPsych.data.get().filter({ trialType: 'test', correct: false }).count() > 0) { 
+		// check if there is a single mistake return to start
+		const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
+		const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
+		if (relevantData.filter({ trialType: 'test', correct: false }).count() > 0) {
             return true;
         } else {
             return false;
         }
     }
-}
+};
 
 timeline.push(instructionsLoop);
 

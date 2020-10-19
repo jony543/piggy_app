@@ -89,6 +89,14 @@ Array.prototype.multiIndexOf = function (el) {
 	return idxs;
 };
 
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 // A function to sort with indices I got from: https://stackoverflow.com/questions/3730510/javascript-sort-array-and-return-an-array-of-indicies-that-indicates-the-positi
 function sortWithIndices(toSort) {
 	for (var i = 0; i < toSort.length; i++) {
