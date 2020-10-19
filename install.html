@@ -3,7 +3,6 @@
     <head>
         <title>Get App</title>
         <meta charset="UTF-8">   
-        <script src="helpers.js"></script>         
 
         <link rel="stylesheet" type="text/css"href="style.css">
 
@@ -41,14 +40,43 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="apple-mobile-web-app-title" content="App">
     </head>
-    <body>    
-        <div id="installInstructions" class="centered hidden">
+    <body id="body-element">    
+        <div id="installInstructions" style="visibility: hidden;" class="centered">
             <h1>Install the app already...</h1>
             <h2>It's very simple</h2>
-        </div>    
-        <div id="loading" class="centered stretched horizontal">
+        </div>   
+        <div id="loading" class="centered stretched horizontal" style="visibility: visible;">
             <img src="images/loading.gif" />
-        </div>  
+        </div> 
+        <iframe id="iframe-element" src="/" onload="onMyFrameLoad(this)" style="visibility: hidden; position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
+            Your browser doesn't support iframes
+        </iframe>                        
     </body>
-    <script src="install.js"></script>
+    <script>
+        var isInWebAppiOS = window.navigator.standalone === true;
+        var isInWebAppChrome =
+                window.matchMedia("(display-mode: fullscreen)").matches ||
+                window.matchMedia("(display-mode: standalone)").matches ||
+                window.matchMedia("(display-mode: minimal-ui)").matches;
+
+        if ( isInWebAppiOS || isInWebAppChrome ) {
+            var userId = /[&?]userId=([^&]+)/.exec(location.search)[1];
+            var studyId= 9;
+            var batchId = /[&?]batchId=([^&]+)/.exec(location.search)[1];
+
+            var xxx = "/experiments/publix/" + studyId + "/start?" +
+                                "batchId=" + batchId + 
+                                "&personalMultipleWorkerId=" + userId;
+            
+            document.getElementById('iframe-element').style.visibility = 'visible';
+            document.getElementById('iframe-element').src = xxx;
+        } else {
+            document.getElementById('loading').style.visibility = 'hidden';
+            document.getElementById('installInstructions').style.visibility = 'visible';
+        }
+
+        function onMyFrameLoad() {
+            document.getElementById('loading').style.visibility = 'hidden';
+        };
+    </script>
 </html>
