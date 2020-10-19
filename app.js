@@ -1,4 +1,4 @@
-Promise.all([jatos.loaded(), wait(2000)]).then(function() {
+jatos.loaded().then(function() {
 	// get custom settings for component and batch
 	var settings = Object.assign({ }, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
 
