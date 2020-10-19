@@ -11,7 +11,7 @@
         <script src="logic.js"></script>
 
         <link rel="stylesheet" type="text/css"href="style.css">
-        <!-- added by Rani  -->
+
         <link rel="apple-touch-icon" sizes="57x57" href="icons/apple-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="icons/apple-icon-60x60.png">
         <link rel="apple-touch-icon" sizes="72x72" href="icons/apple-icon-72x72.png">
@@ -21,16 +21,22 @@
         <link rel="apple-touch-icon" sizes="144x144" href="icons/apple-icon-144x144.png">
         <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-icon-152x152.png">
         <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
-        <!-- -- -- -- -- --  -->
+        
+        <link rel="manifest" href="icons/manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="icons/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+
         <link rel="icon" type="image/png" sizes="192x192" href="icons/android-icon-192x192.png">
         <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
         <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     </head>
     <body class="bg">         
-        <div class="container">
+        <div id="main_container" class="container">
             <div id="welcome_msg" class="centered"><h1 id="welcome_msg_txt">שלום</h1></div>
-            <div class="split upper separate hidden blinkable" id="upper_half"></div>
+            <img id="piggy_full" class="centered hidden" src="images/container_gold_full.png"/>
+            <div class="split upper separate hidden" id="upper_half"></div>
             <div class="split lower separate hidden blinkable" id="lower_half"></div>
         </div>      
     </body>

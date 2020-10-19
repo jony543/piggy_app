@@ -13,6 +13,9 @@ var dom_helper = {
 	},
 	set_text: function (id, text) {
 		document.getElementById(id).innerHTML = text;
+	},
+	append_html: function (id, html) {
+		document.getElementById(id).insertAdjacentHTML('beforeend', html);
 	}
 };
 

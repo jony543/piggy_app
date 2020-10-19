@@ -58,6 +58,31 @@
   text-align: center;
 }
 
+#lottery {
+  width: 85%;
+}
+
+.dance {
+  position: absolute;  
+  animation-name: dance_animation;
+  animation-duration: 1s;
+  animation-iteration-count: 2;
+  animation-direction: normal;  
+}
+
+@keyframes dance_animation {
+  0%   { padding: 0px 0px 0px 0px; } /* top right bottom left */
+  20%  { padding: 0px 0px 10% 0px; }
+  40%  { padding: 0px 0px 0px 0px; }
+  60%  { padding: 0px 10% 0px 0px; }
+  80%  { padding: 0px 0px 0px 15% }
+  100% { padding: 0px 0px 0px 0px; }
+}
+
+.stretched {
+  position: absolute;
+}
+
 .stretched.horizontal {
 	width: 100%;
 }
