@@ -6,13 +6,19 @@ var instructions = {
 	},
 	type: 'html-button-response',
 	trial_duration: undefined, // no time limit
-	choices: ['Next'],
-	timeline: [ 
+	choices: ['Previous', 'Next'],
+	timeline: [
 		{
-			stimulus: '<h1>page 1</h1>',
+			stimulus: '<h1>page 1</h1>' +
+				'<h2>page 1</h2>' +
+				'<h3>page 1</h3>' +
+				"<div style='float: center;'><img src='images/coin_gold.png'></img>" +
+				"<p><strong>Press the F key</strong></p></div>",
 		},
 		{
-			stimulus: '<h1>page 2</h1>',
+			stimulus: '<h1>page 2</h1>' +
+				"<div style='float: center;'><img src='images/instructions/instructions_2.jpg'></img>" +
+				"<p><strong>Press the F key</strong></p></div>",
 		},
 		{
 			stimulus: '<h1>page 3</h1>',
@@ -20,13 +26,35 @@ var instructions = {
 	]
 };
 
+/* Switch to this version for previous and backwards buttons
+var instructions = {
+	data: {
+		trialType: 'instruction',
+	},
+    type: 'instructions',
+    pages: [
+        'Welcome to the experiment. Click next to begin.',
+        'This is the second page of instructions.',
+		'This is the final page.',
+		'<h2>page 1</h2>' +
+		'<h3>page 1</h3>' +
+		"<div style='float: center;'><img src='images/coin_gold.png'></img>" +
+		"<p><strong>Press the F key</strong></p></div>",
+
+	],
+	button_label_previous: 'MyPrevious' ,
+	button_label_next: 'MyNext',
+    show_clickable_nav: true
+};
+//*/
+
 var test = {
 	data: {
 		trialType: 'test',
 	},
 	type: 'html-button-response',
 	trial_duration: undefined, // no time limit
-	timeline: [ 
+	timeline: [
 		{
 			stimulus: '<h1>Q 1</h1>',
 			choices: () => shuffle(['A', 'B', 'C', 'D']),
@@ -52,28 +80,28 @@ var test = {
 };
 
 var instructionsLoop = {
-    timeline: [instructions, test],
-    loop_function: function(data) {
+	timeline: [instructions, test],
+	loop_function: function (data) {
 		// check if there is a single mistake return to start
 		const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
 		const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
 		if (relevantData.filter({ trialType: 'test', correct: false }).count() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+			return true;
+		} else {
+			return false;
+		}
+	}
 };
 
 timeline.push(instructionsLoop);
 
-jatos.onLoad(function() {
-	jsPsych.init( {
-        timeline: timeline,
-        //display_element: 'jspsych-display-element',
-        on_finish: function() {
-            var resultJson = jsPsych.data.get().json(); // optioinal - change .json() to .csv()
-            jatos.appendResultData(resultJson).then(console.log('bye'));
-        }
-    }); 
+jatos.onLoad(function () {
+	jsPsych.init({
+		timeline: timeline,
+		//display_element: 'jspsych-display-element',
+		on_finish: function () {
+			var resultJson = jsPsych.data.get().json(); // optioinal - change .json() to .csv()
+			jatos.appendResultData(resultJson).then(console.log('bye'));
+		}
+	});
 });
