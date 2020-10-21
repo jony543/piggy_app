@@ -68,14 +68,14 @@ function assignReward(rewardsData) {
 }
 
 // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
-function getManipulationStartingTime(subData, daysToBaseUponManipulation) {
+function getManipulationStartingTime(subData, daysToBaseUponManipulation, referenceDayPrecentile) {
   const entryTimes2BaseManipulationIndices = [].concat.apply([], daysToBaseUponManipulation.map(x => subData.day.multiIndexOf(x))); // get relevant indices of the relevant times
   const entryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // get the relevant times (startTime)
   const copyOfEntryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // a copy of the previos var
   const timeZeroOfTheseDays = entryTimes2BaseManipulation.map((x, ind) => x - copyOfEntryTimes2BaseManipulation[ind].setHours(0, 0, 0, 0)); // using the copy to calculate the in each day (in ms I think) regardless of the data
   sortWithIndices(timeZeroOfTheseDays); // sort and add an object of sorted indices
   const sortedEntryTimes2BaseManipulationTime = timeZeroOfTheseDays.sortIndices.map(x => entryTimes2BaseManipulation[x]); // sort the entry times regardless of date...
-  const timeToManipulate = sortedEntryTimes2BaseManipulationTime[Math.floor((sortedEntryTimes2BaseManipulationTime.length - 1) / 2)]; // get the time from which to devalue/still-valued manipulation (according to the median; if even taking the earlier)
+  const timeToManipulate = sortedEntryTimes2BaseManipulationTime[Math.floor((sortedEntryTimes2BaseManipulationTime.length - 1) * referenceDayPrecentile)]; // get the time from which to devalue/still-valued manipulation (according to the median; if even taking the earlier); * if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
   timeToManipulate.setFullYear(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()); // change the date to today (without changing the time.
   return timeToManipulate
 }
@@ -96,6 +96,20 @@ function InitializeCost(cost_settings) {
   } else {
     return [0]
   }
+}
+
+function checkIfToHideOutcome(hideOutcome) {
+  if (hideOutcome.hide) { // If to hide outcomes
+    if (isUnderManipulation && hideOutcome.hideOnlyUnderManipulationPeriods) { // If it's manipulation time and hiding is on only during manipulations.
+      return true;
+    } else if (!hideOutcome.hideOnlyUnderManipulationPeriods && hideOutcome.daysToHideAt.includes(dayOfExperiment)) {
+      const timeToHideOutcome = getManipulationStartingTime(subData, hideOutcome.daysToBaseUponHidingTime[hideOutcome.daysToHideAt.indexOf(dayOfExperiment)], hideOutcome.relativeTimeOfDayToStart) // according to the median time in specified days
+      if (new Date() >= timeToHideOutcome) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 // ****************************************************************
@@ -141,7 +155,7 @@ var logic = {
         }
 
         // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
-        const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation) // according to the median time in specified days
+        const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation) // according to the median time in specified days
 
         if (new Date() >= timeToManipulate) {
           // check if this is the first time the outcome should be devalued that day
@@ -155,23 +169,29 @@ var logic = {
           };
         }
       }
+
+      // Hide outcome
+      // ---------------------------
+      var toHideOutcome = checkIfToHideOutcome(settings.hideOutcome)
+
     } else { // if it is the first entry
       isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit());
       dayOfExperiment = 1;
     }
     let cost = InitializeCost(settings.cost)
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
-    var dataToSave = { 
-      subID: jatos.workerId, 
-      manipulationToday: whichManipulation, 
-      activateManipulation: activateManipulation, 
-      isUnderManipulation: isUnderManipulation, 
-      isWin: isWin, 
-      reward: reward, 
-      cost: cost, 
-      day: dayOfExperiment, 
-      startTime: startTime, 
-      isFirstTime: isFirstTime 
+    var dataToSave = {
+      subID: jatos.workerId,
+      day: dayOfExperiment,
+      isWin: isWin,
+      reward: reward,
+      cost: cost,
+      manipulationToday: whichManipulation,
+      activateManipulation: activateManipulation,
+      isUnderManipulation: isUnderManipulation,
+      hideOutcome: toHideOutcome,
+      isFirstTime: isFirstTime,
+      startTime: startTime
     };
     return dataToSave;
   }
