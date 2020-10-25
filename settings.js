@@ -57,6 +57,7 @@ window.app_settings = {
 		goodbyeText: 'נתראה בפעם הבאה',
 		devaluationNotificationText: 'הקופה מלאה, לא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.',
 		verifyBeginningText: 'לחצ/י אשר כדי להתחיל.',
+		dayBeginningMessage: 'תא המטען של החללית פנוי לאיסוף זהב',
 	},
 	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome"],
 }

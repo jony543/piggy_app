@@ -89,7 +89,7 @@ function assignReward(rewardsData) {
 function getManipulationStartingTime(subData, daysToBaseUponManipulation, referenceDayPrecentile) {
   const entryTimes2BaseManipulationIndices = [].concat.apply([], daysToBaseUponManipulation.map(x => subData.day.multiIndexOf(x))); // get relevant indices of the relevant times
   const entryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // get the relevant times (startTime)
-  const copyOfEntryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // a copy of the previos var
+  const copyOfEntryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // a copy of the previous var
   const timeZeroOfTheseDays = entryTimes2BaseManipulation.map((x, ind) => x - copyOfEntryTimes2BaseManipulation[ind].setHours(0, 0, 0, 0)); // using the copy to calculate the in each day (in ms I think) regardless of the data
   sortWithIndices(timeZeroOfTheseDays); // sort and add an object of sorted indices
   const sortedEntryTimes2BaseManipulationTime = timeZeroOfTheseDays.sortIndices.map(x => entryTimes2BaseManipulation[x]); // sort the entry times regardless of date...
@@ -130,6 +130,14 @@ function checkIfToHideOutcome(hideOutcome) {
   return false;
 }
 
+function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
+  // check if reset of the container was already done today:
+  const dayBeginning = new Date(new Date().setHours(0, 0, 0, 0)); // get the date of ths day but with hours 00:00:00
+  const firstToday = subData.startTime.find((x)=> new Date(x) > dayBeginning); // get the first entry of this day
+  const resetContainerToday = subData.rewardContainerReset.slice(subData.startTime.indexOf(firstToday)) // slice the rewardContainerReset part according to all entries of today
+  return !resetContainerToday.some((x)=>!!x) && new Date().getHours() > hourAtDayToResetRewardContainer? true : false;
+}
+    
 // ****************************************************************
 //           LOGIC / Run Data (calculate run parameters):
 // ----------------------------------------------------------------
@@ -140,6 +148,7 @@ var logic = {
     let isUnderManipulation = false;
     let whichManipulation = null;
     let activateManipulation = false;
+    let resetContainer = false;
 
     let isFirstTime = !Object.keys(subData).length;
     if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
@@ -187,6 +196,13 @@ var logic = {
           };
         }
       }
+debugger
+
+      // reset container
+      // ---------------------------
+      if (dayOfExperiment > 1) {
+        resetContainer = checkIfResetContainer(subData, hourAtDayToResetRewardContainer)
+      }
 
       // Hide outcome
       // ---------------------------
@@ -198,6 +214,7 @@ var logic = {
     }
     let cost = InitializeCost(settings.cost)
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
+    
     var dataToSave = {
       subID: jatos.workerId,
       day: dayOfExperiment,
@@ -230,3 +247,15 @@ var logic = {
 * startTime - the time recorded on entry. Maybe useful to set stuff with respect to the startTime if it is necessary or convenient.
 * isFirstTime - boolean indicating the first time participants entered the app.
 */
+
+
+//// I created but not in use for now...:
+//// Check if the time to reset the container has arrived (i.e., it's a new day):
+//lastEntry=new Date(subData.startTime[subData.startTime.length-1])
+//lastEntryDateArray=[lastEntry.getDate(), lastEntry.getMonth(), lastEntry.getFullYear()]
+//todayDate = [new Date().getDate(), new Date().getMonth(), new Date().getFullYear()]
+//firstEntryToday = JSON.stringify(todayDate) !== JSON.stringify(lastEntryDateArray)
+
+
+
+
