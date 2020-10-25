@@ -72,7 +72,9 @@ jatos.loaded().then(function() {
 				// get time of outcome presentation: **
 				data_helper.append_subject_data({ outcomeTime: new Date() })
 				// register outcome viewing after 250ms: **
-				wait(250).then( () => data_helper.append_subject_data({ viewedOutcome: true }))
+				wait(250).then( () =>{ data_helper.append_subject_data({ viewedOutcome: true })
+				dom_helper.hide("welcome_msg");
+			})
 
 				wait(2000).then(function () { // show winning message for 2 seconds 				
 					if (runData.activateManipulation) {

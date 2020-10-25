@@ -14,7 +14,7 @@ window.app_settings = {
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	rewards: {
 		isRatioSchedule: true,
-		winningRate: 2, //per entries if isRatioSchedule is true; per seonds if isRatioSchedule is false, 
+		winningRate: 2, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
 		winningChancePerUnit : function() {
 			return 1/ this.winningRate;
 		  },
@@ -24,6 +24,12 @@ window.app_settings = {
 		maxWinningSum: 30,
 		// for constant reward:
 		rewardConstantSum: 25,
+		
+		// Sure win stuff:
+		winAnywayIfMultipleNonWins: true, // this is to make sure that in case a participant did not win many times they will.
+		RelativeNonWinUnitsBeforeSureWinning : function() {
+			return this.winningRate * 2; // this means that if for example this is a variable ratio of 10, after 20 no wins the 21 attempt will be a sure win.
+		  },
 	},
 	cost: {
 		isCost: false,

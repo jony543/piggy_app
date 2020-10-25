@@ -42,14 +42,31 @@ function getTimeFromLastEntryInSec(timePoint) {
   return diffSeconds;
 }
 
-function checkWinning(subData, isRatioSchedule, winningChancePerUnit) {
-  debugger
-  if (isRatioSchedule) {
-    return Math.random() < winningChancePerUnit;
+function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayIfMultipleNonWins) {
+  if (isRatioSchedule) { // RI schedule
+    if (winAnywayIfMultipleNonWins && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
+      const indicesWithViewingOutcome = subData.viewedOutcome.multiIndexOf(true)
+      const relevantIndicesToCheck = indicesWithViewingOutcome.slice(length-app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
+      if (!relevantIndicesToCheck.filter((x)=>subData.isWin[x]).length) { // this checks if there was no win in the relevant times.
+        return true
+      }
+    } else {
+      return Math.random() < winningChancePerUnit;
+    }
   } else { // namely a VI schedule
     if (!!Object.keys(subData).length) { // if there is some data for this subject
-      const lastEntryTime = new Date([...subData.outcomeTime].reverse().find(element => !!element)); // [NOTE] Make sure later it always takes the final line. Consider if this should be the start time or the endtime or reward time
-      var secsFromLastEntry = getTimeFromLastEntryInSec(lastEntryTime);
+      if (winAnywayIfMultipleNonWins && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
+      const ms_per_second = 1000;
+      const timeToCheckBack = new Date(new Date() - ms_per_second * app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
+      const firstEntryAfterTimeToCheck = subData.outcomeTime.find((x)=> new Date(x) > timeToCheckBack)
+      const relevantentries = subData.viewedOutcome.slice(subData.outcomeTime.indexOf(firstEntryAfterTimeToCheck))
+      if (!firstEntryAfterTimeToCheck || !relevantentries.some((x)=>!!x)){ // if there was no entry after the time to check or there was no win in every entry since the time to check
+        return true
+        }
+      } else {
+        const lastEntryTime = new Date([...subData.outcomeTime].reverse().find(element => !!element)); // [NOTE] Make sure later it always takes the final line. Consider if this should be the start time or the endtime or reward time
+        var secsFromLastEntry = getTimeFromLastEntryInSec(lastEntryTime);
+        }
     } else { // i.e., first entry
       var secsFromLastEntry = 1;
     }
@@ -127,7 +144,7 @@ var logic = {
     let isFirstTime = !Object.keys(subData).length;
     if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
 
-      isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit());
+      isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
 
       // DEVALUATION / STILL-VALUED tests(check and set)
       // -------------------------------------------------------
@@ -176,7 +193,7 @@ var logic = {
       var toHideOutcome = checkIfToHideOutcome(settings.hideOutcome)
 
     } else { // if it is the first entry
-      isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit());
+      isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
       dayOfExperiment = 1;
     }
     let cost = InitializeCost(settings.cost)
