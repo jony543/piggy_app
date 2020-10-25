@@ -43,11 +43,12 @@ function getTimeFromLastEntryInSec(timePoint) {
 }
 
 function checkWinning(subData, isRatioSchedule, winningChancePerUnit) {
+  debugger
   if (isRatioSchedule) {
     return Math.random() < winningChancePerUnit;
   } else { // namely a VI schedule
     if (!!Object.keys(subData).length) { // if there is some data for this subject
-      const lastEntryTime = new Date(subData.press2Time[subData.press2Time.length - 1]); // [NOTE] Make sure later it always takes the final line. Consider if this should be the start time or the endtime or reward time
+      const lastEntryTime = new Date([...subData.outcomeTime].reverse().find(element => !!element)); // [NOTE] Make sure later it always takes the final line. Consider if this should be the start time or the endtime or reward time
       var secsFromLastEntry = getTimeFromLastEntryInSec(lastEntryTime);
     } else { // i.e., first entry
       var secsFromLastEntry = 1;
