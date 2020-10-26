@@ -4,11 +4,9 @@ jatos.loaded().then(function () {
 
 	// get subject data from batch session
 	var subData = data_helper.get_subject_data(true);
-	subData.resetContainer[166]=false /***** temp */
-	subData.resetContainer[170]=false /***** temp */
-	subData.resetContainer[173]=false /***** temp */
-
-	debugger
+	// subData.resetContainer[166]=false /***** temp */
+	// subData.resetContainer[170]=false /***** temp */
+	// subData.resetContainer[173]=false /***** temp */
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
@@ -30,6 +28,12 @@ jatos.loaded().then(function () {
 					data_helper.append_subject_data({ resetContainer: true })
 					console.log('C')
 				})
+		}
+
+		// show cost on top right corner if needed
+		if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+			dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, lgic.cost_on.entrance));
+			dom_helper.blink('cost_indicator', 1000);
 		}
 
 		dom_helper.hide("welcome_msg");
@@ -92,19 +96,19 @@ jatos.loaded().then(function () {
 				// register outcome viewing after 250ms: **
 				wait(250).then(() => data_helper.append_subject_data({ viewedOutcome: true }));
 
-				wait(2000).then(function () { // show winning message for 2 seconds 				
-					if (runData.activateManipulation) {
-						dom_helper.hide("welcome_msg");
+				wait(2000).then(function () { // show winning/loosing message for 2 seconds 
+					var devaluationOption = logic.isDevaluation(runData, settings);
 
-						if (runData.manipulationToday == 'devaluation') {
-							dom_helper.show("piggy_full");
-							dom_helper.add_css_class('piggy_full', 'dance');
-						}
-						if (runData.manipulationToday == 'still_valued') {
-							dom_helper.show("piggy_half");
-							dom_helper.add_css_class('piggy_full', 'dance');
-						}
+					if (devaluationOption == 'devaluation') {
+						dom_helper.hide("welcome_msg");
+						dom_helper.show("piggy_full");
+						dom_helper.add_css_class('piggy_full', 'dance');		
 					}
+					if (devaluationOption == 'still_valued') {
+						dom_helper.hide("welcome_msg");
+						dom_helper.show("piggy_half");
+						dom_helper.add_css_class('piggy_full', 'dance');		
+					}	
 
 					// collect end time and save subject data as results
 					data_helper.append_subject_data({ endTime: new Date() }).then(function () {

@@ -44,7 +44,7 @@ function getTimeFromLastEntryInSec(timePoint) {
 
 function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayIfMultipleNonWins) {
   if (isRatioSchedule) { // RI schedule
-    if (winAnywayIfMultipleNonWins && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
+    if (winAnywayIfMultipleNonWins && subData.viewedOutcome && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
       const indicesWithViewingOutcome = subData.viewedOutcome.multiIndexOf(true)
       const relevantIndicesToCheck = indicesWithViewingOutcome.slice(length - app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
       if (!relevantIndicesToCheck.filter((x) => subData.isWin[x]).length) { // this checks if there was no win in the relevant times.
@@ -223,6 +223,26 @@ var logic = {
       startTime: startTime
     };
     return dataToSave;
+  },
+  isDevaluation: function (runData, seetings) {
+    if (!!settings.forceDeval) 
+      return settings.forceDeval;
+
+    if (runData.activateManipulation)
+      return runData.manipulationToday; 
+
+    return null;
+  },
+  getCost: function (runData, settings, cost_on) {
+    return   settings.cost.isCost 
+             && settings.cost.presentCost 
+             && (runData.cost.length > (cost_on - 1)) 
+             && runData.cost[cost_on];
+  },
+  cost_on: {
+    entrance: 0,
+    click1: 1,
+    click2: 2
   }
 };
 
