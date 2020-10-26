@@ -54,6 +54,14 @@ window.app_settings = {
 		daysToBaseUponHidingTime: [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
+	durations: { //in ms
+		// every trial:
+		entranceMessage: 1000,
+		waitingForOutcomeAnim: 4500,
+		minTimeToIndicateOutcomeViewing: 250,
+		// manipulation:
+		manipulationAnim: 2000,
+	},
 	text: {
 		welcomeText: 'ששלום',
 		winningText: 'זכית ב- ',
@@ -61,14 +69,24 @@ window.app_settings = {
 		goodbyeText: 'נתראה בפעם הבאה',
 		devaluationNotificationText: 'הקופה מלאה, לא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.',
 		verifyBeginningText: 'לחצ/י אשר כדי להתחיל.',
-		rewardContainerClearingMessage: 'תא המטען של החללית פנוי לאיסוף זהב !\nכדי לאשר שקראת יש לכתוב את האותיות: ',
+		// alerts, prompts etc:
+		rewardContainerClearingMessage: 'תא המטען של החללית פנוי לאיסוף זהב !',
+		confirmationCodeTextMessage: '\nכדי לאשר שקראת יש לכתוב את האותיות: ',
+		manipulationMessage: function (manipulationType) {
+			if (manipulationType == 'devaluation') {
+				return '** הקופה מלאה **\nלא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.';
+			} else { // i.e., 'still_valued'
+				return '** הקופה חצי מלאה **\n\nלחצ/י על ok כדי לאשר.';
+			}
+		},
 	},
-	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome"],
+	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime"],
+	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 }
 
 // contingency:
 /////////////// !!!!!!!!!!  chancePerSec: 1 / winningRate,
-	// winningSum: (will be computed unifomly in the given range)
+// winningSum: (will be computed unifomly in the given range)
 // Notes
 // ------------
 // The short-circuit (&&) and spread operater assinmgnet (...) used for the assinments here were based on the technique described here: https://stackoverflow.com/questions/11704267/in-javascript-how-to-conditionally-add-a-member-to-an-object/40560953#40560953

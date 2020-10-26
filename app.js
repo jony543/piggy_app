@@ -4,11 +4,6 @@ jatos.loaded().then(function () {
 
 	// get subject data from batch session
 	var subData = data_helper.get_subject_data(true);
-	subData.resetContainer[166]=false /***** temp */
-	subData.resetContainer[170]=false /***** temp */
-	subData.resetContainer[173]=false /***** temp */
-
-	debugger
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
@@ -18,13 +13,13 @@ jatos.loaded().then(function () {
 			jatos.goToComponent("instructions");
 			return;
 		}
-		
+
 		if (runData.resetContainer) { // activating reseting container when relevant. **
 			console.log('A')
 			data_helper.append_subject_data({ resetContainer: false })
 				.then(() => {
 					console.log('B')
-					getConfirmation(settings.text.rewardContainerClearingMessage);	
+					getConfirmation(settings.text.rewardContainerClearingMessage + settings.text.confirmationCodeTextMessage, 'prompt');
 				})
 				.then(() => {
 					data_helper.append_subject_data({ resetContainer: true })
@@ -32,10 +27,12 @@ jatos.loaded().then(function () {
 				})
 		}
 
-		dom_helper.hide("welcome_msg");
+		wait(settings.durations.entranceMessage).then(() => { // **
+			dom_helper.hide("welcome_msg");
 
-		dom_helper.show("upper_half");
-		dom_helper.show("lower_half");
+			dom_helper.show("upper_half");
+			dom_helper.show("lower_half");
+		})
 
 		var lowerHalfClicked = false;
 
@@ -76,7 +73,7 @@ jatos.loaded().then(function () {
 			dom_helper.append_html('main_container',
 				'<img id="lottery" class="centered" src="images/lottery.gif"/>');
 
-			wait(4500).then(function () { // wait until gif animation is finished
+			wait(settings.durations.waitingForOutcomeAnim).then(function () { // wait until gif animation is finished
 				dom_helper.hide("lottery");
 
 				if (runData.isWin) {
@@ -89,13 +86,17 @@ jatos.loaded().then(function () {
 
 				// get time of outcome presentation: **
 				data_helper.append_subject_data({ outcomeTime: new Date() })
-				// register outcome viewing after 250ms: **
-				wait(250).then(() => data_helper.append_subject_data({ viewedOutcome: true }));
+				// register outcome viewing after e.g., 250ms: **
+				wait(settings.durations.minTimeToIndicateOutcomeViewing).then(() => data_helper.append_subject_data({ viewedOutcome: true }));
 
-				wait(2000).then(function () { // show winning message for 2 seconds 				
+				wait(settings.durations.manipulationAnim).then(function () { // show winning message for 2 seconds 				
 					if (runData.activateManipulation) {
 						dom_helper.hide("welcome_msg");
 
+						data_helper.append_subject_data({ manipulationAlertTime: new Date() }) // **
+						getConfirmation(settings.text.manipulationMessage(runData.manipulationToday), 'alert'); //**
+						data_helper.append_subject_data({ manipulationConfirmationTime: new Date() }) // **
+						
 						if (runData.manipulationToday == 'devaluation') {
 							dom_helper.show("piggy_full");
 							dom_helper.add_css_class('piggy_full', 'dance');
