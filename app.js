@@ -1,4 +1,17 @@
 jatos.loaded().then(function () {
+	var terminate_subject_data_worker  = false;
+	subject_data_worker.done = function (x) { 
+		// when all messages are processed save the information as a JATOS result
+		if (terminate_subject_data_worker) {
+			var subData = data_helper.get_subject_data(false);
+			var currentRunData = subData[jatos.studyResultId];
+			
+			jatos.appendResultData(currentRunData).then(function () {
+				console.log('finished');
+			});
+		}			
+	};
+
 	// get custom settings for component and batch
 	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
 
@@ -10,118 +23,126 @@ jatos.loaded().then(function () {
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
+	subject_data_worker.postMessage(runData);
 
-	data_helper.append_subject_data(runData).then(function () {
-		if (runData.isFirstTime) {
-			jatos.goToComponent("instructions");
-			return;
-		}
-		
-		if (runData.resetContainer) { // activating reseting container when relevant. **
-			console.log('A')
-			data_helper.append_subject_data({ resetContainer: false })
-				.then(() => {
-					console.log('B')
-					getConfirmation(settings.text.rewardContainerClearingMessage);	
-				})
-				.then(() => {
-					data_helper.append_subject_data({ resetContainer: true })
-					console.log('C')
-				})
-		}
+	if (runData.isFirstTime) {
+		jatos.goToComponent("instructions");
+		return;
+	}
+	
+	// TO RANI - not sure what the purpose of this code. 
+	// Commented for now and will redo when I create new confirmation implementation
+	// if (runData.resetContainer) { // activating reseting container when relevant. **
+	// 	console.log('A')
+	// 	data_helper.append_subject_data({ resetContainer: false })
+	// 		.then(() => {
+	// 			console.log('B')
+	// 			getConfirmation(settings.text.rewardContainerClearingMessage);	
+	// 		})
+	// 		.then(() => {
+	// 			data_helper.append_subject_data({ resetContainer: true })
+	// 			console.log('C')
+	// 		})
+	// }
 
-		// show cost on top right corner if needed
-		if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
-			dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, lgic.cost_on.entrance));
-			dom_helper.blink('cost_indicator', 1000);
-		}
+	// show cost on top right corner if needed
+	if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+		var indicator_id = dom_helper.duplicate('cost_indicator_1_');
+		dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
+		dom_helper.show(indicator_id);
+	}
 
-		dom_helper.hide("welcome_msg");
+	dom_helper.hide("welcome_msg");
 
-		dom_helper.show("upper_half");
-		dom_helper.show("lower_half");
+	dom_helper.show("upper_half");
+	dom_helper.show("lower_half");
 
-		var lowerHalfClicked = false;
+	var lowerHalfClicked = false;
 
-		var p1 = new Promise((resolve, reject) => {
-			document.getElementById('lower_half').onclick = function () {
-				if (!lowerHalfClicked) {
-					dom_helper.remove_css_class('lower_half', 'blinkable');
+	var p1 = new Promise((resolve, reject) => {
+		document.getElementById('lower_half').onclick = function () {
+			if (!lowerHalfClicked) {
+				dom_helper.remove_css_class('lower_half', 'blinkable');
 
-					data_helper.append_subject_data({ press1Time: new Date() })
-						.then(function () {
-							dom_helper.add_css_class('upper_half', 'blinkable');
-							lowerHalfClicked = true;
-							resolve();
-						});
+				subject_data_worker.postMessage({ press1Time: new Date() });
+
+				if (!!logic.getCost(runData, settings, logic.cost_on.click1)) {
+					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
+					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click1));
+					dom_helper.show(indicator_id);
 				}
-			};
-		});
-
-		var p2 = new Promise((resolve, reject) => {
-			document.getElementById('upper_half').onclick = function () {
-				if (lowerHalfClicked) {
-					dom_helper.remove_css_class('upper_half', 'blinkable');
-					data_helper.append_subject_data({ press2Time: new Date() })
-						.then(function () {
-							resolve();
-						});
-				}
+				
+				dom_helper.add_css_class('upper_half', 'blinkable');
+				lowerHalfClicked = true;
+				resolve();
 			}
-		});
+		};
+	});
 
-		Promise.all([p1, p2]).then(function () {
-			document.getElementById('lower_half').onclick = undefined;
-			document.getElementById('upper_half').onclick = undefined;
+	var p2 = new Promise((resolve, reject) => {
+		document.getElementById('upper_half').onclick = function () {
+			if (lowerHalfClicked) {
+				dom_helper.remove_css_class('upper_half', 'blinkable');
 
-			dom_helper.hide("upper_half");
-			dom_helper.hide("lower_half");
+				subject_data_worker.postMessage({ press2Time: new Date() });
 
-			dom_helper.append_html('main_container',
-				'<img id="lottery" class="centered" src="images/lottery.gif"/>');
-
-			wait(4500).then(function () { // wait until gif animation is finished
-				dom_helper.hide("lottery");
-
-				if (runData.isWin) {
-					dom_helper.set_text('welcome_msg_txt', "You won " + runData.reward.toFixed(2) + "$");
-				} else {
-					dom_helper.set_text('welcome_msg_txt', "You didn't win");
+				if (!!logic.getCost(runData, settings, logic.cost_on.click2)) {
+					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
+					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click2));
+					dom_helper.show(indicator_id);
 				}
 
-				dom_helper.show("welcome_msg");
+				resolve();
+			}
+		}
+	});
 
-				// get time of outcome presentation: **
-				data_helper.append_subject_data({ outcomeTime: new Date() })
-				// register outcome viewing after 250ms: **
-				wait(250).then(() => data_helper.append_subject_data({ viewedOutcome: true }));
+	Promise.all([p1, p2]).then(function () {
+		document.getElementById('lower_half').onclick = undefined;
+		document.getElementById('upper_half').onclick = undefined;
 
-				wait(2000).then(function () { // show winning/loosing message for 2 seconds 
-					var devaluationOption = logic.isDevaluation(runData, settings);
+		dom_helper.hide("upper_half");
+		dom_helper.hide("lower_half");
 
-					if (devaluationOption == 'devaluation') {
-						dom_helper.hide("welcome_msg");
-						dom_helper.show("piggy_full");
-						dom_helper.add_css_class('piggy_full', 'dance');		
-					}
-					if (devaluationOption == 'still_valued') {
-						dom_helper.hide("welcome_msg");
-						dom_helper.show("piggy_half");
-						dom_helper.add_css_class('piggy_full', 'dance');		
-					}	
+		dom_helper.append_html('main_container',
+			'<img id="lottery" class="centered" src="images/lottery.gif"/>');
 
-					// collect end time and save subject data as results
-					data_helper.append_subject_data({ endTime: new Date() }).then(function () {
-						var subData = data_helper.get_subject_data(false);
-						var runData = subData[jatos.studyResultId];
+		wait(4500).then(function () { // wait until gif animation is finished
+			dom_helper.hide("lottery");
 
-						// TODO - consider turning it to csv at this point
+			if (runData.isWin) {
+				dom_helper.set_text('welcome_msg_txt', "You won " + runData.reward.toFixed(2) + "$");
+			} else {
+				dom_helper.set_text('welcome_msg_txt', "You didn't win");
+			}
 
-						jatos.appendResultData(runData).then(function () {
-							console.log('finished');
-						});
-					});
-				});
+			dom_helper.show("welcome_msg");
+
+			// get time of outcome presentation: **
+			subject_data_worker.postMessage({ outcomeTime: new Date() });
+
+			// register outcome viewing after 250ms: **
+			wait(250).then(() => { 
+				subject_data_worker.postMessage({ viewedOutcome: true });
+			});
+
+			wait(2000).then(function () { // show winning/loosing message for 2 seconds 
+				var devaluationOption = logic.isDevaluation(runData, settings);
+
+				if (devaluationOption == 'devaluation') {
+					dom_helper.hide("welcome_msg");
+					dom_helper.show("piggy_full");
+					dom_helper.add_css_class('piggy_full', 'dance');		
+				}
+				if (devaluationOption == 'still_valued') {
+					dom_helper.hide("welcome_msg");
+					dom_helper.show("piggy_half");
+					dom_helper.add_css_class('piggy_full', 'dance');		
+				}	
+
+				// collect end time and save subject data as results
+				subject_data_worker.postMessage({ endTime: new Date() });				
+				terminate_subject_data_worker = true;
 			});
 		});
 	});
