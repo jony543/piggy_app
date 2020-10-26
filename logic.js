@@ -46,8 +46,8 @@ function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayI
   if (isRatioSchedule) { // RI schedule
     if (winAnywayIfMultipleNonWins && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
       const indicesWithViewingOutcome = subData.viewedOutcome.multiIndexOf(true)
-      const relevantIndicesToCheck = indicesWithViewingOutcome.slice(length-app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
-      if (!relevantIndicesToCheck.filter((x)=>subData.isWin[x]).length) { // this checks if there was no win in the relevant times.
+      const relevantIndicesToCheck = indicesWithViewingOutcome.slice(length - app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
+      if (!relevantIndicesToCheck.filter((x) => subData.isWin[x]).length) { // this checks if there was no win in the relevant times.
         return true
       }
     } else {
@@ -56,17 +56,17 @@ function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayI
   } else { // namely a VI schedule
     if (!!Object.keys(subData).length) { // if there is some data for this subject
       if (winAnywayIfMultipleNonWins && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
-      const ms_per_second = 1000;
-      const timeToCheckBack = new Date(new Date() - ms_per_second * app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
-      const firstEntryAfterTimeToCheck = subData.outcomeTime.find((x)=> new Date(x) > timeToCheckBack)
-      const relevantentries = subData.viewedOutcome.slice(subData.outcomeTime.indexOf(firstEntryAfterTimeToCheck))
-      if (!firstEntryAfterTimeToCheck || !relevantentries.some((x)=>!!x)){ // if there was no entry after the time to check or there was no win in every entry since the time to check
-        return true
+        const ms_per_second = 1000;
+        const timeToCheckBack = new Date(new Date() - ms_per_second * app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
+        const firstEntryAfterTimeToCheck = subData.outcomeTime.find((x) => new Date(x) > timeToCheckBack)
+        const relevantentries = subData.viewedOutcome.slice(subData.outcomeTime.indexOf(firstEntryAfterTimeToCheck))
+        if (!firstEntryAfterTimeToCheck || !relevantentries.some((x) => !!x)) { // if there was no entry after the time to check or there was no win in every entry since the time to check
+          return true
         }
       } else {
         const lastEntryTime = new Date([...subData.outcomeTime].reverse().find(element => !!element)); // [NOTE] Make sure later it always takes the final line. Consider if this should be the start time or the endtime or reward time
         var secsFromLastEntry = getTimeFromLastEntryInSec(lastEntryTime);
-        }
+      }
     } else { // i.e., first entry
       var secsFromLastEntry = 1;
     }
@@ -133,11 +133,11 @@ function checkIfToHideOutcome(hideOutcome) {
 function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
   // check if reset of the container was already done today:
   const dayBeginning = new Date(new Date().setHours(0, 0, 0, 0)); // get the date of ths day but with hours 00:00:00
-  const firstToday = subData.startTime.find((x)=> new Date(x) > dayBeginning); // get the first entry of this day
-  const resetContainerToday = subData.rewardContainerReset.slice(subData.startTime.indexOf(firstToday)) // slice the rewardContainerReset part according to all entries of today
-  return !resetContainerToday.some((x)=>!!x) && new Date().getHours() > hourAtDayToResetRewardContainer? true : false;
+  const firstToday = subData.startTime.find((x) => new Date(x) > dayBeginning); // get the first entry of this day
+  const resetContainerToday = subData.resetContainer.slice(subData.startTime.indexOf(firstToday)) // slice the resetContainer part according to all entries of today
+  return !resetContainerToday.some((x) => !!x) && new Date().getHours() > hourAtDayToResetRewardContainer ? true : false;
 }
-    
+
 // ****************************************************************
 //           LOGIC / Run Data (calculate run parameters):
 // ----------------------------------------------------------------
@@ -148,7 +148,6 @@ var logic = {
     let isUnderManipulation = false;
     let whichManipulation = null;
     let activateManipulation = false;
-    let resetContainer = false;
 
     let isFirstTime = !Object.keys(subData).length;
     if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
@@ -196,13 +195,6 @@ var logic = {
           };
         }
       }
-debugger
-
-      // reset container
-      // ---------------------------
-      if (dayOfExperiment > 1) {
-        resetContainer = checkIfResetContainer(subData, hourAtDayToResetRewardContainer)
-      }
 
       // Hide outcome
       // ---------------------------
@@ -214,13 +206,15 @@ debugger
     }
     let cost = InitializeCost(settings.cost)
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
-    
+    let resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, settings.rewards.hourAtDayToResetRewardContainer) : false; // check if reset container
+
     var dataToSave = {
       subID: jatos.workerId,
       day: dayOfExperiment,
       isWin: isWin,
       reward: reward,
       cost: cost,
+      resetContainer: resetContainer,
       manipulationToday: whichManipulation,
       activateManipulation: activateManipulation,
       isUnderManipulation: isUnderManipulation,
@@ -255,6 +249,11 @@ debugger
 //lastEntryDateArray=[lastEntry.getDate(), lastEntry.getMonth(), lastEntry.getFullYear()]
 //todayDate = [new Date().getDate(), new Date().getMonth(), new Date().getFullYear()]
 //firstEntryToday = JSON.stringify(todayDate) !== JSON.stringify(lastEntryDateArray)
+
+
+
+
+//var person = prompt(app_settings.text.rewardContainerClearingMessage, "Harry Potter");
 
 
 

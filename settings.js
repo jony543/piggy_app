@@ -15,21 +15,25 @@ window.app_settings = {
 	rewards: {
 		isRatioSchedule: true,
 		winningRate: 2, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
-		winningChancePerUnit : function() {
-			return 1/ this.winningRate;
-		  },
+		winningChancePerUnit: function () {
+			return 1 / this.winningRate;
+		},
+
 		isVariableReward: false,
 		// for VariableReward (will be computed unifomly in the given range):
 		minWinningSum: 20,
 		maxWinningSum: 30,
 		// for constant reward:
 		rewardConstantSum: 25,
-		
+
 		// Sure win stuff:
 		winAnywayIfMultipleNonWins: true, // this is to make sure that in case a participant did not win many times they will.
-		RelativeNonWinUnitsBeforeSureWinning : function() {
+		RelativeNonWinUnitsBeforeSureWinning: function () {
 			return this.winningRate * 2; // this means that if for example this is a variable ratio of 10, after 20 no wins the 21 attempt will be a sure win.
-		  },
+		},
+
+		notifyRewardContainerReset: true,
+		hourAtDayToResetRewardContainer: 5, //time at day to empty container according to a 24h watch, thus possiblie assignments are 0-23. Assign 0 to simply seperate between days.
 	},
 	cost: {
 		isCost: false,
@@ -46,8 +50,8 @@ window.app_settings = {
 		// option 1:
 		hideOnlyUnderManipulationPeriods: true, // if false will hide every day from what set in daysToHideAt
 		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
-		daysToHideAt: [2, 3, 4, 5, 8, 10, 12], 
-		daysToBaseUponHidingTime: [[1], [1,2], [2,3], [3], [5,6,7], [9], [10,11]], // This should specify an array for each value in daysToHideAt
+		daysToHideAt: [2, 3, 4, 5, 8, 10, 12],
+		daysToBaseUponHidingTime: [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
 	text: {
@@ -57,9 +61,9 @@ window.app_settings = {
 		goodbyeText: 'נתראה בפעם הבאה',
 		devaluationNotificationText: 'הקופה מלאה, לא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.',
 		verifyBeginningText: 'לחצ/י אשר כדי להתחיל.',
-		dayBeginningMessage: 'תא המטען של החללית פנוי לאיסוף זהב',
+		rewardContainerClearingMessage: 'תא המטען של החללית פנוי לאיסוף זהב !\nכדי לאשר שקראת יש לכתוב את האותיות: ',
 	},
-	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome"],
+	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome"],
 }
 
 // contingency:

@@ -93,11 +93,11 @@ Array.prototype.multiIndexOf = function (el) {
 };
 
 function shuffle(a) {
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+	for (let i = a.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[a[i], a[j]] = [a[j], a[i]];
+	}
+	return a;
 }
 
 // A function to sort with indices I got from: https://stackoverflow.com/questions/3730510/javascript-sort-array-and-return-an-array-of-indicies-that-indicates-the-positi
@@ -116,3 +116,20 @@ function sortWithIndices(toSort) {
 	return toSort;
 }
 
+function makeid(length) { // adapted to generate random strings from : https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+	var result = '';
+	var characters = 'bcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
+	var charactersLength = characters.length;
+	for (var i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}
+
+function getConfirmation(msg) {
+	confirmationCode = makeid(3);
+	confirmation = '';
+	while (!confirmation || confirmation.toLowerCase() !== confirmationCode) {
+		confirmation = prompt(msg + confirmationCode);
+	}
+}
