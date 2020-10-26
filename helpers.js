@@ -16,6 +16,24 @@ var dom_helper = {
 	},
 	append_html: function (id, html) {
 		document.getElementById(id).insertAdjacentHTML('beforeend', html);
+	},
+	blink: function (id, ms) {
+		this.show(id);
+		setTimeout((function () { this.hide(id); }).bind(this), ms);
+	},
+	duplicate: function (id) {
+		var original = document.getElementById(id);
+		var clone = original.cloneNode(true); // "deep" clone
+
+		var clone_id = id + (new Date()).getTime();
+		clone.id = clone_id;
+
+		original.parentNode.appendChild(clone);
+
+		return clone_id;
+	},
+	removeElement: function (id) {
+		return document.getElementById(id).parentNode.removeChild(elem);
 	}
 };
 

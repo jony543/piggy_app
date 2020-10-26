@@ -1,12 +1,13 @@
 .bg {
-    background-image: url('images/context_A.jpg');
-    background-color: rgb(30, 30, 30, 0.7);
-    background-size: 100vw 100vh;
-  }
+  background-image: url('images/context_A.jpg');
+  background-color: rgb(30, 30, 30, 0.7);
+  background-size: 100vw 100vh;
+}
 
 .hidden {
 	display: none;
 }
+
 .split {
     position: absolute;
     left: 0;
@@ -56,6 +57,15 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+}
+
+#cost_indicator {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
 }
 
 #lottery {

@@ -5,6 +5,7 @@
 window.app_settings = {
 	pressesRequired: 2,
 	isInstallation: false,
+	forceDeval: null,
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
 	optionalDaysForLastDeval: [8, 9], // The day not chosen for devaluation will be used as a comparable valued day

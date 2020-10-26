@@ -27,6 +27,12 @@ jatos.loaded().then(function () {
 				})
 		}
 
+		// show cost on top right corner if needed
+		if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+			dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, lgic.cost_on.entrance));
+			dom_helper.blink('cost_indicator', 1000);
+		}
+
 		wait(settings.durations.entranceMessage).then(() => { // **
 			dom_helper.hide("welcome_msg");
 
@@ -96,7 +102,7 @@ jatos.loaded().then(function () {
 						data_helper.append_subject_data({ manipulationAlertTime: new Date() }) // **
 						getConfirmation(settings.text.manipulationMessage(runData.manipulationToday), 'alert'); //**
 						data_helper.append_subject_data({ manipulationConfirmationTime: new Date() }) // **
-						
+
 						if (runData.manipulationToday == 'devaluation') {
 							dom_helper.show("piggy_full");
 							dom_helper.add_css_class('piggy_full', 'dance');
@@ -105,6 +111,18 @@ jatos.loaded().then(function () {
 							dom_helper.show("piggy_half");
 							dom_helper.add_css_class('piggy_full', 'dance');
 						}
+				wait(2000).then(function () { // show winning/loosing message for 2 seconds
+					var devaluationOption = logic.isDevaluation(runData, settings);
+
+					if (devaluationOption == 'devaluation') {
+						dom_helper.hide("welcome_msg");
+						dom_helper.show("piggy_full");
+						dom_helper.add_css_class('piggy_full', 'dance');
+					}
+					if (devaluationOption == 'still_valued') {
+						dom_helper.hide("welcome_msg");
+						dom_helper.show("piggy_half");
+						dom_helper.add_css_class('piggy_full', 'dance');
 					}
 
 					// collect end time and save subject data as results
