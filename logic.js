@@ -187,7 +187,7 @@ var logic = {
           // check if this is the first time the outcome should be devalued that day
           if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
             (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-            (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.endTime[subData.endTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is an endTime to previous entry]
+            (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
             activateManipulation = true;
             isWin = true; // On the devaluation indication time there is a certain win...
           } else {
@@ -224,7 +224,7 @@ var logic = {
     };
     return dataToSave;
   },
-  isDevaluation: function (runData, settings) {
+  isManipulation: function (runData, settings) {
     if (!!settings.forceDeval) 
       return settings.forceDeval;
 

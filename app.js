@@ -17,9 +17,6 @@ jatos.loaded().then(function () {
 
 	// get subject data from batch session
 	var subData = data_helper.get_subject_data(true);
-	// subData.resetContainer[166]=false /***** temp */
-	// subData.resetContainer[170]=false /***** temp */
-	// subData.resetContainer[173]=false /***** temp */
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
@@ -52,10 +49,12 @@ jatos.loaded().then(function () {
 		dom_helper.show(indicator_id);
 	}
 
-	dom_helper.hide("welcome_msg");
+	wait(settings.durations.entranceMessage).then(() => { 
+			dom_helper.hide("welcome_msg");
 
-	dom_helper.show("upper_half");
-	dom_helper.show("lower_half");
+			dom_helper.show("upper_half");
+			dom_helper.show("lower_half");
+	});
 
 	var lowerHalfClicked = false;
 
@@ -83,7 +82,7 @@ jatos.loaded().then(function () {
 		document.getElementById('upper_half').onclick = function () {
 			if (lowerHalfClicked) {
 				dom_helper.remove_css_class('upper_half', 'blinkable');
-
+				
 				subject_data_worker.postMessage({ press2Time: new Date() });
 
 				if (!!logic.getCost(runData, settings, logic.cost_on.click2)) {
@@ -107,7 +106,7 @@ jatos.loaded().then(function () {
 		dom_helper.append_html('main_container',
 			'<img id="lottery" class="centered" src="images/lottery.gif"/>');
 
-		wait(4500).then(function () { // wait until gif animation is finished
+		wait(settings.durations.waitingForOutcomeAnim).then(function () { // wait until gif animation is finished
 			dom_helper.hide("lottery");
 
 			if (runData.isWin) {
@@ -122,24 +121,31 @@ jatos.loaded().then(function () {
 			subject_data_worker.postMessage({ outcomeTime: new Date() });
 
 			// register outcome viewing after 250ms: **
-			wait(250).then(() => { 
+			wait(settings.durations.minTimeToIndicateOutcomeViewing).then(() => { 
 				subject_data_worker.postMessage({ viewedOutcome: true });
 			});
 
-			wait(2000).then(function () { // show winning/loosing message for 2 seconds 
-				var devaluationOption = logic.isDevaluation(runData, settings);
+			wait(settings.durations.manipulationAnim).then(function () { // show winning/loosing message for 2 seconds
+				var manipulationOption = logic.isManipulation(runData, settings);
 
-				if (devaluationOption == 'devaluation') {
+				if (manipulationOption) {
 					dom_helper.hide("welcome_msg");
-					dom_helper.show("piggy_full");
-					dom_helper.add_css_class('piggy_full', 'dance');		
+
+					data_helper.append_subject_data({ manipulationAlertTime: new Date() }) // **
+					getConfirmation(settings.text.manipulationMessage(manipulationOption), 'alert'); //**
+					data_helper.append_subject_data({ manipulationConfirmationTime: new Date() }) // **
+					
+					if (manipulationOption == 'devaluation') {
+						dom_helper.show("piggy_full");
+						dom_helper.add_css_class('piggy_full', 'dance');
+					}
+
+					if (manipulationOption == 'still_valued') {
+						dom_helper.show("piggy_half");
+						dom_helper.add_css_class('piggy_half', 'dance');
+					}
 				}
-				if (devaluationOption == 'still_valued') {
-					dom_helper.hide("welcome_msg");
-					dom_helper.show("piggy_half");
-					dom_helper.add_css_class('piggy_full', 'dance');		
-				}	
-
+				
 				// collect end time and save subject data as results
 				subject_data_worker.postMessage({ endTime: new Date() });				
 				terminate_subject_data_worker = true;

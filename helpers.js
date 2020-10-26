@@ -144,10 +144,14 @@ function makeid(length) { // adapted to generate random strings from : https://s
 	return result;
 }
 
-function getConfirmation(msg) {
-	confirmationCode = makeid(3);
-	confirmation = '';
-	while (!confirmation || confirmation.toLowerCase() !== confirmationCode) {
-		confirmation = prompt(msg + confirmationCode);
+function getConfirmation(msg, type) {
+	if (type === "prompt") {
+		confirmationCode = makeid(3);
+		confirmation = '';
+		while (!confirmation || confirmation.toLowerCase() !== confirmationCode) {
+			confirmation = prompt(msg + confirmationCode);
+		}	
+	} else if (type === "alert") {
+		alert(msg)
 	}
 }
