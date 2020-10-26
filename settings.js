@@ -5,7 +5,7 @@
 window.app_settings = {
 	pressesRequired: 2,
 	isInstallation: false,
-	forceDeval: null,
+	forceDeval: null, // for debugging purposes
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
 	optionalDaysForLastDeval: [8, 9], // The day not chosen for devaluation will be used as a comparable valued day
@@ -76,7 +76,7 @@ window.app_settings = {
 		manipulationMessage: function (manipulationType) {
 			if (manipulationType == 'devaluation') {
 				return '** הקופה מלאה **\nלא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.';
-			} else { // i.e., 'still_valued'
+			} else if (manipulationType == 'still_valued') { // i.e., 'still_valued'
 				return '** הקופה חצי מלאה **\n\nלחצ/י על ok כדי לאשר.';
 			}
 		},

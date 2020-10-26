@@ -95,34 +95,26 @@ jatos.loaded().then(function () {
 				// register outcome viewing after e.g., 250ms: **
 				wait(settings.durations.minTimeToIndicateOutcomeViewing).then(() => data_helper.append_subject_data({ viewedOutcome: true }));
 
-				wait(settings.durations.manipulationAnim).then(function () { // show winning message for 2 seconds 				
-					if (runData.activateManipulation) {
+				wait(settings.durations.manipulationAnim).then(function () { // show winning/loosing message for 2 seconds
+					debugger
+					var manipulationOption = logic.isManipulation(runData, settings);
+					
+					if (manipulationOption) {
 						dom_helper.hide("welcome_msg");
 
 						data_helper.append_subject_data({ manipulationAlertTime: new Date() }) // **
-						getConfirmation(settings.text.manipulationMessage(runData.manipulationToday), 'alert'); //**
+						getConfirmation(settings.text.manipulationMessage(manipulationOption), 'alert'); //**
 						data_helper.append_subject_data({ manipulationConfirmationTime: new Date() }) // **
-
-						if (runData.manipulationToday == 'devaluation') {
+						
+						if (manipulationOption == 'devaluation') {
 							dom_helper.show("piggy_full");
 							dom_helper.add_css_class('piggy_full', 'dance');
 						}
-						if (runData.manipulationToday == 'still_valued') {
-							dom_helper.show("piggy_half");
-							dom_helper.add_css_class('piggy_full', 'dance');
-						}
-				wait(2000).then(function () { // show winning/loosing message for 2 seconds
-					var devaluationOption = logic.isDevaluation(runData, settings);
 
-					if (devaluationOption == 'devaluation') {
-						dom_helper.hide("welcome_msg");
-						dom_helper.show("piggy_full");
-						dom_helper.add_css_class('piggy_full', 'dance');
-					}
-					if (devaluationOption == 'still_valued') {
-						dom_helper.hide("welcome_msg");
-						dom_helper.show("piggy_half");
-						dom_helper.add_css_class('piggy_full', 'dance');
+						if (manipulationOption == 'still_valued') {
+							dom_helper.show("piggy_half");
+							dom_helper.add_css_class('piggy_half', 'dance');
+						}
 					}
 
 					// collect end time and save subject data as results

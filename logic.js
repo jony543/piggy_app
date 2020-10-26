@@ -224,7 +224,7 @@ var logic = {
     };
     return dataToSave;
   },
-  isDevaluation: function (runData, seetings) {
+  isManipulation: function (runData, settings) {
     if (!!settings.forceDeval) 
       return settings.forceDeval;
 
