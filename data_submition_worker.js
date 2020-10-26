@@ -12,7 +12,7 @@ window.subject_data_worker = {
 				}
 			}).bind(this))
 			.catch((function () { 
-				this.q.push[x]; 
+				this.send_data();
 			}).bind(this));
 	},
 	postMessage: function (data) {

@@ -131,9 +131,9 @@ jatos.loaded().then(function () {
 				if (manipulationOption) {
 					dom_helper.hide("welcome_msg");
 
-					data_helper.append_subject_data({ manipulationAlertTime: new Date() }) // **
+					subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
 					getConfirmation(settings.text.manipulationMessage(manipulationOption), 'alert'); //**
-					data_helper.append_subject_data({ manipulationConfirmationTime: new Date() }) // **
+					subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 					
 					if (manipulationOption == 'devaluation') {
 						dom_helper.show("piggy_full");
