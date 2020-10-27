@@ -61,12 +61,66 @@
 
 #cost_indicator {
   position: absolute;
-  top: 5%;
+  top: 12%;
   right: 5%;
   transform: translate(-50%, -50%);
   text-align: center;
   color: white;
+  font-size: 7em;
 }
+
+.goUpEntrance {
+  position: absolute;  
+  animation-name: goUpEntrance_animation;
+  /*animation-duration: 1s;*/
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes goUpEntrance_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
+}
+
+.goUpClick1 {
+  position: absolute;  
+  animation-name: goUpClick1_animation;
+  /*animation-duration: 1s;*/
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes goUpClick1_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
+}
+
+.goUpClick2 {
+  position: absolute;  
+  animation-name: goUpClick2_animation;
+  /*animation-duration: 1s;*/
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes goUpClick2_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
+}
+
+.goUpOutcome {
+  position: absolute;  
+  animation-name: goUpOutcome_animation;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes goUpOutcome_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
+}
+
 
 #lottery {
   width: 85%;

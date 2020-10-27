@@ -37,14 +37,14 @@ window.app_settings = {
 		hourAtDayToResetRewardContainer: 5, //time at day to empty container according to a 24h watch, thus possiblie assignments are 0-23. Assign 0 to simply seperate between days.
 	},
 	cost: {
-		isCost: false,
-		isCostPerPress: false,
+		isCost: true,
+		isCostPerPress: true,
 		isVariableCost: false,
 		minCostSum: 1,
 		maxCostSum: 5,
 		// for constant cost:
 		costConstantSum: 1,
-		presentCost: false, // O'Doherty did not use visual feedback for the cost, Gillan did (in their MB-MF with devaluation study)
+		presentCost: true, // O'Doherty did not use visual feedback for the cost, Gillan did (in their MB-MF with devaluation study)
 	},
 	hideOutcome: {
 		hide: false,
@@ -57,11 +57,13 @@ window.app_settings = {
 	},
 	durations: { //in ms
 		// every trial:
-		entranceMessage: 1000,
+		entranceMessage: 1500,
 		waitingForOutcomeAnim: 4500,
 		minTimeToIndicateOutcomeViewing: 250,
 		// manipulation:
 		manipulationAnim: 2000,
+		// animations:
+		costAnim: 1000,
 	},
 	text: {
 		welcomeText: 'ששלום',

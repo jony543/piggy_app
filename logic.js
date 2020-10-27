@@ -50,12 +50,11 @@ function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayI
       if (!relevantIndicesToCheck.filter((x) => subData.isWin[x]).length) { // this checks if there was no win in the relevant times.
         return true
       }
-    } else {
-      return Math.random() < winningChancePerUnit;
     }
+    return Math.random() < winningChancePerUnit;
   } else { // namely a VI schedule
     if (!!Object.keys(subData).length) { // if there is some data for this subject
-      if (winAnywayIfMultipleNonWins && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
+      if (winAnywayIfMultipleNonWins && subData.viewedOutcome && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
         const ms_per_second = 1000;
         const timeToCheckBack = new Date(new Date() - ms_per_second * app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
         const firstEntryAfterTimeToCheck = subData.outcomeTime.find((x) => new Date(x) > timeToCheckBack)
@@ -225,19 +224,19 @@ var logic = {
     return dataToSave;
   },
   isManipulation: function (runData, settings) {
-    if (!!settings.forceDeval) 
+    if (!!settings.forceDeval)
       return settings.forceDeval;
 
     if (runData.activateManipulation)
-      return runData.manipulationToday; 
+      return runData.manipulationToday;
 
     return null;
   },
   getCost: function (runData, settings, cost_on) {
-    return   settings.cost.isCost 
-             && settings.cost.presentCost 
-             && (runData.cost.length > (cost_on - 1)) 
-             && runData.cost[cost_on];
+    return settings.cost.isCost
+      && settings.cost.presentCost
+      && (runData.cost.length > (cost_on - 1))
+      && runData.cost[cost_on];
   },
   cost_on: {
     entrance: 0,
@@ -274,7 +273,4 @@ var logic = {
 
 
 //var person = prompt(app_settings.text.rewardContainerClearingMessage, "Harry Potter");
-
-
-
 

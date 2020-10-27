@@ -8,6 +8,9 @@ jatos.loaded().then(function () {
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
 
+	// assign animation times according to settings:
+	document.getElementById('cost_indicator').style.animationDuration = String(settings.durations.costAnim/1000) + 's' // **	
+
 	data_helper.append_subject_data(runData).then(function () {
 		if (runData.isFirstTime) {
 			jatos.goToComponent("instructions");
@@ -27,10 +30,11 @@ jatos.loaded().then(function () {
 				})
 		}
 
-		// show cost on top right corner if needed
+		// show cost on top right corner if needed [At entrance]
 		if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
-			dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, lgic.cost_on.entrance));
-			dom_helper.blink('cost_indicator', 1000);
+			dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
+			dom_helper.blink('cost_indicator', settings.durations.costAnim);
+			dom_helper.add_css_class('cost_indicator', 'goUpEntrance');
 		}
 
 		wait(settings.durations.entranceMessage).then(() => { // **
@@ -47,6 +51,13 @@ jatos.loaded().then(function () {
 				if (!lowerHalfClicked) {
 					dom_helper.remove_css_class('lower_half', 'blinkable');
 
+					// show cost on top right corner if needed [After 1st click]
+					if (settings.cost.isCostPerPress && !!logic.getCost(runData, settings, logic.cost_on.click1)) {
+						dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, logic.cost_on.click1));
+						dom_helper.blink('cost_indicator', settings.durations.costAnim);
+						dom_helper.add_css_class('cost_indicator', 'goUpClick1');
+					}
+
 					data_helper.append_subject_data({ press1Time: new Date() })
 						.then(function () {
 							dom_helper.add_css_class('upper_half', 'blinkable');
@@ -61,6 +72,14 @@ jatos.loaded().then(function () {
 			document.getElementById('upper_half').onclick = function () {
 				if (lowerHalfClicked) {
 					dom_helper.remove_css_class('upper_half', 'blinkable');
+
+					// show cost on top right corner if needed [After 2nd click]
+					if (settings.cost.isCostPerPress && !!logic.getCost(runData, settings, logic.cost_on.click2)) {
+						dom_helper.set_text('cost_indicator', "-" + logic.getCost(runData, settings, logic.cost_on.click2));
+						dom_helper.blink('cost_indicator', settings.durations.costAnim);
+						dom_helper.add_css_class('cost_indicator', 'goUpClick2');
+					}
+
 					data_helper.append_subject_data({ press2Time: new Date() })
 						.then(function () {
 							resolve();
@@ -83,7 +102,9 @@ jatos.loaded().then(function () {
 				dom_helper.hide("lottery");
 
 				if (runData.isWin) {
-					dom_helper.set_text('welcome_msg_txt', "You won " + runData.reward.toFixed(2) + "$");
+					dom_helper.set_text('welcome_msg_txt', "You won " + runData.reward.toFixed(2) + "$"); //**
+					dom_helper.blink('gold_coin', 2000); // **
+					dom_helper.add_css_class('gold_coin', 'goUpOutcome'); // **
 				} else {
 					dom_helper.set_text('welcome_msg_txt', "You didn't win");
 				}
@@ -96,16 +117,16 @@ jatos.loaded().then(function () {
 				wait(settings.durations.minTimeToIndicateOutcomeViewing).then(() => data_helper.append_subject_data({ viewedOutcome: true }));
 
 				wait(settings.durations.manipulationAnim).then(function () { // show winning/loosing message for 2 seconds
-					debugger
+
 					var manipulationOption = logic.isManipulation(runData, settings);
-					
+
 					if (manipulationOption) {
 						dom_helper.hide("welcome_msg");
 
 						data_helper.append_subject_data({ manipulationAlertTime: new Date() }) // **
 						getConfirmation(settings.text.manipulationMessage(manipulationOption), 'alert'); //**
 						data_helper.append_subject_data({ manipulationConfirmationTime: new Date() }) // **
-						
+
 						if (manipulationOption == 'devaluation') {
 							dom_helper.show("piggy_full");
 							dom_helper.add_css_class('piggy_full', 'dance');
