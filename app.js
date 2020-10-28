@@ -75,17 +75,10 @@ jatos.loaded().then(function () {
 					dom_helper.show(indicator_id);
 				}
 
-				data_helper.append_subject_data({ press1Time: new Date() })
-					.then(function () {
-						dom_helper.add_css_class('upper_half', 'blinkable');
-						lowerHalfClicked = true;
-						resolve();
-					});
-			}
-
 			dom_helper.add_css_class('upper_half', 'blinkable');
 			lowerHalfClicked = true;
 			resolve();
+			}
 		}
 	});
 
