@@ -59,7 +59,7 @@
   text-align: center;
 }
 
-#cost_indicator {
+.cost_indicator {
   position: absolute;
   top: 12%;
   right: 5%;
@@ -69,43 +69,17 @@
   font-size: 7em;
 }
 
-.goUpEntrance {
+.goUp {
   position: absolute;  
-  animation-name: goUpEntrance_animation;
+  animation-name: goUp_animation;
   /*animation-duration: 1s;*/
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
 }
-@keyframes goUpEntrance_animation {
-  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
-  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
-}
-
-.goUpClick1 {
-  position: absolute;  
-  animation-name: goUpClick1_animation;
-  /*animation-duration: 1s;*/
-  animation-iteration-count: 1;
-  animation-direction: normal;
-  animation-fill-mode: forwards;
-}
-@keyframes goUpClick1_animation {
-  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
-  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
-}
-
-.goUpClick2 {
-  position: absolute;  
-  animation-name: goUpClick2_animation;
-  /*animation-duration: 1s;*/
-  animation-iteration-count: 1;
-  animation-direction: normal;
-  animation-fill-mode: forwards;
-}
-@keyframes goUpClick2_animation {
-  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
-  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
+@keyframes goUp_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:1.0; }
+  100% { padding: 0px 0px 20% 0px; opacity:0.0; }
 }
 
 .goUpOutcome {
@@ -142,6 +116,20 @@
   80%  { padding: 0px 0px 0px 15% }
   100% { padding: 0px 0px 0px 0px; }
 }
+
+/*
+.disappear-left {
+  animation-name: disappear_left_animation;
+  animation-fill-mode: forwards;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+  animation-direction: normal;  
+}
+@keyframes disappear_left_animation {
+  from { padding: 0px 0px 0px 0px; opacity: 100%; }
+  to { padding: 0px 100% 0px 0px; opacity: 30% }
+}
+*/
 
 .stretched {
   position: absolute;
