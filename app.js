@@ -24,6 +24,9 @@ jatos.loaded().then(function () {
 
 	// assign animation times according to settings:
 	document.getElementById('cost_indicator_1_').style.animationDuration = String(settings.durations.costAnim / 1000) + 's' // **	
+	document.getElementById('outcome_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
+	document.getElementById('outcome_no_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
+	document.getElementById('welcome_msg').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 
 	if (runData.isFirstTime) {
 		jatos.goToComponent("instructions");
@@ -120,15 +123,20 @@ jatos.loaded().then(function () {
 		wait(settings.durations.waitingForOutcomeAnim).then(function () { // wait until gif animation is finished
 			dom_helper.hide("lottery");
 
+			dom_helper.remove_css_class('welcome_msg', 'centered'); // **
+			dom_helper.add_css_class('welcome_msg', 'outcome_text'); // **
+
 			if (runData.isWin) {
 				dom_helper.set_text('welcome_msg_txt', "You won " + runData.reward.toFixed(2) + "$"); //**
-				dom_helper.blink('gold_coin', 2000); // **
-				dom_helper.add_css_class('gold_coin', 'goUpOutcome'); // **
+				dom_helper.blink('outcome_win', settings.durations.outcomeAnim); // **
+				dom_helper.add_css_class('outcome_win', 'goUpOutcomeImage'); // **
 			} else {
 				dom_helper.set_text('welcome_msg_txt', "You didn't win");
+				dom_helper.blink('outcome_no_win', settings.durations.outcomeAnim); // **
+				dom_helper.add_css_class('outcome_no_win', 'goUpOutcomeImage'); // **
 			}
 
-			dom_helper.show("welcome_msg");
+			dom_helper.blink("welcome_msg",settings.durations.outcomeAnim);
 
 			// get time of outcome presentation: **
 			subject_data_worker.postMessage({ outcomeTime: new Date() });
@@ -139,7 +147,7 @@ jatos.loaded().then(function () {
 			});
 
 
-			wait(settings.durations.manipulationAnim).then(function () { // show winning/loosing message for 2 seconds
+			wait(settings.durations.outcomeAnim).then(function () { // show winning/loosing message for 2 seconds
 				var manipulationOption = logic.isManipulation(runData, settings);
 
 				if (manipulationOption) {

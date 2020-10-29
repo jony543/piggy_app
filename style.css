@@ -114,19 +114,6 @@
   100% { padding: 0px 0px 20% 0px; opacity:0.0; }
 }
 
-.goUpOutcome {
-  position: absolute;  
-  animation-name: goUpOutcome_animation;
-  animation-duration: 2s;
-  animation-iteration-count: 1;
-  animation-direction: normal;
-  animation-fill-mode: forwards;
-}
-@keyframes goUpOutcome_animation {
-  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
-  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
-}
-
 #lottery {
   position: absolute;
   width: 75%;
@@ -147,7 +134,47 @@
 100% { padding: 0px 0px 0px 0px; opacity:1.0; }
 }
 
+.outcome_image {
+  position: absolute;
+  width: 35vw;
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
+.goUpOutcomeImage {
+  position: absolute;  
+  animation-name: goUpOutcome_animation;
+  /*animation-duration: 2s;*/
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes goUpOutcome_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  100% { padding: 0px 0px 20% 0px; opacity:1.0; }
+}
+
+.outcome_text {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 0.3em;
+
+  animation-name: outcome_text_animation;
+  /*animation-duration: 2s;*/
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes outcome_text_animation {
+0%   { opacity:0.0; }
+50%   { opacity:0.0; }
+100% { opacity:1.0; }
+}
 
 .dance {
   position: absolute;  

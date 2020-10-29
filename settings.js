@@ -61,7 +61,7 @@ window.app_settings = {
 		waitingForOutcomeAnim: 4500,
 		minTimeToIndicateOutcomeViewing: 250,
 		// manipulation:
-		manipulationAnim: 2000,
+		outcomeAnim: 2000,
 		// animations:
 		costAnim: 1000,
 		surface_disappearance: 700,
