@@ -2,6 +2,38 @@
   background-image: url('images/context_A.jpg');
   background-color: rgb(30, 30, 30, 0.7);
   background-size: 100vw 100vh;
+
+}
+
+.ice {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+
+  animation-name: ice_animation;
+  animation-duration: 0.5s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+@keyframes ice_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  100% { padding: 0px 0px 0px 0px; opacity:0.2; }
+}
+@keyframes ice_breaking { /* called inside app.js */
+  0%   { padding: 0px 0px 0px 0px; opacity:0.2; }
+  100% { padding: 0px 0px 0px 0px; opacity:0.0; }
+}
+
+#ice_upper {
+  clip: rect(0, 100vw, 50vh, 0);
+}
+
+#ice_lower {
+  clip: rect(50vh, 100vw, 100vh, 0);
 }
 
 .hidden {
@@ -95,10 +127,27 @@
   100% { padding: 0px 0px 20% 0px; opacity:1.0; }
 }
 
-
 #lottery {
-  width: 85%;
+  position: absolute;
+  width: 75%;
+  height: auto;
+  top: 50%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+
+  animation-name: lottery_entry;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
 }
+@keyframes lottery_entry {
+0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+100% { padding: 0px 0px 0px 0px; opacity:1.0; }
+}
+
+
 
 .dance {
   position: absolute;  

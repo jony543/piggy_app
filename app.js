@@ -71,13 +71,16 @@ jatos.loaded().then(function () {
 				// show cost on top right corner if needed [After 1st click]
 				if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
-					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
+					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click1));
 					dom_helper.show(indicator_id);
 				}
 
-			dom_helper.add_css_class('upper_half', 'blinkable');
-			lowerHalfClicked = true;
-			resolve();
+				document.getElementById('ice_lower').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
+				document.getElementById('ice_lower').style.animationName = "ice_breaking"; // **
+
+				dom_helper.add_css_class('upper_half', 'blinkable');
+				lowerHalfClicked = true;
+				resolve();
 			}
 		}
 	});
@@ -92,9 +95,12 @@ jatos.loaded().then(function () {
 				// show cost on top right corner if needed [After 2nd click]
 				if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
-					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
+					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click2));
 					dom_helper.show(indicator_id);
 				}
+
+				document.getElementById('ice_upper').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
+				document.getElementById('ice_upper').style.animationName = "ice_breaking" // **
 
 				resolve();
 			}
@@ -109,7 +115,7 @@ jatos.loaded().then(function () {
 		dom_helper.hide("lower_half");
 
 		dom_helper.append_html('main_container',
-			'<img id="lottery" class="centered" src="images/lottery.gif"/>');
+			'<img id="lottery" class="waiting_for_outcome_gif" src="images/lottery.gif"/>');
 
 		wait(settings.durations.waitingForOutcomeAnim).then(function () { // wait until gif animation is finished
 			dom_helper.hide("lottery");

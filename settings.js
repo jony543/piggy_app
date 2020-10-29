@@ -64,6 +64,7 @@ window.app_settings = {
 		manipulationAnim: 2000,
 		// animations:
 		costAnim: 1000,
+		surface_disappearance: 700,
 	},
 	text: {
 		welcomeText: 'ששלום',
