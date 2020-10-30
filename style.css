@@ -49,11 +49,13 @@
 .upper {
     top: 0;
     height: 50%;
+    z-index: 2;
 }
 
 .lower {
     bottom: 0;
-    height: 50%;  
+    height: 50%; 
+    z-index: 3;
 }
 
 .blinkable:after {
@@ -185,13 +187,19 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  font-size: 0.66vw;
+  font-size: 0.63vw;
   
   animation-name: appearSlowlyText_animation;
   animation-duration: 1s;
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
+}
+
+#cover {
+  width: 85vw;
+  height: auto;
+  z-index: 1;
 }
 
 .dance {
@@ -249,4 +257,18 @@ h1 {
 
 .jspsych-html-button-response-button button {
   font-size: 4rem;
+}
+
+.most_in_front {
+  position: absolute;
+  z-index: 100;
+}
+
+
+.text_box {
+  box-sizing: border-box;
+  width: 70vw;
+  border: 0.5vw solid rgb(100, 100, 100);
+  background-color: rgba(200, 200, 200, 0.7);
+  border-radius: 15px;
 }

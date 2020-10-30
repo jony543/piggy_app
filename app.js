@@ -48,6 +48,10 @@ jatos.loaded().then(function () {
 	// 		})
 	// }
 
+////
+dom_helper.show("cover");
+////
+
 	// show cost on top right corner if needed [At entrance]
 	if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
 		var indicator_id = dom_helper.duplicate('cost_indicator_1_');
