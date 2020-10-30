@@ -148,6 +148,10 @@ var logic = {
     let whichManipulation = null;
     let activateManipulation = false;
 
+    ///////////
+//if isDemo
+//debugger
+    ///////////
     let isFirstTime = !Object.keys(subData).length;
     if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
 

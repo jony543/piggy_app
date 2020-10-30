@@ -31,10 +31,10 @@ var instructions = {
 	data: {
 		trialType: 'instruction',
 	},
-    type: 'instructions',
-    pages: [
-        'Welcome to the experiment. Click next to begin.',
-        'This is the second page of instructions.',
+	type: 'instructions',
+	pages: [
+		'Welcome to the experiment. Click next to begin.',
+		'This is the second page of instructions.',
 		'This is the final page.',
 		'<h2>page 1</h2>' +
 		'<h3>page 1</h3>' +
@@ -44,7 +44,7 @@ var instructions = {
 	],
 	button_label_previous: 'MyPrevious' ,
 	button_label_next: 'MyNext',
-    show_clickable_nav: true
+	show_clickable_nav: true
 };
 //*/
 
@@ -102,6 +102,19 @@ jatos.onLoad(function () {
 		on_finish: function () {
 			var resultJson = jsPsych.data.get().json(); // optioinal - change .json() to .csv()
 			jatos.appendResultData(resultJson).then(console.log('bye'));
+
+			// embed the app for demo purposes:
+			gg = document.createElement('object');
+			gg.setAttribute("data", "index.html")
+			gg.style.position = "absolute"
+			gg.style.top = "50%"
+			gg.style.left = "50%"
+			gg.style.transform = "translate(-50%, -50%)"
+			gg.style.width = "70vw"
+			gg.style.height = "70vh"
+			gg.style.border = "0.5vw solid rgb(100, 100, 100)"
+			gg.style.borderRadius= "20px"		  
+			document.body.appendChild(gg)
 		}
 	});
 });
