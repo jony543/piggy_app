@@ -142,74 +142,125 @@ function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
 // ----------------------------------------------------------------
 var logic = {
   initialize: function (subData, settings) {
-    // Get counter-balanced stuff and Initialize variables:
-    [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(jatos.workerId, app_settings);
-    let isUnderManipulation = false;
-    let whichManipulation = null;
-    let activateManipulation = false;
 
-    ///////////
-//if isDemo
-//debugger
-    ///////////
-    let isFirstTime = !Object.keys(subData).length;
-    if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
-
-      isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
-
-      // DEVALUATION / STILL-VALUED tests(check and set)
-      // -------------------------------------------------------
-      const expStartingTime = new Date(subData["startTime"][0]);
-      daysFromBeginning = dateDiff(expStartingTime, new Date()); // "new Date()" is getting the current time.
-      dayOfExperiment = daysFromBeginning + 1;
-      devalueToday = dayOfExperiment === firstDevalDay || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
-      comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment    
-      if (devalueToday || comparableValuedToday) {
-        whichManipulation = ['devaluation', 'still_valued'].filter((item, i) => [devalueToday, comparableValuedToday][i])[0];
+    // CHECK IF INSTRUCTIONS
+    // -------------------------------------------------------
+    let noDataYet = !Object.keys(subData).length; // check if this is the first entry
+    if (noDataYet) {
+      var dataToSave = {
+        subID: jatos.workerId,
+        startInstructionsTime: startTime,
+        showInstructions: true,
       };
+      return dataToSave;
+    }
 
-      // OPERATE DEVALUATION DAY
-      // ---------------------------
-      if (devalueToday || comparableValuedToday) {
-        // resolving which days to base devaluation time on:
-        switch (dayOfExperiment) {
-          case firstDevalDay:
-          case firstComparableValDay:
-            daysToBaseUponManipulation = settings.daysToBaseUponFirstDeval;
-            break;
-          case lastDevalDay:
-          case lastComparableValDay:
-            daysToBaseUponDeval = settings.daysToBaseUponLastDeval;
-            break;
+    // CHECK AND SET DEMO
+    // -------------------------------------------------------
+    // demo vars defaults:
+    let isDemo = null;
+    let isDemoCompleted = null;
+    let demoTrialNum = null
+
+    if (settings.allowDemo) { // check if demo is available and set variables accordingly      
+      if (subData.showInstructions[subData.showInstructions.length - 1] || (subData.isDemo[subData.isDemo.length - 1] && !subData.isDemoCompleted[subData.isDemoCompleted.length - 1])) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
+        isDemo = true;
+        isDemoCompleted = false; // this will be set to change after the participant confirms there is no need in another demo
+        if (subData.showInstructions[subData.showInstructions.length - 1]) { // if this is the first demo trial after instructions
+          demoTrialNum = 0
+        } else {
+          demoTrialNum = subData.demoTrialNum[subData.demoTrialNum.length - 1] + 1
         }
-
-        // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
-        const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation) // according to the median time in specified days
-
-        if (new Date() >= timeToManipulate) {
-          // check if this is the first time the outcome should be devalued that day
-          if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
-            (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-            (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
-            activateManipulation = true;
-            isWin = true; // On the devaluation indication time there is a certain win...
-          } else {
-            isUnderManipulation = true;
-          };
-        }
+      } else {
+        isDemo = false;
+        isDemoCompleted = true;
       }
+      var isFirstTime = subData.isDemo[subData.isDemo.length - 1] && subData.isDemoCompleted[subData.isDemoCompleted.length - 1] ? true : false;
+    } else {
+      var isFirstTime = subData.showInstructions[subData.showInstructions.length - 1];
+    }
 
-      // Hide outcome
-      // ---------------------------
-      var toHideOutcome = checkIfToHideOutcome(settings.hideOutcome)
+    // -------------------------------------------------------
 
-    } else { // if it is the first entry
-      isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
-      dayOfExperiment = 1;
+    if (isDemo) {
+      var dayOfExperiment = null
+      let demoVars = settings.demoCycle[demoTrialNum % Object.keys(settings.demoCycle).length]
+      // assign the variables for the demo:
+      isWin = demoVars.isWin
+      whichManipulation = demoVars.whichManipulation
+      activateManipulation = demoVars.activateManipulation
+      isUnderManipulation = demoVars.isUnderManipulation
+      var toHideOutcome = demoVars.toHideOutcome
+      var resetContainer = demoVars.resetContainer
+    } else {
+      // Get counter-balanced stuff and Initialize variables:
+      [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(jatos.workerId, app_settings);
+      var isUnderManipulation = false;
+      var whichManipulation = null;
+      var activateManipulation = false;
+
+      if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
+
+        isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
+
+        // DEVALUATION / STILL-VALUED tests(check and set)
+        // -------------------------------------------------------
+        const expStartingTime = new Date(subData["startTime"][0]);
+        daysFromBeginning = dateDiff(expStartingTime, new Date()); // "new Date()" is getting the current time.
+        dayOfExperiment = daysFromBeginning + 1;
+        devalueToday = dayOfExperiment === firstDevalDay || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
+        comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment    
+        if (devalueToday || comparableValuedToday) {
+          whichManipulation = ['devaluation', 'still_valued'].filter((item, i) => [devalueToday, comparableValuedToday][i])[0];
+        };
+
+        // OPERATE DEVALUATION DAY
+        // ---------------------------
+        if (devalueToday || comparableValuedToday) {
+          // resolving which days to base devaluation time on:
+          switch (dayOfExperiment) {
+            case firstDevalDay:
+            case firstComparableValDay:
+              daysToBaseUponManipulation = settings.daysToBaseUponFirstDeval;
+              break;
+            case lastDevalDay:
+            case lastComparableValDay:
+              daysToBaseUponDeval = settings.daysToBaseUponLastDeval;
+              break;
+          }
+
+          // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
+          const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation) // according to the median time in specified days
+
+          if (new Date() >= timeToManipulate) {
+            // check if this is the first time the outcome should be devalued that day
+            if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
+              (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
+              (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
+              activateManipulation = true;
+              isWin = true; // On the devaluation indication time there is a certain win...
+            } else {
+              isUnderManipulation = true;
+            };
+          }
+        }
+
+        // Hide outcome
+        // ---------------------------
+        var toHideOutcome = checkIfToHideOutcome(settings.hideOutcome);
+
+        // Reset container
+        // ---------------------------
+        var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, settings.rewards.hourAtDayToResetRewardContainer) : false; // check if reset container
+
+      } else { // if it is the first entry
+        isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
+        dayOfExperiment = 1;
+        var resetContainer = false;
+      }
     }
     let cost = InitializeCost(settings.cost)
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
-    let resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, settings.rewards.hourAtDayToResetRewardContainer) : false; // check if reset container
 
     var dataToSave = {
       subID: jatos.workerId,
@@ -223,7 +274,11 @@ var logic = {
       isUnderManipulation: isUnderManipulation,
       hideOutcome: toHideOutcome,
       isFirstTime: isFirstTime,
-      startTime: startTime
+      startTime: startTime,
+      showInstructions: false,
+      isDemo: isDemo,
+      isDemoCompleted: isDemoCompleted,
+      demoTrialNum: demoTrialNum,
     };
     return dataToSave;
   },

@@ -28,9 +28,12 @@ jatos.loaded().then(function () {
 	document.getElementById('outcome_no_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 
-	if (runData.isFirstTime) {
+	// go to instructinos (if relevant)
+	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
 		jatos.goToComponent("instructions");
 		return;
+	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
+		alert(settings.text.realGameBegins)
 	}
 
 	// TO RANI - not sure what the purpose of this code. 
@@ -178,7 +181,22 @@ jatos.loaded().then(function () {
 				dom_helper.set_text('welcome_msg_txt', "See you next time"); //**
 				dom_helper.show('welcome_msg'); // **
 				////
-				///
+
+				// Check if to complete demo when relevant: **
+				console.log(runData.isDemo)
+				console.log(runData.isDemoCompleted)
+				console.log(runData.demoTrialNum)
+
+				if (runData.isDemo &&
+					runData.demoTrialNum % Object.keys(settings.demoCycle).length === Object.keys(settings.demoCycle).length - 1 // checking that this is the last trial in the demo cycle
+				) {
+					wait(1000).then(function () {
+						isDemoCompleted = prompt(settings.text.completeDemo);
+						if (isDemoCompleted.toLowerCase() === 'yes') {
+							subject_data_worker.postMessage({ isDemoCompleted: true }) // **
+						};
+					});
+				};
 
 				// collect end time and save subject data as results
 				subject_data_worker.postMessage({ endTime: new Date() });

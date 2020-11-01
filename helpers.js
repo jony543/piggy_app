@@ -150,7 +150,7 @@ function getConfirmation(msg, type) {
 		confirmation = '';
 		while (!confirmation || confirmation.toLowerCase() !== confirmationCode) {
 			confirmation = prompt(msg + confirmationCode);
-		}	
+		}
 	} else if (type === "alert") {
 		alert(msg)
 	}
