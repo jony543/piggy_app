@@ -100,7 +100,7 @@
   transform: translate(-50%, -50%);
   text-align: center;
   color: red;
-  font-size: 7em;
+  font-size: 12vw;
 }
 
 .goUp {
@@ -187,7 +187,6 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  font-size: 0.63vw;
   
   animation-name: appearSlowlyText_animation;
   animation-duration: 1s;
@@ -252,7 +251,7 @@
 	
 h1 {
 	color: dodgerblue;
-	font-size: 10em;
+	font-size: 12vw;
 }
 
 .jspsych-html-button-response-button button {
@@ -270,4 +269,8 @@ h1 {
   border: 0.5vw solid rgb(100, 100, 100);
   background-color: rgba(220, 220, 220, 0.75);
   border-radius: 15px;
+}
+
+.goodByeMessageTextSize {
+  font-size: 6vw;
 }

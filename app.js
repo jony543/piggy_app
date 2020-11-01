@@ -178,9 +178,11 @@ jatos.loaded().then(function () {
 				///
 				//debugger
 				dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
+				dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
 				dom_helper.set_text('welcome_msg_txt', "See you next time"); //**
 				dom_helper.show('welcome_msg'); // **
-				////
+				/////
+				///
 
 				// Check if to complete demo when relevant: **
 				console.log(runData.isDemo)
