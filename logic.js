@@ -142,20 +142,25 @@ function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
 // ----------------------------------------------------------------
 var logic = {
   initialize: function (subData, settings) {
+    const noDataYet = !Object.keys(subData).length; // check if this is the first entry
 
     // CHECK IF INSTRUCTIONS
     // -------------------------------------------------------
-    let noDataYet = !Object.keys(subData).length; // check if this is the first entry
-    if (noDataYet) {
-      var dataToSave = {
-        subID: jatos.workerId,
-        startInstructionsTime: startTime,
-        showInstructions: true,
-      };
-      return dataToSave;
+    if (settings.allowInstructions) {
+      if (!noDataYet) {
+        var instructionCompletion = subData.completedInstructions.filter((x) => x !== undefined);
+        instructionCompletion = instructionCompletion[instructionCompletion.length - 1];
+      }
+      if (noDataYet || !instructionCompletion) {
+        var dataToSave = {
+          subID: jatos.workerId,
+          startInstructionsTime: startTime,
+          showInstructions: true,
+        };
+        return dataToSave;
+      }
     }
-
-    // CHECK AND SET DEMO
+    // CHECK AND SET DEMO (and whether this is the First REAL trial of the game)
     // -------------------------------------------------------
     // demo vars defaults:
     let isDemo = null;
@@ -163,10 +168,10 @@ var logic = {
     let demoTrialNum = null
 
     if (settings.allowDemo) { // check if demo is available and set variables accordingly      
-      if (subData.showInstructions[subData.showInstructions.length - 1] || (subData.isDemo[subData.isDemo.length - 1] && !subData.isDemoCompleted[subData.isDemoCompleted.length - 1])) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
+      if (noDataYet || subData.showInstructions[subData.showInstructions.length - 1] || (subData.isDemo[subData.isDemo.length - 1] && !subData.isDemoCompleted[subData.isDemoCompleted.length - 1])) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
         isDemo = true;
         isDemoCompleted = false; // this will be set to change after the participant confirms there is no need in another demo
-        if (subData.showInstructions[subData.showInstructions.length - 1]) { // if this is the first demo trial after instructions
+        if (noDataYet || subData.demoTrialNum[subData.demoTrialNum.length - 1] === null) { // if this is the first demo trial after instructions
           demoTrialNum = 0
         } else {
           demoTrialNum = subData.demoTrialNum[subData.demoTrialNum.length - 1] + 1
@@ -175,9 +180,13 @@ var logic = {
         isDemo = false;
         isDemoCompleted = true;
       }
-      var isFirstTime = subData.isDemo[subData.isDemo.length - 1] && subData.isDemoCompleted[subData.isDemoCompleted.length - 1] ? true : false;
+      var isFirstTime = !noDataYet && subData.isDemo[subData.isDemo.length - 1] && subData.isDemoCompleted[subData.isDemoCompleted.length - 1] ? true : false;
     } else {
-      var isFirstTime = subData.showInstructions[subData.showInstructions.length - 1];
+      if (settings.allowInstructions) {
+        var isFirstTime = subData.showInstructions[subData.showInstructions.length - 1];
+      } else {
+        isFirstTime = noDataYet;
+      }
     }
 
     // -------------------------------------------------------

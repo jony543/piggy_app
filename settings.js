@@ -86,6 +86,7 @@ window.app_settings = {
 		completeDemo: 'ההדגמה הסתיימה. אם ברצונך לסיים חלק זה ולהתחיל במשחק האמיתי יש לכתוב yes.\n כל דבר אחר. כדי לבצע סיבוב הדגמה נוסף יש ללחוץ על',
 		realGameBegins: 'המשחק האמיתי מתחיל עכשיו.\nהזהב שייאסף מעכשיו שווה כסף אמיתי.\nבהצלחה!',
 	},
+	allowInstructions: false, // for debugging purpose.
 	allowDemo: false,
 	demoCycle: {
 		0: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false },
@@ -96,8 +97,9 @@ window.app_settings = {
 		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false },
 		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true },
 	},
-	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "isDemo", "isDemoCompleted", "demoTrialNum"],
+	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "completedInstructions", "isDemo", "isDemoCompleted", "demoTrialNum"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
+	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }
 
 // contingency:

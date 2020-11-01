@@ -185,15 +185,12 @@ jatos.loaded().then(function () {
 				///
 
 				// Check if to complete demo when relevant: **
-				console.log(runData.isDemo)
-				console.log(runData.isDemoCompleted)
-				console.log(runData.demoTrialNum)
-
 				if (runData.isDemo &&
 					runData.demoTrialNum % Object.keys(settings.demoCycle).length === Object.keys(settings.demoCycle).length - 1 // checking that this is the last trial in the demo cycle
 				) {
 					wait(1000).then(function () {
 						isDemoCompleted = prompt(settings.text.completeDemo);
+						debugger
 						if (isDemoCompleted.toLowerCase() === 'yes') {
 							subject_data_worker.postMessage({ isDemoCompleted: true }) // **
 						};
