@@ -166,7 +166,7 @@ var logic = {
     let isDemo = null;
     let isDemoCompleted = null;
     let demoTrialNum = null
-
+debugger
     if (settings.allowDemo) { // check if demo is available and set variables accordingly      
       if (noDataYet || subData.showInstructions[subData.showInstructions.length - 1] || (subData.isDemo[subData.isDemo.length - 1] && !subData.isDemoCompleted[subData.isDemoCompleted.length - 1])) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
         isDemo = true;
@@ -183,9 +183,9 @@ var logic = {
       var isFirstTime = !noDataYet && subData.isDemo[subData.isDemo.length - 1] && subData.isDemoCompleted[subData.isDemoCompleted.length - 1] ? true : false;
     } else {
       if (settings.allowInstructions) {
-        var isFirstTime = subData.showInstructions[subData.showInstructions.length - 1];
+        var isFirstTime = !!subData.showInstructions[subData.showInstructions.length - 1];
       } else {
-        isFirstTime = noDataYet;
+        var isFirstTime = noDataYet;
       }
     }
 
