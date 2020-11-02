@@ -1,3 +1,39 @@
+// ****************************************************************
+//                           FUNCTIONS:
+// ---------------------------------------------------------------
+function exitAppDemo () {
+	debugger
+	console.log('Exit THE APP')
+	dom_helper.duplicate('embedded_app');
+}
+
+function loadAppDemo () {
+	debugger
+	console.log('FUNFUNFUN')
+	//dom_helper.hide("embedded_app")
+	dom_helper.duplicate('embedded_app');
+	//dom_helper.show(embedded_app_id);
+}
+
+
+function checkReady(target_n_data_points) {
+
+	var subData = data_helper.get_subject_data(true);
+	current_n_data_points = subData.day.length
+
+    if (current_n_data_points !== target_n_data_points && !subData.endTime[subData.endTime.length-1]) { // check again while there is no new data point and while it has no value for endTime
+		console.log('SAD')
+        setTimeout("checkReady()", 300);
+    } else {
+        console.log('WOWI')
+    }
+}
+
+
+
+// ****************************************************************
+//                           PIPELINE:
+// ---------------------------------------------------------------
 jatos.loaded().then(function () {
 	var terminate_subject_data_worker = false;
 	subject_data_worker.done = function (x) {
@@ -124,8 +160,60 @@ jatos.loaded().then(function () {
 				var dataObj = {...jsPsych.data.get().values()}
 				subject_data_worker.postMessage(dataObj)
 				subject_data_worker.postMessage({ completedInstructions: true });
+
+
+debugger
+// creating the smarthpone appearance:
+outerRectangle = document.createElement('div');
+outerRectangle.setAttribute("id", "outerRectangle");
+outerRectangle.setAttribute("class", "bigRectangle");
+
+innerRectangle = document.createElement('div');
+innerRectangle.setAttribute("id", "innerRectangle");
+innerRectangle.setAttribute("class", "smallRectangle");
+
+outerRectangle.appendChild(innerRectangle);
+
+document.body.appendChild(outerRectangle);
+
+for (i = 0; i < 19; i++) {
+	dom_helper.duplicate('innerRectangle');
+}
+
+
+
+
+
+
+
+// button of exit the app
+debugger
+				exitAppElement = document.createElement('button');
+				exitAppElement.setAttribute("id", "demoExitButton");
+				exitAppElement.setAttribute("onclick", "exitAppDemo()");
+				exitAppElement.appendChild(document.createTextNode("Exit the app"));
+				document.body.appendChild(exitAppElement);
+				dom_helper.add_css_class('demoExitButton', 'demoButton');
+
+
+// button of openning the app
+
+				loadTheAppElement = document.createElement('button');
+				loadTheAppElement.setAttribute("id", "demoLoadButton");
+				loadTheAppElement.setAttribute("onclick", "loadAppDemo()");
+				loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
+				document.body.appendChild(loadTheAppElement);
+				dom_helper.add_css_class('demoLoadButton', 'demoButton');
+				dom_helper.add_css_class('demoLoadButton', 'loadButton');
+
+
+
+
+
+
 				// embed the app for demo purposes:
 				embeddedElement = document.createElement('object');
+				embeddedElement.setAttribute("id", "embedded_app")
 				embeddedElement.setAttribute("data", "index.html")
 				embeddedElement.style.position = "absolute"
 				embeddedElement.style.top = "50%"
@@ -134,8 +222,15 @@ jatos.loaded().then(function () {
 				embeddedElement.style.width = "70vw"
 				embeddedElement.style.height = "70vh"
 				embeddedElement.style.border = "0.5vw solid rgb(100, 100, 100)"
-				embeddedElement.style.borderRadius = "20px"
+				embeddedElement.style.borderRadius = "5vw"
 				document.body.appendChild(embeddedElement)
+
+
+// check when embedded app finshed running:
+				var subData = data_helper.get_subject_data(true);
+				n_data_points = subData.day.length // just to chekc the number of data points
+				target_n_data_points = subData.day.length+1
+				checkReady(target_n_data_points)
 
 				terminate_subject_data_worker = true;
 			}
