@@ -286,7 +286,7 @@ h1 {
   width: 20vw;
   height: 5vh;
 
-  background-color: white;
+  background-color: rgba(200, 200, 200, 0.4);
   border: 1vw solid #555555;
   color: black;
   padding: 16px 32px;
@@ -332,10 +332,11 @@ h1 {
 .smallRectangle {
   display:inline-block;
   width: 12vw;
-  height: 6vh;
+  height: 6.5vh;
   margin-left: 3.5vw;
   margin-top: 4.3vh;
-  border: 0.5vw solid rgb(100, 100, 100,0.7);
+  border: 0.5vw solid transparent;
+  background-color: rgba(200, 200, 200, 0.35);
   overflow: hidden;
   border-radius: 15px;
 }
@@ -343,7 +344,7 @@ h1 {
 .appIconSpecifics {
   display:inline-block;
   width: 13vw;
-  height: calc(6vh + 1vw);
+  height: calc(6.5vh + 1vw);
   margin-left: 3.5vw;
   margin-top: 5vh;
   overflow: hidden;
@@ -368,9 +369,17 @@ h1 {
 }
 @keyframes appOpenClose_animation {
   0%   { padding: 0px 0px 0px 0px; opacity:1.0;}
-  100% { padding: 0px 0px 20% 0px; opacity:0.3; width: 12vw; height: 6vh; top: 62.5%; left: 58%; border: none;}
+  100% { padding: 0px 0px 20% 0px; opacity:0.0; width: 12vw; height: 6vh; top: 62.5%; left: 58%; border: none; border-radius: 15px;}
 }
 
 .disabled{
   pointer-events: none;
+}
+
+hr {
+  position: relative;
+  top: 2vh;
+  margin-left: 5vh;
+  margin-right: 5vh;
+  border-top: 2vw dotted rgba(200, 200, 200, 0.7);
 }

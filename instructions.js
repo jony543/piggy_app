@@ -51,8 +51,10 @@ function checkReady(target_n_data_points) {
 	console.log(subData.endTime[subData.endTime.length - 1])
 	if (current_n_data_points === target_n_data_points && !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
 		console.log('WOWI')
-		dom_helper.show('demoExitButton')
-		dom_helper.remove_css_class('demoExitButton', 'disabled');
+		wait(2000).then(() => {
+			dom_helper.show('demoExitButton')
+			dom_helper.remove_css_class('demoExitButton', 'disabled');
+		});
 	} else {
 		console.log('SAD')
 		setTimeout('checkReady(' + target_n_data_points + ')', 300);
@@ -81,8 +83,13 @@ function createSmartphoneApperance() {
 	appIconElement.setAttribute("class", "appIconSpecifics");
 	appIconElement.setAttribute("src", "icons/android-icon-72x72.png");
 	outerRectangle.appendChild(appIconElement);
+	// another app:
+	dom_helper.duplicate('innerRectangle');
+	// draw a line:
+	lineElement = document.createElement('hr');
+	outerRectangle.appendChild(lineElement);
 	// add another 5 regular rectangles:
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < 4; i++) {
 		dom_helper.duplicate('innerRectangle');
 	}
 }
@@ -97,6 +104,22 @@ function createExitAppButton(elementIdName) {
 	document.body.appendChild(exitAppElement);
 	dom_helper.add_css_class(elementIdName, 'demoButton');
 	dom_helper.add_css_class(elementIdName, 'disabled');
+}
+
+function createLoadAppButton(elementIdName) {
+	// button of openning the app:
+	loadTheAppElement = document.createElement('button');
+	loadTheAppElement.setAttribute("id", elementIdName);
+	loadTheAppElement.setAttribute("onclick", "appDemoID = loadAppDemo()");
+	loadTheAppElement.setAttribute("class", "loadButton");
+	//loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
+	document.body.appendChild(loadTheAppElement);
+
+	var appIconPosition = document.getElementById('appIcon').getBoundingClientRect()
+	document.getElementById(elementIdName).style.top = String(appIconPosition.top) + "px"
+	document.getElementById(elementIdName).style.left = String(appIconPosition.left) + "px"
+	document.getElementById(elementIdName).style.height = String(appIconPosition.height) + "px"
+	document.getElementById(elementIdName).style.width = String(appIconPosition.width) + "px"
 }
 
 // ****************************************************************
@@ -234,36 +257,7 @@ jatos.loaded().then(function () {
 				createSmartphoneApperance()
 				debugger
 				createExitAppButton(elementIdName = 'demoExitButton')
-
-
-
-				// button of exit the app:
-				exitAppElement = document.createElement('button');
-				exitAppElement.setAttribute("id", "demoExitButton");
-				exitAppElement.setAttribute("onclick", "exitAppDemo(appDemoID)");
-				//exitAppElement.appendChild(document.createTextNode("Exit the app"));
-				document.body.appendChild(exitAppElement);
-				dom_helper.add_css_class('demoExitButton', 'demoButton');
-
-
-				// button of openning the app:
-				loadTheAppElement = document.createElement('button');
-				loadTheAppElement.setAttribute("id", "demoLoadButton");
-				loadTheAppElement.setAttribute("onclick", "appDemoID = loadAppDemo()");
-				loadTheAppElement.setAttribute("class", "loadButton");
-				//loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
-				document.body.appendChild(loadTheAppElement);
-
-
-				var appIconPosition = document.getElementById('appIcon').getBoundingClientRect()
-				document.getElementById('demoLoadButton').style.top = String(appIconPosition.top) + "px"
-				document.getElementById('demoLoadButton').style.left = String(appIconPosition.left) + "px"
-				document.getElementById('demoLoadButton').style.height = String(appIconPosition.height) + "px"
-				document.getElementById('demoLoadButton').style.width = String(appIconPosition.width) + "px"
-
-
-
-
+				createLoadAppButton(elementIdName = 'demoLoadButton')
 
 
 
