@@ -280,24 +280,24 @@ h1 {
 
 .demoButton {
   position: absolute;
-  top: 95%;
+  top: 81.5%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 30vw;
+  width: 20vw;
   height: 5vh;
 
   background-color: white;
-  border: 0.3vw solid #555555;
+  border: 1vw solid #555555;
   color: black;
   padding: 16px 32px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 3vw;
   margin: 4px 2px;
   transition-duration: 0.4s;
-  border-radius: 5px;
+  border-radius: 50px;
   outline: none;
+  z-index: 999;
 }
 
 .demoButton:active {
@@ -307,12 +307,15 @@ h1 {
 
 .loadButton {
   position: absolute;
-  top: 5%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 30vw;
-  height: 5vh;
+  background-color: transparent;
+  border-radius: 15px;
+  outline: none;
 }
+
+.loadButton:active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
 
 /* draw a smartphone screen */
 .bigRectangle {
@@ -329,11 +332,45 @@ h1 {
 .smallRectangle {
   display:inline-block;
   width: 12vw;
-  height: 12vw;
+  height: 6vh;
   margin-left: 3.5vw;
-  margin-top: 5vh;
+  margin-top: 4.3vh;
   border: 0.5vw solid rgb(100, 100, 100,0.7);
   overflow: hidden;
   border-radius: 15px;
 }
 
+.appIconSpecifics {
+  display:inline-block;
+  width: 13vw;
+  height: calc(6vh + 1vw);
+  margin-left: 3.5vw;
+  margin-top: 5vh;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.appClose {
+  position: absolute;  
+  animation-name: appOpenClose_animation;
+  animation-duration: 0.3s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+.appOpen {
+  position: absolute;  
+  animation-name: appOpenClose_animation;
+  animation-duration: 0.3s;
+  animation-iteration-count: 1;
+  animation-direction: reverse;
+  animation-fill-mode: forwards;
+}
+@keyframes appOpenClose_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:1.0;}
+  100% { padding: 0px 0px 20% 0px; opacity:0.3; width: 12vw; height: 6vh; top: 62.5%; left: 58%; border: none;}
+}
+
+.disabled{
+  pointer-events: none;
+}

@@ -1,35 +1,103 @@
 // ****************************************************************
 //                           FUNCTIONS:
 // ---------------------------------------------------------------
-function exitAppDemo () {
-	debugger
+function exitAppDemo(appDemoID) {
 	console.log('Exit THE APP')
-	dom_helper.duplicate('embedded_app');
+	dom_helper.remove_css_class(appDemoID, 'appOpen');
+	dom_helper.add_css_class(appDemoID, 'appClose');
+	wait(1000).then(() => dom_helper.hide(appDemoID));
 }
 
-function loadAppDemo () {
+function loadAppDemo() {
+	// first set the stuff to check when embedded app finshed running:
+	var subData = data_helper.get_subject_data(true);
+	var target_n_data_points = subData.day.length + 1
 	debugger
-	console.log('FUNFUNFUN')
-	//dom_helper.hide("embedded_app")
-	dom_helper.duplicate('embedded_app');
-	//dom_helper.show(embedded_app_id);
+	checkReady(target_n_data_points)
+
+	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
+		// embed the app for demo purposes:
+		appDemoID = "embedded_app";
+		embeddedElement = document.createElement('object');
+		embeddedElement.setAttribute("id", appDemoID)
+		embeddedElement.setAttribute("data", "index.html")
+		embeddedElement.style.position = "absolute"
+		embeddedElement.style.top = "50%"
+		embeddedElement.style.left = "50%"
+		embeddedElement.style.transform = "translate(-50%, -50%)"
+		embeddedElement.style.width = "70vw"
+		embeddedElement.style.height = "70vh"
+		embeddedElement.style.border = "0.5vw solid rgb(100, 100, 100)"
+		embeddedElement.style.borderRadius = "5vw"
+		document.body.appendChild(embeddedElement)
+	} else {
+		var appDemoID = dom_helper.duplicate('embedded_app');
+	}
+	dom_helper.remove_css_class(appDemoID, 'appClose');
+	dom_helper.add_css_class(appDemoID, 'appOpen');
+	dom_helper.show(appDemoID);
+	dom_helper.hide('demoExitButton')
+
+	return appDemoID
 }
 
 
 function checkReady(target_n_data_points) {
-
 	var subData = data_helper.get_subject_data(true);
 	current_n_data_points = subData.day.length
 
-    if (current_n_data_points !== target_n_data_points && !subData.endTime[subData.endTime.length-1]) { // check again while there is no new data point and while it has no value for endTime
+	console.log(current_n_data_points)
+	console.log(target_n_data_points)
+	console.log(subData.endTime[subData.endTime.length - 1])
+	if (current_n_data_points === target_n_data_points && !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
+		console.log('WOWI')
+		dom_helper.show('demoExitButton')
+		dom_helper.remove_css_class('demoExitButton', 'disabled');
+	} else {
 		console.log('SAD')
-        setTimeout("checkReady()", 300);
-    } else {
-        console.log('WOWI')
-    }
+		setTimeout('checkReady(' + target_n_data_points + ')', 300);
+	}
 }
 
+function createSmartphoneApperance() {
+	// outer rectangle:
+	outerRectangle = document.createElement('div');
+	outerRectangle.setAttribute("id", "outerRectangle");
+	outerRectangle.setAttribute("class", "bigRectangle");
+	// inner rectangles:
+	innerRectangle = document.createElement('div');
+	innerRectangle.setAttribute("id", "innerRectangle");
+	innerRectangle.setAttribute("class", "smallRectangle");
+	// put the inner rectangle in the outer rectangle
+	outerRectangle.appendChild(innerRectangle);
+	document.body.appendChild(outerRectangle);
+	// duplicate the small rectangles
+	for (i = 0; i < 13; i++) {
+		dom_helper.duplicate('innerRectangle');
+	}
+	// add the icon element:
+	appIconElement = document.createElement('img');
+	appIconElement.setAttribute("id", "appIcon");
+	appIconElement.setAttribute("class", "appIconSpecifics");
+	appIconElement.setAttribute("src", "icons/android-icon-72x72.png");
+	outerRectangle.appendChild(appIconElement);
+	// add another 5 regular rectangles:
+	for (i = 0; i < 5; i++) {
+		dom_helper.duplicate('innerRectangle');
+	}
+}
 
+function createExitAppButton(elementIdName) {
+	debugger
+	// button of exit the app:
+	exitAppElement = document.createElement('button');
+	exitAppElement.setAttribute("id", elementIdName);
+	exitAppElement.setAttribute("onclick", "exitAppDemo(appDemoID)");
+	//exitAppElement.appendChild(document.createTextNode("Exit the app"));
+	document.body.appendChild(exitAppElement);
+	dom_helper.add_css_class(elementIdName, 'demoButton');
+	dom_helper.add_css_class(elementIdName, 'disabled');
+}
 
 // ****************************************************************
 //                           PIPELINE:
@@ -157,80 +225,50 @@ jatos.loaded().then(function () {
 			timeline: timeline,
 			//display_element: 'jspsych-display-element',
 			on_finish: function () {
-				var dataObj = {...jsPsych.data.get().values()}
+				var dataObj = { ...jsPsych.data.get().values() }
 				subject_data_worker.postMessage(dataObj)
 				subject_data_worker.postMessage({ completedInstructions: true });
 
 
-debugger
-// creating the smarthpone appearance:
-outerRectangle = document.createElement('div');
-outerRectangle.setAttribute("id", "outerRectangle");
-outerRectangle.setAttribute("class", "bigRectangle");
 
-innerRectangle = document.createElement('div');
-innerRectangle.setAttribute("id", "innerRectangle");
-innerRectangle.setAttribute("class", "smallRectangle");
-
-outerRectangle.appendChild(innerRectangle);
-
-document.body.appendChild(outerRectangle);
-
-for (i = 0; i < 19; i++) {
-	dom_helper.duplicate('innerRectangle');
-}
+				createSmartphoneApperance()
+				debugger
+				createExitAppButton(elementIdName = 'demoExitButton')
 
 
 
-
-
-
-
-// button of exit the app
-debugger
+				// button of exit the app:
 				exitAppElement = document.createElement('button');
 				exitAppElement.setAttribute("id", "demoExitButton");
-				exitAppElement.setAttribute("onclick", "exitAppDemo()");
-				exitAppElement.appendChild(document.createTextNode("Exit the app"));
+				exitAppElement.setAttribute("onclick", "exitAppDemo(appDemoID)");
+				//exitAppElement.appendChild(document.createTextNode("Exit the app"));
 				document.body.appendChild(exitAppElement);
 				dom_helper.add_css_class('demoExitButton', 'demoButton');
 
 
-// button of openning the app
-
+				// button of openning the app:
 				loadTheAppElement = document.createElement('button');
 				loadTheAppElement.setAttribute("id", "demoLoadButton");
-				loadTheAppElement.setAttribute("onclick", "loadAppDemo()");
-				loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
+				loadTheAppElement.setAttribute("onclick", "appDemoID = loadAppDemo()");
+				loadTheAppElement.setAttribute("class", "loadButton");
+				//loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
 				document.body.appendChild(loadTheAppElement);
-				dom_helper.add_css_class('demoLoadButton', 'demoButton');
-				dom_helper.add_css_class('demoLoadButton', 'loadButton');
+
+
+				var appIconPosition = document.getElementById('appIcon').getBoundingClientRect()
+				document.getElementById('demoLoadButton').style.top = String(appIconPosition.top) + "px"
+				document.getElementById('demoLoadButton').style.left = String(appIconPosition.left) + "px"
+				document.getElementById('demoLoadButton').style.height = String(appIconPosition.height) + "px"
+				document.getElementById('demoLoadButton').style.width = String(appIconPosition.width) + "px"
 
 
 
 
 
 
-				// embed the app for demo purposes:
-				embeddedElement = document.createElement('object');
-				embeddedElement.setAttribute("id", "embedded_app")
-				embeddedElement.setAttribute("data", "index.html")
-				embeddedElement.style.position = "absolute"
-				embeddedElement.style.top = "50%"
-				embeddedElement.style.left = "50%"
-				embeddedElement.style.transform = "translate(-50%, -50%)"
-				embeddedElement.style.width = "70vw"
-				embeddedElement.style.height = "70vh"
-				embeddedElement.style.border = "0.5vw solid rgb(100, 100, 100)"
-				embeddedElement.style.borderRadius = "5vw"
-				document.body.appendChild(embeddedElement)
 
 
-// check when embedded app finshed running:
-				var subData = data_helper.get_subject_data(true);
-				n_data_points = subData.day.length // just to chekc the number of data points
-				target_n_data_points = subData.day.length+1
-				checkReady(target_n_data_points)
+
 
 				terminate_subject_data_worker = true;
 			}
