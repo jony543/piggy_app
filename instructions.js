@@ -1,6 +1,17 @@
 // ****************************************************************
 //                           FUNCTIONS:
-// ---------------------------------------------------------------
+// ----------------------------------------------------------------
+var check_consent = function (elem) {
+	if (document.getElementById('consent_checkbox').checked) {
+		return true;
+	}
+	else {
+		alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+		return false;
+	}
+	return false;
+};
+
 function exitAppDemo(appDemoID) {
 	console.log('Exit THE APP')
 	dom_helper.remove_css_class(appDemoID, 'appOpen');
@@ -12,7 +23,7 @@ function loadAppDemo() {
 	// first set the stuff to check when embedded app finshed running:
 	var subData = data_helper.get_subject_data(true);
 	var target_n_data_points = subData.day.length + 1
-	debugger
+
 	checkReady(target_n_data_points)
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
@@ -95,7 +106,6 @@ function createSmartphoneApperance() {
 }
 
 function createExitAppButton(elementIdName) {
-	debugger
 	// button of exit the app:
 	exitAppElement = document.createElement('button');
 	exitAppElement.setAttribute("id", elementIdName);
@@ -147,6 +157,13 @@ jatos.loaded().then(function () {
 
 	////// up to this point I copied it from the app.js ///////// **
 	var timeline = [];
+
+	var consentForm = {
+		type: 'external-html',
+		url: "informed_consent.html",
+		cont_btn: "start",
+		check_fn: check_consent
+	};
 
 	var instructions = {
 		data: {
@@ -241,6 +258,7 @@ jatos.loaded().then(function () {
 		}
 	};
 
+	timeline.push(consentForm);
 	timeline.push(instructionsLoop);
 
 	jatos.onLoad(function () {
@@ -249,20 +267,15 @@ jatos.loaded().then(function () {
 			//display_element: 'jspsych-display-element',
 			on_finish: function () {
 				var dataObj = { ...jsPsych.data.get().values() }
+
+				// saving the data
 				subject_data_worker.postMessage(dataObj)
 				subject_data_worker.postMessage({ completedInstructions: true });
 
-
-
+				// Operate the embedded demo:
 				createSmartphoneApperance()
-				debugger
 				createExitAppButton(elementIdName = 'demoExitButton')
 				createLoadAppButton(elementIdName = 'demoLoadButton')
-
-
-
-
-
 
 				terminate_subject_data_worker = true;
 			}
