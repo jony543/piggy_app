@@ -100,6 +100,15 @@ function wait(delay) {
 	});
 }
 
+function syncWait(ms) {
+    var start = Date.now(),
+        now = start;
+    while (now - start < ms) {
+      now = Date.now();
+    }
+}
+
+
 Array.prototype.multiIndexOf = function (el) {
 	var idxs = [];
 	for (var i = this.length - 1; i >= 0; i--) {

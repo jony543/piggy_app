@@ -60,13 +60,11 @@ function checkReady(target_n_data_points) {
 	var current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
 
 	if (current_n_data_points === target_n_data_points && !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
-		console.log('WOWI')
 		wait(2000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
 		});
 	} else {
-		console.log('SAD')
 		setTimeout('checkReady(' + target_n_data_points + ')', 300);
 	}
 }
@@ -142,7 +140,7 @@ function removeSmartphoneApperance(appDemoID) {
 //                        INITIALIZATION:
 // ---------------------------------------------------------------
 var appClosed = null; //indicator for when the embedded app is closed or open during the demo.
-
+var runDemo = null;
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
@@ -165,7 +163,7 @@ jatos.loaded().then(function () {
 
 	// get subject data from batch session
 	var subData = data_helper.get_subject_data(true);
-debugger
+
 	////// up to this point I copied it from the app.js ///////// **
 	var timeline = [];
 
@@ -219,32 +217,31 @@ debugger
 			trialType: 'checkIfDemoCompleted',
 		},
 		type: 'html-keyboard-response',
-		trial_duration: 300, // check every 0.3s
+		trial_duration: 400, // check every 0.4s
 		choices: jsPsych.NO_KEYS,
 		stimulus: '',
 	};
 	var demo_cycle_loop = {
 		timeline: [checkIfDemoCompleted],
 		loop_function: function (data) {
-			console.log('XXXXX')
 			var subData = data_helper.get_subject_data(true);
-			console.log(subData)
-			//debugger
 			if (!!Object.keys(subData).length &&
-				subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) &&
-				!!subData.endTime[subData.endTime.length - 1] &&
-				appClosed) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended
+				subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
+				!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+				appClosed) {  // app was closed
+				appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant
 				wait(300).then(() => removeSmartphoneApperance());
+				syncWait(750)
 				return false;
 			} else {
 				return true;
 			}
 		}
-	}
+	};
 
-	var continuet_or_repeat_demo_cycle = {
+	var continue_or_repeat_demo_cycle = {
 		data: {
-			trialType: 'continuet_or_repeat_demo_cycle',
+			trialType: 'continue_or_repeat_demo_cycle',
 		},
 		type: 'html-button-response',
 		trial_duration: undefined, // no time limit
@@ -257,13 +254,14 @@ debugger
 		]
 	};
 	var big_demo_loop = {
-		timeline: [demo, demo_cycle_loop, continuet_or_repeat_demo_cycle],
+		timeline: [demo, demo_cycle_loop, continue_or_repeat_demo_cycle],
 		loop_function: function (data) {
 			console.log('YYYYY')
 			const subPressedContinue = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]);
 			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
 				return false;
 			} else {
+				// Operate the embedded demo:
 				return true;
 			}
 		}
@@ -338,9 +336,7 @@ debugger
 			}
 		}
 	};
-	// temp:
-	timeline.push(continuet_or_repeat_demo_cycle);
-	//
+
 	timeline.push(consentForm);
 	timeline.push(instructionsLoop);
 

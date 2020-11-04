@@ -385,12 +385,10 @@ hr {
 
 #repeatOrContinueButtons {
   position: relative;
-  top: 35vh;
   font-size: 5vw;
 }
 
 #repeatOrContinueText {
   position: relative;
-  top: 35vh;
   font-size: 4.5vw;
 }
