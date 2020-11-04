@@ -36,20 +36,17 @@ jatos.loaded().then(function () {
 		alert(settings.text.realGameBegins)
 	}
 
-	// TO RANI - not sure what the purpose of this code. 
-	// Commented for now and will redo when I create new confirmation implementation
-	// if (runData.resetContainer) { // activating reseting container when relevant. **
-	// 	console.log('A')
-	// 	data_helper.append_subject_data({ resetContainer: false })
-	// 		.then(() => {
-	// 			console.log('B')
-	// 			getConfirmation(settings.text.rewardContainerClearingMessage);	
-	// 		})
-	// 		.then(() => {
-	// 			data_helper.append_subject_data({ resetContainer: true })
-	// 			console.log('C')
-	// 		})
-	// }
+	// RANI - please see if this is correct.
+	// Also - why send 2 consecutive messages of resetContainer? the second will override the first.
+	if (runData.resetContainer) { // activating reseting container when relevant. **
+		console.log('A');
+		subject_data_worker.postMessage({ resetContainer: false });
+		console.log('B');
+		dialog_helper.show(settings.text.rewardContainerClearingMessage).then(function () {	
+			subject_data_worker.postMessage({ resetContainer: true })
+			console.log('C');	
+		});
+	}
 
 	////
 	if (runData.hideOutcome) {
@@ -156,37 +153,50 @@ jatos.loaded().then(function () {
 
 			wait(settings.durations.outcomeAnim).then(function () { // show winning/loosing message for 2 seconds
 				var manipulationOption = logic.isManipulation(runData, settings);
+				dom_helper.hide("welcome_msg");
 
-				if (manipulationOption) {
-					dom_helper.hide("welcome_msg");
+				var continue_execution_after_devaluation; 
+				var hold_execution_until_after_devaluation = new Promise((resolve, reject) => 
+					{ 
+						continue_execution_after_devaluation = resolve;
+					});	
 
+				if (manipulationOption) {					
 					subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
-					getConfirmation(settings.text.manipulationMessage(manipulationOption), 'alert'); //**
-					subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
+					dialog_helper.show(settings.text.manipulationMessage(manipulationOption)).then(function () {
+						subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 
-					if (manipulationOption == 'devaluation') {
-						dom_helper.show("piggy_full");
-						dom_helper.add_css_class('piggy_full', 'dance');
-					}
+						if (manipulationOption == 'devaluation') {
+							dom_helper.show("piggy_full");
+							dom_helper.add_css_class('piggy_full', 'dance');
+						}
 
-					if (manipulationOption == 'still_valued') {
-						dom_helper.show("piggy_half");
-						dom_helper.add_css_class('piggy_half', 'dance');
-					}
+						if (manipulationOption == 'still_valued') {
+							dom_helper.show("piggy_half");
+							dom_helper.add_css_class('piggy_half', 'dance');
+						}
+
+						continue_execution_after_devaluation();
+					});
+				} else {
+					continue_execution_after_devaluation();
 				}
 
-				///
-				//debugger
-				dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
-				dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
-				dom_helper.set_text('welcome_msg_txt', "See you next time"); //**
-				dom_helper.show('welcome_msg'); // **
-				/////
-				///
 
-				// collect end time and save subject data as results
-				subject_data_worker.postMessage({ endTime: new Date() });
-				terminate_subject_data_worker = true;
+				hold_execution_until_after_devaluation.then(function () {
+					///
+					//debugger
+					dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
+					dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
+					dom_helper.set_text('welcome_msg_txt', "See you next time"); //**
+					dom_helper.show('welcome_msg'); // **
+					/////
+					///
+
+					// collect end time and save subject data as results
+					subject_data_worker.postMessage({ endTime: new Date() });
+					terminate_subject_data_worker = true;
+				});
 			});
 		});
 	});

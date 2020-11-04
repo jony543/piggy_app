@@ -171,7 +171,10 @@ var dialog_helper = {
 		}
 		return result;
 	},
-	show: function (msg, confirmation) {
+	random_code_confirmation: function (msg) { // returns promise
+		return this.show(msg, this.makeid());
+	},
+	show: function (msg, confirmation) { // returns promise
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
 				dom_helper.show("dialog_response_text");
@@ -196,7 +199,7 @@ var dialog_helper = {
 
 				dom_helper.hide('dialog_box');
 				dom_helper.hide("screen-disabled-mask");
-				
+
 				resolve();
 			}
 		});		
