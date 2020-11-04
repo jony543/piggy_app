@@ -184,19 +184,6 @@ jatos.loaded().then(function () {
 				/////
 				///
 
-				// Check if to complete demo when relevant: **
-				if (runData.isDemo &&
-					runData.demoTrialNum % Object.keys(settings.demoCycle).length === Object.keys(settings.demoCycle).length - 1 // checking that this is the last trial in the demo cycle
-				) {
-					wait(1000).then(function () {
-						isDemoCompleted = prompt(settings.text.completeDemo);
-						debugger
-						if (isDemoCompleted.toLowerCase() === 'yes') {
-							subject_data_worker.postMessage({ isDemoCompleted: true }) // **
-						};
-					});
-				};
-
 				// collect end time and save subject data as results
 				subject_data_worker.postMessage({ endTime: new Date() });
 				terminate_subject_data_worker = true;

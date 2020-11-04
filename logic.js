@@ -161,17 +161,15 @@ var logic = {
         return dataToSave;
       }
     }
-    // CHECK AND SET DEMO (and whether this is the First REAL trial of the game - isFirstTime)
+    // CHECK AND SET DEMO
     // -------------------------------------------------------
     // demo vars defaults:
     let isDemo = null;
-    let isDemoCompleted = null;
     let demoTrialNum = null
 
     if (settings.allowDemo) { // check if demo is available and set variables accordingly      
-      if (noDataYet || subData.showInstructions[subData.showInstructions.length - 1] || (subData.isDemo[subData.isDemo.length - 1] && !subData.isDemoCompleted[subData.isDemoCompleted.length - 1])) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
+      if (isCalledFromInstructions) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
         isDemo = true;
-        isDemoCompleted = false; // this will be set to change after the participant confirms there is no need in another demo
         if (noDataYet || subData.demoTrialNum[subData.demoTrialNum.length - 1] === null || subData.demoTrialNum[subData.demoTrialNum.length - 1] === undefined) { // if this is the first demo trial after instructions
           demoTrialNum = 0
         } else {
@@ -179,15 +177,14 @@ var logic = {
         }
       } else {
         isDemo = false;
-        isDemoCompleted = true;
       }
-      var isFirstTime = !noDataYet && subData.isDemo[subData.isDemo.length - 1] && subData.isDemoCompleted[subData.isDemoCompleted.length - 1] ? true : false;
+    }
+    // CHECK IF THIS IS THE FIRST REAL TRIAL
+    // -------------------------------------------------------  
+    if (settings.allowDemo) { // if there is no demo (and instructions)
+      var isFirstTime = !noDataYet && subData.isDemo[subData.isDemo.length - 1] && !isCalledFromInstructions ? true : false;
     } else {
-      if (settings.allowInstructions) {
-        var isFirstTime = !!subData.showInstructions[subData.showInstructions.length - 1];
-      } else {
         var isFirstTime = noDataYet;
-      }
     }
 
     // -------------------------------------------------------
@@ -287,7 +284,6 @@ var logic = {
       startTime: startTime,
       showInstructions: false,
       isDemo: isDemo,
-      isDemoCompleted: isDemoCompleted,
       demoTrialNum: demoTrialNum,
     };
     return dataToSave;
