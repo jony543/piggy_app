@@ -17,6 +17,12 @@ var dom_helper = {
 	append_html: function (id, html) {
 		document.getElementById(id).insertAdjacentHTML('beforeend', html);
 	},
+	enable: function (id) {
+		document.getElementById(id).disabled = false;
+	},
+	disable: function (id) {
+		document.getElementById(id).disabled = true;
+	},
 	blink: function (id, ms) {
 		this.show(id);
 		setTimeout((function () { this.hide(id); }).bind(this), ms);
@@ -143,16 +149,6 @@ function sortWithIndices(toSort) {
 	return toSort;
 }
 
-function makeid(length) { // adapted to generate random strings from : https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-	var result = '';
-	var characters = 'bcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
-	var charactersLength = characters.length;
-	for (var i = 0; i < length; i++) {
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	}
-	return result;
-}
-
 function getConfirmation(msg, type) {
 	if (type === "prompt") {
 		confirmationCode = makeid(3);
@@ -162,5 +158,46 @@ function getConfirmation(msg, type) {
 		}
 	} else if (type === "alert") {
 		alert(msg)
+	}
+}
+
+var dialog_helper = {
+	makeid: function (length) { // adapted to generate random strings from : https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+		var result = '';
+		var characters = 'bcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
+		var charactersLength = characters.length;
+		for (var i = 0; i < length; i++) {
+			result += characters.charAt(Math.floor(Math.random() * charactersLength));
+		}
+		return result;
+	},
+	show: function (msg, confirmation) {
+		return new Promise(function (resolve) {
+			if (!!confirmation) {
+				dom_helper.show("dialog_response_text");
+				dom_helper.disable("dialog_ok_button");
+				document.getElementById('dialog_response_text').oninput = function () {
+					if (document.getElementById('dialog_response_text').value == confirmation) {
+						dom_helper.enable("dialog_ok_button");
+					}
+				}
+			} else {
+				dom_helper.hide("dialog_response_text");
+				dom_helper.enable("dialog_ok_button")
+			}
+
+			dom_helper.set_text("dialog_msg", msg);
+			dom_helper.show("screen-disabled-mask");
+			dom_helper.show('dialog_box');
+
+			document.getElementById('dialog_ok_button').onclick = function () {
+				document.getElementById('dialog_ok_button').onclick = undefined;
+				document.getElementById('dialog_response_text').oninput = undefined;
+
+				dom_helper.hide('dialog_box');
+
+				resolve();
+			}
+		});		
 	}
 }
