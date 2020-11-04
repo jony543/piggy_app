@@ -195,7 +195,8 @@ var dialog_helper = {
 				document.getElementById('dialog_response_text').oninput = undefined;
 
 				dom_helper.hide('dialog_box');
-
+				dom_helper.hide("screen-disabled-mask");
+				
 				resolve();
 			}
 		});		
