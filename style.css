@@ -316,7 +316,6 @@ h1 {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-
 /* draw a smartphone screen */
 .bigRectangle {
   position: absolute;
@@ -382,4 +381,16 @@ hr {
   margin-left: 5vh;
   margin-right: 5vh;
   border-top: 2vw dotted rgba(200, 200, 200, 0.7);
+}
+
+#repeatOrContinueButtons {
+  position: relative;
+  top: 35vh;
+  font-size: 5vw;
+}
+
+#repeatOrContinueText {
+  position: relative;
+  top: 35vh;
+  font-size: 4.5vw;
 }

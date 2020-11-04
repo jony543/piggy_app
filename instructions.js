@@ -17,12 +17,13 @@ function exitAppDemo(appDemoID) {
 	dom_helper.remove_css_class(appDemoID, 'appOpen');
 	dom_helper.add_css_class(appDemoID, 'appClose');
 	wait(1000).then(() => dom_helper.hide(appDemoID));
+	appClosed = true; // this to indicate that the app is closed
 }
 
 function loadAppDemo() {
 	// first set the stuff to check when embedded app finshed running:
 	var subData = data_helper.get_subject_data(true);
-	var target_n_data_points = subData.day.length + 1
+	var target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
 	checkReady(target_n_data_points)
 
@@ -49,17 +50,15 @@ function loadAppDemo() {
 	dom_helper.show(appDemoID);
 	dom_helper.hide('demoExitButton')
 
+	appClosed = false; // this to indicate that the app is closed
 	return appDemoID
 }
 
 
 function checkReady(target_n_data_points) {
 	var subData = data_helper.get_subject_data(true);
-	current_n_data_points = subData.day.length
+	var current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
 
-	console.log(current_n_data_points)
-	console.log(target_n_data_points)
-	console.log(subData.endTime[subData.endTime.length - 1])
 	if (current_n_data_points === target_n_data_points && !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
 		console.log('WOWI')
 		wait(2000).then(() => {
@@ -132,6 +131,18 @@ function createLoadAppButton(elementIdName) {
 	document.getElementById(elementIdName).style.width = String(appIconPosition.width) + "px"
 }
 
+function removeSmartphoneApperance(appDemoID) {
+	//document.getElementById(appDemoID).remove();
+	document.getElementById("outerRectangle").remove();
+	document.getElementById("demoExitButton").remove();
+	document.getElementById("demoLoadButton").remove();
+}
+
+// ****************************************************************
+//                        INITIALIZATION:
+// ---------------------------------------------------------------
+var appClosed = null; //indicator for when the embedded app is closed or open during the demo.
+
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
@@ -154,7 +165,7 @@ jatos.loaded().then(function () {
 
 	// get subject data from batch session
 	var subData = data_helper.get_subject_data(true);
-
+debugger
 	////// up to this point I copied it from the app.js ///////// **
 	var timeline = [];
 
@@ -190,6 +201,76 @@ jatos.loaded().then(function () {
 			}
 		]
 	};
+
+	//setting demo stuff:
+	//--------------------
+
+	var demo = {
+		type: 'call-function',
+		func: function () {
+			// Operate the embedded demo:
+			createSmartphoneApperance()
+			createExitAppButton(elementIdName = 'demoExitButton')
+			createLoadAppButton(elementIdName = 'demoLoadButton')
+		},
+	};
+	var checkIfDemoCompleted = {
+		data: {
+			trialType: 'checkIfDemoCompleted',
+		},
+		type: 'html-keyboard-response',
+		trial_duration: 300, // check every 0.3s
+		choices: jsPsych.NO_KEYS,
+		stimulus: '',
+	};
+	var demo_cycle_loop = {
+		timeline: [checkIfDemoCompleted],
+		loop_function: function (data) {
+			console.log('XXXXX')
+			var subData = data_helper.get_subject_data(true);
+			console.log(subData)
+			//debugger
+			if (!!Object.keys(subData).length &&
+				subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) &&
+				!!subData.endTime[subData.endTime.length - 1] &&
+				appClosed) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended
+				wait(300).then(() => removeSmartphoneApperance());
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+
+	var continuet_or_repeat_demo_cycle = {
+		data: {
+			trialType: 'continuet_or_repeat_demo_cycle',
+		},
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		choices: ['Repeat', 'Continue'],
+		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+		timeline: [
+			{
+				stimulus: '<p id="repeatOrContinueText">Do you want to continue?</p>',
+			}
+		]
+	};
+	var big_demo_loop = {
+		timeline: [demo, demo_cycle_loop, continuet_or_repeat_demo_cycle],
+		loop_function: function (data) {
+			console.log('YYYYY')
+			const subPressedContinue = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]);
+			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+
+
+	//--------------------
 
 	/* Switch to this version for previous and backwards buttons
 	var instructions = {
@@ -245,7 +326,7 @@ jatos.loaded().then(function () {
 	};
 
 	var instructionsLoop = {
-		timeline: [instructions, test],
+		timeline: [instructions, big_demo_loop, test],
 		loop_function: function (data) {
 			// check if there is a single mistake return to start
 			const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
@@ -257,7 +338,9 @@ jatos.loaded().then(function () {
 			}
 		}
 	};
-
+	// temp:
+	timeline.push(continuet_or_repeat_demo_cycle);
+	//
 	timeline.push(consentForm);
 	timeline.push(instructionsLoop);
 
@@ -272,10 +355,10 @@ jatos.loaded().then(function () {
 				subject_data_worker.postMessage(dataObj)
 				subject_data_worker.postMessage({ completedInstructions: true });
 
-				// Operate the embedded demo:
-				createSmartphoneApperance()
-				createExitAppButton(elementIdName = 'demoExitButton')
-				createLoadAppButton(elementIdName = 'demoLoadButton')
+				//// Operate the embedded demo:
+				//createSmartphoneApperance()
+				//createExitAppButton(elementIdName = 'demoExitButton')
+				//createLoadAppButton(elementIdName = 'demoLoadButton')
 
 				terminate_subject_data_worker = true;
 			}

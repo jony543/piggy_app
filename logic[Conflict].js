@@ -143,11 +143,11 @@ function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
 var logic = {
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
-    const isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName; // checks if the app is running inside the instructionsn module (for the demo purpose)
 
     // CHECK IF INSTRUCTIONS
     // -------------------------------------------------------
     if (settings.allowInstructions) {
+      isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName; // checks if the app is running inside the instructionsn module (for the demo purpose)
       if (!noDataYet) {
         var instructionCompletion = subData.completedInstructions.filter((x) => x !== undefined);
         instructionCompletion = instructionCompletion[instructionCompletion.length - 1];
@@ -170,7 +170,7 @@ var logic = {
 
     if (settings.allowDemo) { // check if demo is available and set variables accordingly      
       if (noDataYet || subData.showInstructions[subData.showInstructions.length - 1] || (subData.isDemo[subData.isDemo.length - 1] && !subData.isDemoCompleted[subData.isDemoCompleted.length - 1])) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
-        isDemo = true;
+      isDemo = true;
         isDemoCompleted = false; // this will be set to change after the participant confirms there is no need in another demo
         if (noDataYet || subData.demoTrialNum[subData.demoTrialNum.length - 1] === null || subData.demoTrialNum[subData.demoTrialNum.length - 1] === undefined) { // if this is the first demo trial after instructions
           demoTrialNum = 0
