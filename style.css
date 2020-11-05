@@ -164,6 +164,16 @@
   100% { padding: 0px 0px 20% 0px; opacity:1.0; }
 }
 
+#superimposed_outcome_sum {
+  position: absolute;
+  font-size: 6vw;
+  top: 48%; /* Adjust this value to move the positioned div up and down */
+  left: 52.5%;
+  /*background: rgba(0, 0, 0, 0.8);*/
+  color: rgb(240, 240, 240);
+  text-shadow: -1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey;
+}
+
 .outcome_text {
   position: absolute;
   top: 57%;
