@@ -137,10 +137,10 @@ function removeSmartphoneApperance(appDemoID) {
 }
 
 // ****************************************************************
-//                        INITIALIZATION:
+//                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
 var appClosed = null; //indicator for when the embedded app is closed or open during the demo.
-var runDemo = null;
+
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------

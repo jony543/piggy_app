@@ -27,6 +27,7 @@ jatos.loaded().then(function () {
 	document.getElementById('outcome_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('outcome_no_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
+	document.getElementById('superimposed_outcome_sum').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
@@ -139,6 +140,12 @@ jatos.loaded().then(function () {
 				dom_helper.add_css_class('outcome_no_win', 'goUpOutcomeImage'); // **
 			}
 
+			// add a superimposed text on the outcome
+			dom_helper.set_text('superimposed_outcome_sum_txt', runData.reward);
+			dom_helper.show('superimposed_outcome_sum', settings.durations.outcomeAnim); // **
+			dom_helper.add_css_class('superimposed_outcome_sum', 'goUpOutcomeImage'); // **
+
+			// add text about the outcome below
 			dom_helper.show("outcome_text_1_", settings.durations.outcomeAnim);
 			dom_helper.add_css_class('outcome_text_1_', 'appearSlowlyOutcomeText'); // **
 
