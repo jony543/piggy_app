@@ -180,6 +180,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  white-space: nowrap;
   font-size: 7.1vw;
 }
 
@@ -212,8 +213,10 @@
 }
 
 #cover {
+  top: 50vh;
+  left: 57vw;
   width: 85vw;
-  height: auto;
+  height: 35vh;
   z-index: 1;
 }
 

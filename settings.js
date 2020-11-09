@@ -25,7 +25,7 @@ window.app_settings = {
 		minWinningSum: 20,
 		maxWinningSum: 30,
 		// for constant reward:
-		rewardConstantSum: 25,
+		rewardConstantSum: 15,
 
 		// Sure win stuff:
 		winAnywayIfMultipleNonWins: true, // this is to make sure that in case a participant did not win many times they will.

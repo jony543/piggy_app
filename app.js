@@ -131,11 +131,11 @@ jatos.loaded().then(function () {
 			dom_helper.hide("lottery");
 
 			if (runData.isWin) {
-				dom_helper.set_text('outcome_text_1_', "You won " + runData.reward.toFixed(2) + "$"); //**
+				dom_helper.set_text('outcome_text_1_', "מצאת " + runData.reward + " יחידות זהב"); //**
 				dom_helper.show('outcome_win', settings.durations.outcomeAnim); // **
 				dom_helper.add_css_class('outcome_win', 'goUpOutcomeImage'); // **
 			} else {
-				dom_helper.set_text('outcome_text_1_', "You didn't win");
+				dom_helper.set_text('outcome_text_1_', "לא מצאת זהב הפעם");
 				dom_helper.show('outcome_no_win', settings.durations.outcomeAnim); // **
 				dom_helper.add_css_class('outcome_no_win', 'goUpOutcomeImage'); // **
 			}
@@ -195,7 +195,7 @@ jatos.loaded().then(function () {
 					//debugger
 					dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
 					dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
-					dom_helper.set_text('welcome_msg_txt', "See you next time"); //**
+					dom_helper.set_text('welcome_msg_txt', "נתראה בפעם הבאה"); //**
 					dom_helper.show('welcome_msg'); // **
 					/////
 					///
