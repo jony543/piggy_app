@@ -2,7 +2,6 @@
   background-image: url('images/context_A.jpg');
   background-color: rgb(30, 30, 30, 0.7);
   background-size: 100vw 100vh;
-
 }
 
 .ice {
@@ -296,6 +295,38 @@ h1 {
 
 /* FOR INSTRUCTIONS */
 /* ---------------- */
+.bg_instructions {
+  background-color: #666666ff;
+  background-size: 100vw 100vh;
+  background-repeat:no-repeat;
+}
+
+#instructionsButtons {
+  position: relative;
+  display: block;
+  top: 49.5vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25vw;
+  height: 4vh;
+  margin-right: 20vw;
+  margin-left: auto;
+
+  background-color: rgba(200, 200, 200, 0.7);
+  border: 1vw solid rgb(50, 50, 50);
+  color: rgb(50, 50, 50);
+  text-align: center;
+  font-size: 4vw;
+  transition-duration: 0.4s;
+  border-radius: 50px;
+  outline: none;
+  z-index: 999;
+}
+
+#instructionsButtons:active {
+  background-color: #555555;
+  color: white;
+}
 
 .demoButton {
   position: absolute;

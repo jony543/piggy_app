@@ -140,7 +140,7 @@ function removeSmartphoneApperance(appDemoID) {
 //                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
 var appClosed = null; //indicator for when the embedded app is closed or open during the demo.
-
+var instructions_page = 1;
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
@@ -165,8 +165,11 @@ jatos.loaded().then(function () {
 	var subData = data_helper.get_subject_data(true);
 
 	////// up to this point I copied it from the app.js ///////// **
+
 	var timeline = [];
 
+	// SET INFORMED CONSENT:
+	//---------------------------
 	var consentForm = {
 		type: 'external-html',
 		url: "informed_consent.html",
@@ -174,31 +177,53 @@ jatos.loaded().then(function () {
 		check_fn: check_consent
 	};
 
+	// SET WRITTEN INSTRUCTIONS:
+	//---------------------------
 	var instructions = {
 		data: {
 			trialType: 'instruction',
 		},
 		type: 'html-button-response',
 		trial_duration: undefined, // no time limit
-		choices: ['Previous', 'Next'],
+		choices: ['המשך', 'חזור'],
 		timeline: [
 			{
-				stimulus: '<h1>page 1</h1>' +
-					'<h2>page 1</h2>' +
-					'<h3>page 1</h3>' +
-					"<div style='float: center;'><img src='images/coin_gold.png'></img>" +
-					"<p><strong>Press the F key</strong></p></div>",
-			},
-			{
-				stimulus: '<h1>page 2</h1>' +
-					"<div style='float: center;'><img src='images/instructions/instructions_2.jpg'></img>" +
-					"<p><strong>Press the F key</strong></p></div>",
-			},
-			{
-				stimulus: '<h1>page 3</h1>',
+				stimulus: '',
+				on_load: function () {
+					document.body.style.backgroundImage = "url('images/instructions/instructions_" + String(instructions_page) + ".jpg')";
+					document.getElementById("instructionsButtons").disabled = true;
+					document.getElementById("instructionsButtons").style.opacity = "0.5";
+					setTimeout(function () {
+						document.getElementById("instructionsButtons").disabled = false
+						document.getElementById("instructionsButtons").style.opacity = "1";
+					}, 1500);
+				}
 			}
-		]
+		],
+		button_html: '<button id="instructionsButtons">%choice%</button>',
 	};
+	var instructionsLoop = {
+		timeline: [instructions],
+		loop_function: function (data) {
+			console.log(instructions_page % settings.n_instruction_pages)
+			// check if there went through the entire pages of the instructions
+			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back
+			if (!(instructions_page % settings.n_instruction_pages) && !goBack) {
+				document.body.style.backgroundImage = "none"
+				document.body.style.backgroundColor = "transparent"
+				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
+				return false;
+			} else {
+				if (goBack && instructions_page > 1) {
+					instructions_page--
+				} else if (!goBack) {
+					instructions_page++
+				}
+				return true;
+			}
+		}
+	};
+
 
 	//setting demo stuff:
 	//--------------------
@@ -323,8 +348,8 @@ jatos.loaded().then(function () {
 		]
 	};
 
-	var instructionsLoop = {
-		timeline: [instructions, big_demo_loop, test],
+	var completeTutorialLoop = {
+		timeline: [instructionsLoop, big_demo_loop, test],
 		loop_function: function (data) {
 			// check if there is a single mistake return to start
 			const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
@@ -338,7 +363,7 @@ jatos.loaded().then(function () {
 	};
 
 	timeline.push(consentForm);
-	timeline.push(instructionsLoop);
+	timeline.push(completeTutorialLoop);
 
 	jatos.onLoad(function () {
 		jsPsych.init({
