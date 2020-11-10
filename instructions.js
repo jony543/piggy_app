@@ -18,6 +18,7 @@ function exitAppDemo(appDemoID) {
 	dom_helper.add_css_class(appDemoID, 'appClose');
 	wait(1000).then(() => dom_helper.hide(appDemoID));
 	appClosed = true; // this to indicate that the app is closed
+	firstAppClosedDetection = true;
 }
 
 function loadAppDemo() {
@@ -33,14 +34,7 @@ function loadAppDemo() {
 		embeddedElement = document.createElement('object');
 		embeddedElement.setAttribute("id", appDemoID)
 		embeddedElement.setAttribute("data", "index.html")
-		embeddedElement.style.position = "absolute"
-		embeddedElement.style.top = "50%"
-		embeddedElement.style.left = "50%"
-		embeddedElement.style.transform = "translate(-50%, -50%)"
-		embeddedElement.style.width = "70vw"
-		embeddedElement.style.height = "70vh"
-		embeddedElement.style.border = "0.5vw solid rgb(100, 100, 100)"
-		embeddedElement.style.borderRadius = "5vw"
+		embeddedElement.className = "bigRectangle"
 		document.body.appendChild(embeddedElement)
 	} else {
 		var appDemoID = dom_helper.duplicate('embedded_app');
@@ -70,6 +64,19 @@ function checkReady(target_n_data_points) {
 }
 
 function createSmartphoneApperance() {
+	// create text above the "smartphone sketch":
+	demoText = document.createElement('h1');
+	demoText.setAttribute("id", "mainDemoText");
+	demoText.setAttribute("class", "demoText");
+	demoText.appendChild(document.createTextNode(app_settings.demoCycleSupportingText[0]));
+	// making the text box
+	demoTextBox = document.createElement('div');
+	demoTextBox.setAttribute("id", "mainDemoTextBox");
+	demoTextBox.setAttribute("class", "demoTextBox");
+
+	demoTextBox.appendChild(demoText);
+	document.body.appendChild(demoTextBox);
+
 	// outer rectangle:
 	outerRectangle = document.createElement('div');
 	outerRectangle.setAttribute("id", "outerRectangle");
@@ -140,7 +147,9 @@ function removeSmartphoneApperance(appDemoID) {
 //                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
 var appClosed = null; //indicator for when the embedded app is closed or open during the demo.
+var firstAppClosedDetection = null; // indicator for when change the instruction above the embedded demo app.
 var instructions_page = 1;
+var mainDemoTextDuplicateID = "mainDemoTextBox";
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
@@ -165,11 +174,14 @@ jatos.loaded().then(function () {
 	var subData = data_helper.get_subject_data(true);
 
 	////// up to this point I copied it from the app.js ///////// **
+	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
+
+	///
 
 	var timeline = [];
 
 	// SET INFORMED CONSENT:
-	//---------------------------
+	//------------------------------------------------------
 	var consentForm = {
 		type: 'external-html',
 		url: "informed_consent.html",
@@ -178,7 +190,7 @@ jatos.loaded().then(function () {
 	};
 
 	// SET WRITTEN INSTRUCTIONS:
-	//---------------------------
+	//------------------------------------------------------
 	var instructions = {
 		data: {
 			trialType: 'instruction',
@@ -205,15 +217,16 @@ jatos.loaded().then(function () {
 	var instructionsLoop = {
 		timeline: [instructions],
 		loop_function: function (data) {
-			console.log(instructions_page % settings.n_instruction_pages)
-			// check if there went through the entire pages of the instructions
-			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back
-			if (!(instructions_page % settings.n_instruction_pages) && !goBack) {
+			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
+			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
 				document.body.style.backgroundImage = "none"
 				document.body.style.backgroundColor = "transparent"
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				return false;
 			} else {
+				//temp
+				return false
+				//
 				if (goBack && instructions_page > 1) {
 					instructions_page--
 				} else if (!goBack) {
@@ -224,10 +237,8 @@ jatos.loaded().then(function () {
 		}
 	};
 
-
-	//setting demo stuff:
-	//--------------------
-
+	// SET DEMO STUFF:
+	//------------------------------------------------------
 	var demo = {
 		type: 'call-function',
 		func: function () {
@@ -250,11 +261,27 @@ jatos.loaded().then(function () {
 		timeline: [checkIfDemoCompleted],
 		loop_function: function (data) {
 			var subData = data_helper.get_subject_data(true);
+			// construct here the demo instructions:
+			if (!!Object.keys(subData).length &&
+				!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+				appClosed && // app was closed
+				firstAppClosedDetection) {  // first detection after app was closed
+				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+				dom_helper.removeElement(oldMainDemoTextDuplicateID)
+				dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+				dom_helper.show(mainDemoTextDuplicateID)		
+				console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+				firstAppClosedDetection = false;
+			}
+			// check if demo cycle is finished:
 			if (!!Object.keys(subData).length &&
 				subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
 				!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
 				appClosed) {  // app was closed
-				appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant
+				appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
+				dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
+				mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
 				wait(300).then(() => removeSmartphoneApperance());
 				syncWait(750)
 				return false;
@@ -292,31 +319,8 @@ jatos.loaded().then(function () {
 		}
 	}
 
-
-	//--------------------
-
-	/* Switch to this version for previous and backwards buttons
-	var instructions = {
-		data: {
-			trialType: 'instruction',
-		},
-		type: 'instructions',
-		pages: [
-			'Welcome to the experiment. Click next to begin.',
-			'This is the second page of instructions.',
-			'This is the final page.',
-			'<h2>page 1</h2>' +
-			'<h3>page 1</h3>' +
-			"<div style='float: center;'><img src='images/coin_gold.png'></img>" +
-			"<p><strong>Press the F key</strong></p></div>",
-	
-		],
-		button_label_previous: 'MyPrevious' ,
-		button_label_next: 'MyNext',
-		show_clickable_nav: true
-	};
-	//*/
-
+	// SET TEST:
+	//------------------------------------------------------
 	var test = {
 		data: {
 			trialType: 'test',
@@ -348,6 +352,8 @@ jatos.loaded().then(function () {
 		]
 	};
 
+	// SET THE MAIN LOOP OF THE TUTORIAL:
+	//------------------------------------------------------
 	var completeTutorialLoop = {
 		timeline: [instructionsLoop, big_demo_loop, test],
 		loop_function: function (data) {
@@ -375,11 +381,6 @@ jatos.loaded().then(function () {
 				// saving the data
 				subject_data_worker.postMessage(dataObj)
 				subject_data_worker.postMessage({ completedInstructions: true });
-
-				//// Operate the embedded demo:
-				//createSmartphoneApperance()
-				//createExitAppButton(elementIdName = 'demoExitButton')
-				//createLoadAppButton(elementIdName = 'demoLoadButton')
 
 				terminate_subject_data_worker = true;
 			}

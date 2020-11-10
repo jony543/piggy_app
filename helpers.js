@@ -39,7 +39,8 @@ var dom_helper = {
 		return clone_id;
 	},
 	removeElement: function (id) {
-		return document.getElementById(id).parentNode.removeChild(elem);
+		var element = document.getElementById(id);
+		element.parentNode.removeChild(element);	
 	}
 };
 

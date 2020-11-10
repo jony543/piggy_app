@@ -293,8 +293,8 @@ h1 {
   font-size: 6vw;
 }
 
-/* FOR INSTRUCTIONS */
-/* ---------------- */
+/*                     FOR INSTRUCTIONS                  */
+/* ----------------------------------------------------- */
 .bg_instructions {
   background-color: #666666ff;
   background-size: 100vw 100vh;
@@ -328,9 +328,54 @@ h1 {
   color: white;
 }
 
+/*                   EMBEDDED DEMO STUFF                 */
+/* ----------------------------------------------------- */
+.demoTextBox {
+  position: absolute;
+  /*align-items: center;*/
+  background-color: rgb(225, 229, 235);
+  top: 14vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 35px;
+  border: 0.8vw solid rgb(50,50,50);
+
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+  animation-name: typing;
+}
+@keyframes typing {
+  0%   { width: 0; height: 0 } /* top right bottom left */
+  50%  { width: 80vw; height: 0  }
+  100%  { width: 80vw; height: 10vh }
+}
+.demoText {
+  padding-left: 2vw;
+  padding-right: 2vw;
+  line-height: normal;
+  text-align: center;
+  color: black;
+  font-size: 4.5vw;
+  
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-timing-function: steps(100, end);
+  animation-fill-mode: forwards;
+  animation-name: appearGradually;
+  animation-delay: 2s;
+  opacity:0;
+}
+@keyframes appearGradually {
+  0%   {opacity:0.0}
+  100% {opacity:1.0}
+}
+
 .demoButton {
   position: absolute;
-  top: 81.5%;
+  top: 93.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 20vw;
@@ -369,7 +414,7 @@ h1 {
 /* draw a smartphone screen */
 .bigRectangle {
   position: absolute;
-  top: 50%;
+  top: 62%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 70vw;
@@ -418,8 +463,11 @@ h1 {
 }
 @keyframes appOpenClose_animation {
   0%   { padding: 0px 0px 0px 0px; opacity:1.0;}
-  100% { padding: 0px 0px 20% 0px; opacity:0.0; width: 12vw; height: 6vh; top: 62.5%; left: 58%; border: none; border-radius: 15px;}
+  100% { padding: 0px 0px 20% 0px; opacity:0.0; width: 12vw; height: 6vh; top: 74.5%; left: 58%; border: none; border-radius: 15px;}
 }
+
+/* ----------------------------------------------------- */
+
 
 .disabled{
   pointer-events: none;

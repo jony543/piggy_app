@@ -97,9 +97,19 @@ window.app_settings = {
 		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false },
 		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true },
 	},
+	demoCycleSupportingText: {
+		0: 'טקסט 1',
+		1: 'טקסט 2',
+		2: 'טקסט 3',
+		3: 'טקסט 4',
+		4: 'טקסט 5',
+		5: 'טקסט 6',
+		6: 'טקסט 7',
+	},
+
 	instructionsFileName: 'instructions.html',
 	n_instruction_pages: 17,
-	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "completedInstructions", "isDemo", "demoTrialNum"],
+	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }

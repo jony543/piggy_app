@@ -170,7 +170,9 @@ var logic = {
     if (settings.allowDemo) { // check if demo is available and set variables accordingly      
       if (isCalledFromInstructions) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
         isDemo = true;
-        if (noDataYet || subData.demoTrialNum[subData.demoTrialNum.length - 1] === null || subData.demoTrialNum[subData.demoTrialNum.length - 1] === undefined) { // if this is the first demo trial after instructions
+        
+        if (subData.instructionsStartedFlag[subData.instructionsStartedFlag.length-1] || // I think those below are redundant after I added this condition
+          noDataYet || subData.demoTrialNum[subData.demoTrialNum.length - 1] === null || subData.demoTrialNum[subData.demoTrialNum.length - 1] === undefined) { // if this is the first demo trial after instructions
           demoTrialNum = 0
         } else {
           demoTrialNum = subData.demoTrialNum[subData.demoTrialNum.length - 1] + 1
