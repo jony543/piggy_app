@@ -175,7 +175,6 @@ jatos.loaded().then(function () {
 
 	////// up to this point I copied it from the app.js ///////// **
 	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
-
 	///
 
 	var timeline = [];
@@ -224,9 +223,6 @@ jatos.loaded().then(function () {
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				return false;
 			} else {
-				//temp
-				return false
-				//
 				if (goBack && instructions_page > 1) {
 					instructions_page--
 				} else if (!goBack) {
