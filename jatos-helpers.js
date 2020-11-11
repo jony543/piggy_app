@@ -24,6 +24,7 @@ if (!window.jatos) {
 		},
 		workerId: '7',
 		batchId: '100',
+		isLocalhost: true, // if (!!jatos.isLocalhost)
 		studyResultId: Date.now(),
 		componentList: [{ title: "c1", id: 1 }, { title: "c2", id: 2 }],
 		startComponent: function (x) { console.log("should go to component " + x) },

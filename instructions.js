@@ -27,18 +27,29 @@ function loadAppDemo() {
 	var target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
 	checkReady(target_n_data_points)
+	
+
+	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
+                                "batchId=" + jatos.batchId + 
+                                "&personalMultipleWorkerId=" + jatos.workerId;
+    if (!!jatos.isLocahost) {
+    	var demoUrl = "index.html";
+    }
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:
 		appDemoID = "embedded_app";
 		embeddedElement = document.createElement('object');
 		embeddedElement.setAttribute("id", appDemoID)
-		embeddedElement.setAttribute("data", "index.html")
+		embeddedElement.setAttribute("data", demoUrl)
 		embeddedElement.className = "bigRectangle"
 		document.body.appendChild(embeddedElement)
 	} else {
 		var appDemoID = dom_helper.duplicate('embedded_app');
+		var duplicatedElement = document.getElementById(appDemoID);
+		duplicatedElement.setAttribute("data", demoUrl)
 	}
+	
 	dom_helper.remove_css_class(appDemoID, 'appClose');
 	dom_helper.add_css_class(appDemoID, 'appOpen');
 	dom_helper.show(appDemoID);

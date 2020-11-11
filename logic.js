@@ -143,7 +143,10 @@ function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
 var logic = {
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
-    const isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName; // checks if the app is running inside the instructionsn module (for the demo purpose)
+
+    var isCalledFromInstructions = subData.showInstructions[subData.showInstructions.length - 1];
+    if (!!jatos.isLocalhost)
+      isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName; // checks if the app is running inside the instructionsn module (for the demo purpose)
 
     // CHECK IF INSTRUCTIONS
     // -------------------------------------------------------
