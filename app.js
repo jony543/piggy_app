@@ -63,7 +63,8 @@ jatos.loaded().then(function () {
 	}
 
 	wait(settings.durations.entranceMessage).then(() => { // **
-		dom_helper.hide("welcome_msg");
+		//dom_helper.hide("welcome_msg");
+		dom_helper.hide("spaceship");
 
 		dom_helper.show("upper_half");
 		dom_helper.show("lower_half");

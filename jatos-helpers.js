@@ -22,7 +22,7 @@ if (!window.jatos) {
 		onLoad: function(func) {
 			func();
 		},
-		workerId: '8',
+		workerId: '7',
 		batchId: '100',
 		studyResultId: Date.now(),
 		componentList: [{ title: "c1", id: 1 }, { title: "c2", id: 2 }],

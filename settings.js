@@ -63,7 +63,7 @@ window.app_settings = {
 		// manipulation:
 		outcomeAnim: 2000,
 		// animations:
-		costAnim: 1000,
+		costAnim: 1500,
 		surface_disappearance: 700,
 	},
 	text: {

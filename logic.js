@@ -234,7 +234,7 @@ var logic = {
               break;
             case lastDevalDay:
             case lastComparableValDay:
-              daysToBaseUponDeval = settings.daysToBaseUponLastDeval;
+              daysToBaseUponManipulation = settings.daysToBaseUponLastDeval;
               break;
           }
 

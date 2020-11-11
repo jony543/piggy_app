@@ -4,6 +4,23 @@
   background-size: 100vw 100vh;
 }
 
+#spaceship {
+  position: absolute;
+  top: 50vh;
+  transform: translate(-50%, -50%);
+  
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+  animation-name: landing;
+}
+@keyframes landing {
+0%   { width: 70vw;  left: 0vw; z-index:2}
+100%  { width: 50vw; left: 20vw; z-index:1}
+}
+
+
 .ice {
   position: absolute;
   left: 0;
@@ -105,7 +122,7 @@
   transform: translate(-50%, -50%);
   text-align: center;
   color: red;
-  font-size: 12vw;
+  font-size: 15vw;
 }
 
 .goUp {
@@ -117,8 +134,8 @@
   animation-fill-mode: forwards;
 }
 @keyframes goUp_animation {
-  0%   { padding: 0px 0px 0px 0px; opacity:1.0; }
-  100% { padding: 0px 0px 20% 0px; opacity:0.0; }
+  0%   { top: 20vh; opacity:1.0; }
+  100% { top: 10vh; opacity:0.0; }
 }
 
 #lottery {
