@@ -148,14 +148,16 @@
   text-align: center;
 
   animation-name: lottery_entry;
-  animation-duration: 2s;
+  /*animation-duration: 3.5s;*/
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
 }
 @keyframes lottery_entry {
 0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
-100% { padding: 0px 0px 0px 0px; opacity:1.0; }
+30%  { padding: 0px 0px 0px 0px; opacity:1.0; }
+90%  { padding: 0px 0px 0px 0px; opacity:1.0; }
+100% { padding: 0px 0px 0px 0px; opacity:0.0; }
 }
 
 .outcome_image {

@@ -127,6 +127,7 @@ jatos.loaded().then(function () {
 
 		dom_helper.append_html('main_container',
 			'<img id="lottery" class="waiting_for_outcome_gif" src="images/lottery.gif"/>');
+		document.getElementById('lottery').style.animationDuration = String(settings.durations.waitingForOutcomeAnim / 1000) + 's' // ** // add animation duration
 
 		wait(settings.durations.waitingForOutcomeAnim).then(function () { // wait until gif animation is finished
 			dom_helper.hide("lottery");

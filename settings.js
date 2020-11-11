@@ -58,7 +58,7 @@ window.app_settings = {
 	durations: { //in ms
 		// every trial:
 		entranceMessage: 1500,
-		waitingForOutcomeAnim: 4500,
+		waitingForOutcomeAnim: 3500,
 		minTimeToIndicateOutcomeViewing: 250,
 		// manipulation:
 		outcomeAnim: 2000,
