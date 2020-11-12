@@ -1,4 +1,5 @@
 await jatos.loaded();
+
 var terminate_subject_data_worker = false;
 subject_data_worker.done = function (x) {
 	// when all messages are processed save the information as a JATOS result

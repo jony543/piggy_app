@@ -3,48 +3,68 @@ let stimH = 50;
 let stimW = 50;
 let nStim = 10;
 let remaining = nStim;
-let positions = [];
-
-function preload() {
-	img = loadImage('images/coin_gold.png');
-}
+let coins = [];
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 
 	stimW = width / 5;
 	stimH = stimW;
-	img.resize(stimH, stimW)
+
+	Coin.prototype.setImage('images/outcome_win.png', stimH, stimW)
 
 	// limit nStim to half the theoretical max amount
 	nStim = min(nStim, 0.5 * floor((height*width)/(stimH* stimW)));
-	
+
 	for (var i = 0; i < nStim; i++) {
 		var x = random(0, width - stimW);
-		var y = random(0, height - stimH);
+		var y = random(0, height - stimH);		
 
-		if (positions.some(p => dist(x,y,p[0],p[1]) < min (stimH, stimW))) {
+		if (coins.some(c => dist(x,y,c.x,c.y) < max(stimW, stimW))) {
 			i -=1
 		} else {			
-			positions.push([x,y]);
+			coins.push(new Coin(x, y));
 		}
 	}
 }
 
-function draw () {
+async function draw () {
 	background(200);
 
 	for (var i = 0; i < remaining; i++) {
-		image(img, positions[i][0], positions[i][1]);
+		coins[i].draw();
 	}
 }
 
 function mousePressed() {
 	for (var i = 0; i < remaining; i++) {
-		if (mouseX > positions[i][0] && mouseX < (positions[i][0] + stimW) &&
-			mouseY > positions[i][1] && mouseY < (positions[i][1] + stimH)) {
-			positions.splice(i, 1);
+		if (coins[i].isPressed()) {
+			coins.splice(i, 1);
 			remaining -= 1;
 		}
 	}
+}
+
+// Setup coin object
+function Coin (x, y) {
+	this.x = x;
+	this.y = y;
+
+	this.draw = function () {
+		image(Coin.prototype.img, this.x, this.y);
+	}
+
+	this.isPressed = function () {
+		return mouseX > this.x && mouseX < (this.x + Coin.prototype.w) &&
+				mouseY > this.y && mouseY < (this.y + Coin.prototype.h);
+	}
+}
+
+Coin.prototype.setImage = function (imgUrl, height, width) {
+	Coin.prototype.img = loadImage(imgUrl, img => {
+		img.resize(width, height);
+	});	
+
+	Coin.prototype.h = height;
+	Coin.prototype.w = width;
 }
