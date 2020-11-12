@@ -1,3 +1,5 @@
+(async ()  => {
+
 await jatos.loaded();
 
 let img;
@@ -22,7 +24,7 @@ subject_data_worker.done = function (x) {
 	}
 };
 
-function setup() {
+window.setup = function() {
 	createCanvas(windowWidth, windowHeight);
 
 	stimW = width / 5;
@@ -32,6 +34,7 @@ function setup() {
 
 	// limit nStim to half the theoretical max amount
 	nStim = min(nStim, 0.5 * floor((height*width)/(stimH* stimW)));
+	remaining = nStim;
 
 	subject_data_worker.postMessage({
 		coins_task_init_data: { 
@@ -63,7 +66,7 @@ function setup() {
 	countDownDate = dt.getTime();
 }
 
-function draw () {
+window.draw = function () {
 	background(200);
 	
 	var now = new Date();
@@ -89,18 +92,17 @@ function draw () {
 		});
 		terminate_subject_data_worker = true;		
 	} else {
-		for (var i = 0; i < remaining; i++) {
-			coins[i].draw();
-		}
+		coins.filter(c => !c.isCollected()).forEach(c => {
+			c.draw();
+		});
 	}
 }
 
-function mousePressed() {
+window.mouseClicked = function () {
 	var hit = false;
 
-	for (var i = 0; i < remaining; i++) {
-		if (coins[i].isPressed()) {
-			coins.splice(i, 1);
+	coins.filter(c => !c.isCollected()).forEach(c => {
+		if (c.isPressed()) {
 			remaining -= 1;
 			hit = true;
 
@@ -112,7 +114,7 @@ function mousePressed() {
 				terminate_subject_data_worker = true;
 			}
 		}
-	}
+	});
 
 	if (!hit) {
 		misses.push({
@@ -132,6 +134,8 @@ function Coin (x, y) {
 	this.x = x;
 	this.y = y;
 	this.clickTime = null;
+
+	this.isCollected = () => !!this.clickTime;
 
 	this.draw = function () {
 		image(Coin.prototype.img, this.x, this.y);
@@ -164,3 +168,5 @@ Coin.prototype.setImage = function (imgUrl, height, width) {
 	Coin.prototype.h = height;
 	Coin.prototype.w = width;
 }
+
+})();
