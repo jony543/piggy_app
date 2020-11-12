@@ -107,6 +107,10 @@ function wait(delay) {
 	});
 }
 
+function delay (delay) {
+	return wait(delay);
+}
+
 function syncWait(ms) {
     var start = Date.now(),
         now = start;
