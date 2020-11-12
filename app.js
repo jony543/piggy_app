@@ -1,3 +1,5 @@
+(async ()  => {
+
 await jatos.loaded();
 
 var terminate_subject_data_worker = false;
@@ -198,3 +200,5 @@ dom_helper.show('welcome_msg'); // **
 // collect end time and save subject data as results
 subject_data_worker.postMessage({ endTime: new Date() });
 terminate_subject_data_worker = true;
+
+})();
