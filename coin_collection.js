@@ -1,3 +1,5 @@
+await jatos.loaded();
+
 let img;
 let stimH = 50;
 let stimW = 50;
