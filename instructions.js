@@ -27,14 +27,14 @@ function loadAppDemo() {
 	var target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
 	checkReady(target_n_data_points)
-	
 
+	debugger
 	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
-                                "batchId=" + jatos.batchId + 
-                                "&personalMultipleWorkerId=" + jatos.workerId;
-    if (!!jatos.isLocahost) {
-    	var demoUrl = "index.html";
-    }
+		"batchId=" + jatos.batchId +
+		"&personalMultipleWorkerId=" + jatos.workerId;
+	if (!!jatos.isLocahost) {
+		var demoUrl = "index.html";
+	}
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:
@@ -49,7 +49,7 @@ function loadAppDemo() {
 		var duplicatedElement = document.getElementById(appDemoID);
 		duplicatedElement.setAttribute("data", demoUrl)
 	}
-	
+
 	dom_helper.remove_css_class(appDemoID, 'appClose');
 	dom_helper.add_css_class(appDemoID, 'appOpen');
 	dom_helper.show(appDemoID);
@@ -277,7 +277,7 @@ jatos.loaded().then(function () {
 				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
 				dom_helper.removeElement(oldMainDemoTextDuplicateID)
 				dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-				dom_helper.show(mainDemoTextDuplicateID)		
+				dom_helper.show(mainDemoTextDuplicateID)
 				console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
 				firstAppClosedDetection = false;
 			}
@@ -383,14 +383,13 @@ jatos.loaded().then(function () {
 			timeline: timeline,
 			//display_element: 'jspsych-display-element',
 			on_finish: function () {
-				var dataObj = { ...jsPsych.data.get().values() }
 
 				// saving the data
-				subject_data_worker.postMessage(dataObj)
+				subject_data_worker.postMessage({ Instructions_Data: { ...jsPsych.data.get().values() } }) // save the instructions data
 				subject_data_worker.postMessage({ completedInstructions: true });
 
-				terminate_subject_data_worker = true;
-			}
-		});
+					terminate_subject_data_worker = true;
+				}
+			});
 	});
 });
