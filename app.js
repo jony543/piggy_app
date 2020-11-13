@@ -64,6 +64,9 @@ if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
 	dom_helper.show(indicator_id);
 }
 
+//show spacechip landing animation:
+dom_helper.add_css_class('spaceship', 'landing_spaceship'); // this includes the animation
+dom_helper.show('spaceship');
 
 // define top & bottom click operations
 var lowerHalfClicked = false;
