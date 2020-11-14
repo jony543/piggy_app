@@ -74,8 +74,10 @@
         }
 
         function onMyFrameLoad() {
-            document.getElementById('iframe-element').style.visibility = 'visible';
-            document.getElementById('app_will_load_soon').style.visibility = 'hidden';
+            if ( isInWebAppiOS || isInWebAppChrome ) {
+                document.getElementById('iframe-element').style.visibility = 'visible';
+                document.getElementById('app_will_load_soon').style.visibility = 'hidden';
+            }
         };
     </script>
 </html>
