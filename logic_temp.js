@@ -143,12 +143,21 @@ function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
 var logic = {
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
+    if (!noDataYet) {
+      var instructionCompletion = subData.completedInstructions.filter((x) => x !== undefined);
+      instructionCompletion = instructionCompletion[instructionCompletion.length - 1];
+    }
 
-    // check if running localy or on the server and determine if called from within the instructions (for the the embedded demo):
-    if (!!jatos.isLocalhost)
-      var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName;
-    else {
-      var isCalledFromInstructions = document.referrer.includes('srid') // this returns true only if called from the instructions as it is currently designed
+
+
+debugger
+    //var isCalledFromInstructions = subData.showInstructions[subData.showInstructions.length - 1];
+    if (!!jatos.isLocalhost) { // If works on the local host.
+      isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName; // checks if the app is running inside the instructionsn module (for the demo purpose)
+    } else if (noDataYet) { // first entry no data yet - it need to redirect to instructions
+      isCalledFromInstructions = false;
+    } else if (!instructionCompletion) { // there is data but the instructions were not completed, need to keep doing the demo from within the instructions.
+      isCalledFromInstructions = true;
     }
 
     // CHECK IF INSTRUCTIONS

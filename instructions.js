@@ -27,29 +27,26 @@ function loadAppDemo() {
 	var target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
 	checkReady(target_n_data_points)
-	
 
 	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
-                                "batchId=" + jatos.batchId + 
-                                "&personalMultipleWorkerId=" + jatos.workerId;
-    if (!!jatos.isLocahost) {
-    	var demoUrl = "index.html";
-    }
+		"batchId=" + jatos.batchId +
+		"&personalMultipleWorkerId=" + jatos.workerId;
+	if (!!jatos.isLocahost) {
+		var demoUrl = "index.html";
+	}
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:
 		appDemoID = "embedded_app";
-		embeddedElement = document.createElement('object');
+		embeddedElement = document.createElement('iframe');
 		embeddedElement.setAttribute("id", appDemoID)
-		embeddedElement.setAttribute("data", demoUrl)
+		embeddedElement.setAttribute("src", demoUrl)
 		embeddedElement.className = "bigRectangle"
 		document.body.appendChild(embeddedElement)
 	} else {
 		var appDemoID = dom_helper.duplicate('embedded_app');
-		var duplicatedElement = document.getElementById(appDemoID);
-		duplicatedElement.setAttribute("data", demoUrl)
 	}
-	
+
 	dom_helper.remove_css_class(appDemoID, 'appClose');
 	dom_helper.add_css_class(appDemoID, 'appOpen');
 	dom_helper.show(appDemoID);
@@ -230,7 +227,7 @@ jatos.loaded().then(function () {
 			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
 			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
 				document.body.style.backgroundImage = "none"
-				document.body.style.backgroundColor = "transparent"
+				document.body.style.backgroundColor = "white"
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				return false;
 			} else {
@@ -277,7 +274,7 @@ jatos.loaded().then(function () {
 				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
 				dom_helper.removeElement(oldMainDemoTextDuplicateID)
 				dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-				dom_helper.show(mainDemoTextDuplicateID)		
+				dom_helper.show(mainDemoTextDuplicateID)
 				console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
 				firstAppClosedDetection = false;
 			}
@@ -383,11 +380,19 @@ jatos.loaded().then(function () {
 			timeline: timeline,
 			//display_element: 'jspsych-display-element',
 			on_finish: function () {
-				var dataObj = { ...jsPsych.data.get().values() }
+
 
 				// saving the data
-				subject_data_worker.postMessage(dataObj)
+				// ---------------------
+				var instructionDataObject = { // get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+					Instructions_Data: {
+						...jsPsych.data.get().filterCustom(function (trial) {
+							return trial.trialType !== "checkIfDemoCompleted"
+						}).values()
+					}
+				} 
 				subject_data_worker.postMessage({ completedInstructions: true });
+				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
 				terminate_subject_data_worker = true;
 			}
