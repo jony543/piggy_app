@@ -12,15 +12,16 @@
 	let finishMessage = "BYE BYE";
 	let finishMessageTextColor = [0, 0, 255]; // can be one value for gray, 3 for RGB, 4 to include alpha
 	let duration = 25; // in seconds
-	let nStim = 20;
-	let remaining = nStim; // **
+	let nStim = 10; // needs to be an even number here
+	let remaining = nStim; // 
 	let coins = [];
+	let rocks = [];
 	let misses = [];
 	let countDownDate = null;
 	let counterXposition = null;
 	let counterYposition = null;
 	let text_size = null;
-
+	
 	let outcomeImageHeightWidthRatio = 325/349; // namely the height = 325 and width = 349
 
 
@@ -52,9 +53,10 @@
 		stimH = stimW * outcomeImageHeightWidthRatio;
 
 		Coin.prototype.setImage('images/outcome_win.png', stimH, stimW)
+		Rock.prototype.setImage('images/outcome_no_win.png', stimH, stimW)
 
 		// limit nStim to half the theoretical max amount
-		nStim = min(nStim, 0.5 * floor((height * width) / (stimH * stimW)) - 1 ); // Rani: I added -1 to the theoretical max amount to cover for the lack of stimulus on the time counter.
+		nStim = min(nStim, 0.5 * floor((height * width) / (stimH * stimW)) - 1); // Rani: I added -1 to the theoretical max amount to cover for the lack of stimulus on the time counter.
 		remaining = nStim;
 
 		subject_data_worker.postMessage({
@@ -68,17 +70,30 @@
 			}
 		});
 
-		for (var i = 0; i < nStim; i++) {
+		for (var i = 0; i < nStim / 2; i++) {
 			var x = random(0, width - stimW);
 			var y = random(0, height - stimH);
-			//debugger
-			if (coins.some(c => abs(x-c.x) <= stimW && abs(y-c.y) <= stimH) || // making sure they are not going over each other
+			if (rocks.some(c => abs(x-c.x) <= stimW && abs(y-c.y) <= stimH) || // making sure they are not going over each other
+				coins.some(c => abs(x-c.x) <= stimW && abs(y-c.y) <= stimH) ||
 				(x > (counterXposition - stimW - 0.75 * text_size) && y < (counterYposition + 0.75 * text_size))) { //makeing sure they does not cover the remaining time counter.
 				i -= 1
 			} else {
 				coins.push(new Coin(x, y));
 			}
 		}
+
+		for (var i = 0; i < nStim / 2; i++) {
+			var x = random(0, width - stimW);
+			var y = random(0, height - stimH);
+			if (rocks.some(c => abs(x-c.x) <= stimW && abs(y-c.y) <= stimH) || // making sure they are not going over each other
+				coins.some(c => abs(x-c.x) <= stimW && abs(y-c.y) <= stimH) ||
+				(x > (counterXposition - stimW - 0.75 * text_size) && y < (counterYposition + 0.75 * text_size))) { //makeing sure they does not cover the remaining time counter.
+				i -= 1
+			} else {
+				rocks.push(new Rock(x, y));
+			}
+		}
+
 
 		textSize(text_size);
 		textAlign(CENTER, CENTER);
@@ -118,6 +133,9 @@
 			coins.filter(c => !c.isCollected()).forEach(c => {
 				c.draw();
 			});
+			rocks.filter(c => !c.isCollected()).forEach(c => {
+				c.draw();
+			});
 		}
 	}
 
@@ -130,7 +148,22 @@
 				hit = true;
 
 				subject_data_worker.postMessage({
-					coins_task_state: coins.map(c => c.serialize())
+					coins_task_coin_state: coins.map(c => c.serialize())
+				});
+
+				if (remaining == 0) {
+					terminate_subject_data_worker = true;
+				}
+			}
+		});
+
+		rocks.filter(c => !c.isCollected()).forEach(c => {
+			if (c.isPressed()) {
+				remaining -= 1;
+				hit = true;
+
+				subject_data_worker.postMessage({
+					coins_task_rock_state: rocks.map(c => c.serialize())
 				});
 
 				if (remaining == 0) {
@@ -190,6 +223,46 @@
 
 		Coin.prototype.h = height;
 		Coin.prototype.w = width;
+	}
+
+	// Setup rock object
+	function Rock(x, y) {
+		this.x = x;
+		this.y = y;
+		this.clickTime = null;
+
+		this.isCollected = () => !!this.clickTime;
+
+		this.draw = function () {
+			image(Rock.prototype.img, this.x, this.y);
+		}
+
+		this.isPressed = function () {
+			if (mouseX > this.x && mouseX < (this.x + Rock.prototype.w) &&
+				mouseY > this.y && mouseY < (this.y + Rock.prototype.h)) {
+				this.clickTime = new Date();
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		this.serialize = function () {
+			return {
+				x: this.x,
+				y: this.y,
+				clickTime: this.clickTime
+			};
+		}
+	}
+
+	Rock.prototype.setImage = function (imgUrl, height, width) {
+		Rock.prototype.img = loadImage(imgUrl, img => {
+			img.resize(width, height);
+		});
+
+		Rock.prototype.h = height;
+		Rock.prototype.w = width;
 	}
 
 })();
