@@ -2,19 +2,11 @@
 
 	await jatos.loaded();
 
-	const includeRocks = true;
-	let bg_img_path = 'images/cave.jpg';
-	let stimSizeProportionOfScreen = 0.2; // will determine the size (width and height of the stimuli)
-	let textSizeProportionOfScreenWidth = 0.1;
-	let ProportionOfScreenWidthToPlaceCounter = 0.9;
-	let ProportionOfScreenHeightToPlaceCounter = 0.05;
+	// get custom settings for component and batch
+	var settings = Object.assign({}, app_settings.coinCollectionTask, jatos.componentJsonInput, jatos.batchJsonInput);
 
-	let counterTextColor = [255, 0, 0]; // can be one value for gray, 3 for RGB, 4 to include alpha
-	let finishMessage = "BYE BYE";
-	let finishMessageTextColor = [0, 0, 255]; // can be one value for gray, 3 for RGB, 4 to include alpha
-	let duration = 25; // in seconds
-	let nStim = 10; // needs to be an even number here
-	let remaining = nStim; // 
+	// initialize parameters:
+	// ------------------------------
 	let coins = [];
 	let rocks = [];
 	let misses = [];
@@ -22,8 +14,6 @@
 	let counterXposition = null;
 	let counterYposition = null;
 	let text_size = null;
-	let outcomeImageHeightWidthRatio = 325 / 349; // namely the height = 325 and width = 349
-
 
 	var terminate_subject_data_worker = false;
 	subject_data_worker.done = function (x) {
@@ -42,23 +32,23 @@
 		createCanvas(windowWidth - 17, windowHeight - 20); // The canvas does not start from the real x=0 and y=0 and this is why I do this. * to see the offsets of the body do document.body.getBoundingClientRect() in the console.
 
 		// setting some important sizes:
-		counterXposition = windowWidth * ProportionOfScreenWidthToPlaceCounter;
-		counterYposition = windowHeight * ProportionOfScreenHeightToPlaceCounter;
-		text_size = windowWidth * textSizeProportionOfScreenWidth;
+		counterXposition = windowWidth * settings.ProportionOfScreenWidthToPlaceCounter;
+		counterYposition = windowHeight * settings.ProportionOfScreenHeightToPlaceCounter;
+		text_size = windowWidth * settings.textSizeProportionOfScreenWidth;
 
 		document.body.style.backgroundColor = "black"; // set the background color (around and behind the background image)
-		bg_img = loadImage(bg_img_path);
+		bg_img = loadImage(settings.bg_img_path);
 
-		stimW = width * stimSizeProportionOfScreen;
-		stimH = stimW * outcomeImageHeightWidthRatio;
+		stimW = width * settings.stimSizeProportionOfScreen;
+		stimH = stimW * settings.outcomeImageHeightWidthRatio;
 
-		Coin.prototype.setImage('images/outcome_win.png', stimH, stimW)
-		if (includeRocks) {
-			Rock.prototype.setImage('images/outcome_no_win.png', stimH, stimW)
+		Coin.prototype.setImage(settings.outcome_win_image_path, stimH, stimW)
+		if (settings.includeRocks) {
+			Rock.prototype.setImage(settings.outcome_no_win_image_path, stimH, stimW)
 		}
 
 		// limit nStim to half the theoretical max amount
-		nStim = min(nStim, 0.5 * floor((height * width) / (stimH * stimW)) - 1); // Rani: I added -1 to the theoretical max amount to cover for the lack of stimulus on the time counter.
+		nStim = min(settings.nStim, 0.5 * floor((height * width) / (stimH * stimW)) - 1); // Rani: I added -1 to the theoretical max amount to cover for the lack of stimulus on the time counter.
 		remaining = nStim;
 
 		subject_data_worker.postMessage({
@@ -72,7 +62,7 @@
 			}
 		});
 
-		const n_stimuli = includeRocks ? 2 : 1;
+		const n_stimuli = settings.includeRocks ? 2 : 1;
 		for (var i = 0; i < nStim; i++) {
 			var x = random(0, width - stimW);
 			var y = random(0, height - stimH);
@@ -93,7 +83,7 @@
 		textAlign(CENTER, CENTER);
 
 		var dt = new Date();
-		dt.setSeconds(dt.getSeconds() + duration);
+		dt.setSeconds(dt.getSeconds() + settings.duration);
 		countDownDate = dt.getTime();
 	}
 
@@ -106,15 +96,15 @@
 		var distance = countDownDate - now.getTime();
 		var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-		fill(...counterTextColor);
+		fill(...settings.counterTextColor);
 		text(max(seconds + 1, 0), counterXposition, counterYposition); // seconds + relative x,y position of the counter
 
 		if (!remaining || now.getTime() > countDownDate) {
 
 			noLoop();
 
-			fill(...finishMessageTextColor);
-			text(finishMessage, windowWidth / 2, windowHeight / 2); // position of the finish text
+			fill(...settings.finishMessageTextColor);
+			text(settings.finishMessage, windowWidth / 2, windowHeight / 2); // position of the finish text
 
 			subject_data_worker.postMessage({
 				coin_task_finish_status: {
@@ -219,7 +209,7 @@
 		Coin.prototype.w = width;
 	}
 
-	if (includeRocks) {
+	if (settings.includeRocks) {
 		// Setup rock object
 		function Rock(x, y) {
 			this.x = x;

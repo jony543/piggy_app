@@ -187,15 +187,21 @@
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 
 		if (manipulationOption == 'devaluation') {
-			dom_helper.show("piggy_full");
-			dom_helper.add_css_class('piggy_full', 'dance');
+			dom_helper.show("warehouse_full");
+			dom_helper.add_css_class('warehouse_full', 'dance');
 		}
 
 		if (manipulationOption == 'still_valued') {
-			dom_helper.show("piggy_half");
-			dom_helper.add_css_class('piggy_half', 'dance');
+			dom_helper.show("warehouse_half");
+			dom_helper.add_css_class('warehouse_half', 'dance');
 		}
 	}
+
+	//** Ineed to set this: */
+	//if (runData.coinCollectionTask) { // If there is no data yet (hold for both cases where demo is used or not)
+	//	jatos.goToComponent("coin_collection");
+	////return;
+	//}
 
 	dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
 	dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **

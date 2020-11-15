@@ -40,7 +40,7 @@ var dom_helper = {
 	},
 	removeElement: function (id) {
 		var element = document.getElementById(id);
-		element.parentNode.removeChild(element);	
+		element.parentNode.removeChild(element);
 	}
 };
 
@@ -107,16 +107,16 @@ function wait(delay) {
 	});
 }
 
-function delay (delay) {
+function delay(delay) {
 	return wait(delay);
 }
 
 function syncWait(ms) {
-    var start = Date.now(),
-        now = start;
-    while (now - start < ms) {
-      now = Date.now();
-    }
+	var start = Date.now(),
+		now = start;
+	while (now - start < ms) {
+		now = Date.now();
+	}
 }
 
 
@@ -171,34 +171,34 @@ var ajax_helper = {
 		return this.request("GET", url);
 	},
 	request: function (method, url) {
-	    return new Promise(function (resolve, reject) {
-	        let xhr = new XMLHttpRequest();
-	        xhr.open(method, url);
-	        xhr.onload = function () {
-	            if (this.status >= 200 && this.status < 300) {
-	                resolve(xhr.response);
-	            } else {
-	                reject({
-	                    status: this.status,
-	                    statusText: xhr.statusText
-	                });
-	            }
-	        };
-	        xhr.onerror = function () {
-	            reject({
-	                status: this.status,
-	                statusText: xhr.statusText
-	            });
-	        };
-	        xhr.send();
-	    });
+		return new Promise(function (resolve, reject) {
+			let xhr = new XMLHttpRequest();
+			xhr.open(method, url);
+			xhr.onload = function () {
+				if (this.status >= 200 && this.status < 300) {
+					resolve(xhr.response);
+				} else {
+					reject({
+						status: this.status,
+						statusText: xhr.statusText
+					});
+				}
+			};
+			xhr.onerror = function () {
+				reject({
+					status: this.status,
+					statusText: xhr.statusText
+				});
+			};
+			xhr.send();
+		});
 	}
 };
 
 var dialog_helper = {
 	makeid: function (length) { // adapted to generate random strings from : https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 		var result = '';
-		var characters = 'bcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
+		var characters = 'abcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
 		var charactersLength = characters.length;
 		for (var i = 0; i < length; i++) {
 			result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -206,15 +206,17 @@ var dialog_helper = {
 		return result;
 	},
 	random_code_confirmation: function (msg) { // returns promise
-		return this.show(msg, this.makeid());
+		return this.show(msg, this.makeid(3));
 	},
 	show: function (msg, confirmation) { // returns promise
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
+				dom_helper.set_text("dialog_confirmation_msg", '.' + "'" + confirmation + "'" + ' כדי למשיך יש להקליד');
+				dom_helper.show("dialog_confirmation_msg")
 				dom_helper.show("dialog_response_text");
 				dom_helper.disable("dialog_ok_button");
 				document.getElementById('dialog_response_text').oninput = function () {
-					if (document.getElementById('dialog_response_text').value == confirmation) {
+					if (document.getElementById('dialog_response_text').value.toLowerCase() == confirmation) {
 						dom_helper.enable("dialog_ok_button");
 					}
 				}
@@ -222,7 +224,6 @@ var dialog_helper = {
 				dom_helper.hide("dialog_response_text");
 				dom_helper.enable("dialog_ok_button")
 			}
-
 			dom_helper.set_text("dialog_msg", msg);
 			dom_helper.show("screen-disabled-mask");
 			dom_helper.show('dialog_box');
@@ -236,6 +237,6 @@ var dialog_helper = {
 
 				resolve();
 			}
-		});		
+		});
 	}
 }
