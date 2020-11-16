@@ -90,7 +90,7 @@ window.app_settings = {
 	coinCollectionTask: {
 		includeRocks: true,
 		duration: 10, // in seconds
-		nStim: 20, // needs to be an even number here
+		nStim: 2, // needs to be an even number here
 		bg_img_path: 'images/cave.jpg',
 		outcome_win_image_path: 'images/outcome_win.png',
 		outcome_no_win_image_path: 'images/outcome_no_win.png',
@@ -106,13 +106,14 @@ window.app_settings = {
 	allowInstructions: true, // for debugging purpose.
 	allowDemo: true,
 	demoCycle: {
-		0: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false },
-		1: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false },
-		2: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false },
-		3: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false },
-		4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: false, isUnderManipulation: true, toHideOutcome: false, resetContainer: false },
-		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false },
-		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true },
+		0: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true  },
+		1: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false  },
+		2: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false  },
+		3: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false  },
+		4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: false, isUnderManipulation: true, toHideOutcome: false, resetContainer: false, consumptionTest: false  },
+		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: false  },
+		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true, consumptionTest: false  },
+		7: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
 	},
 	demoCycleSupportingText: {
 		0: 'טקסט 1',
@@ -122,11 +123,12 @@ window.app_settings = {
 		4: 'טקסט 5',
 		5: 'טקסט 6',
 		6: 'טקסט 7',
+		7: 'טקסט 7',
 	},
 
 	instructionsFileName: 'instructions.html',
 	n_instruction_pages: 17,
-	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum"],
+	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }

@@ -31,7 +31,7 @@ function loadAppDemo() {
 	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
 		"batchId=" + jatos.batchId +
 		"&personalMultipleWorkerId=" + jatos.workerId;
-	if (!!jatos.isLocahost) {
+	if (!!jatos.isLocalhost) {
 		var demoUrl = "index.html";
 	}
 

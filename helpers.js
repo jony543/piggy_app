@@ -231,16 +231,18 @@ var dialog_helper = {
 			dom_helper.show("screen-disabled-mask");
 			dom_helper.show('dialog_box');
 
+			subject_data_worker.postMessage({ isDialogOn: true });
+
 			document.getElementById('dialog_ok_button').onclick = function () {
 				document.getElementById('dialog_ok_button').onclick = undefined;
 				document.getElementById('dialog_response_text').oninput = undefined;
 
-				if (img_id === "cave") {
+				if (img_id === "cave") { // calling the coin collection task:
 					coinTaskElement = document.createElement('iframe');
 					coinTaskElement.setAttribute("id", 'coinTask');
 					coinTaskElement.setAttribute("src", 'coin_collection.html');
 					coinTaskElement.style.cssText = "position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
-					document.body.appendChild(coinTaskElement)			
+					document.body.appendChild(coinTaskElement)	
 				}
 				
 				if (!!img_id) {
@@ -248,6 +250,8 @@ var dialog_helper = {
 				}
 				dom_helper.hide('dialog_box');
 				dom_helper.hide("screen-disabled-mask");
+
+				subject_data_worker.postMessage({ isDialogOn: false });
 
 				resolve();
 			}

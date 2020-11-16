@@ -25,7 +25,8 @@
 			jatos.appendResultData(currentRunData).then(function () {
 				console.log('finished');
 				if (!!document.referrer) { // this may needed to be adapted on the server
-					setTimeout(() => parent.dom_helper.hide('coinTask'), 1000)
+					setTimeout(() => parent.dom_helper.add_css_class('coinTask', 'closing'), 1000)
+					setTimeout(() => parent.dom_helper.hide('coinTask'), 2500)
 				}
 			});
 		}
