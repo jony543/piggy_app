@@ -1,5 +1,6 @@
 (async () => {
 
+	parent.dom_helper.add_css_class('coinTask', 'openning')
 	await jatos.loaded();
 
 	// get custom settings for component and batch
@@ -87,7 +88,7 @@
 		textAlign(CENTER, CENTER);
 
 		var dt = new Date();
-		dt.setSeconds(dt.getSeconds() + settings.duration);
+		dt.setSeconds(dt.getSeconds() + settings.duration + settings.openningAnimTime);
 		countDownDate = dt.getTime();
 	}
 
@@ -117,8 +118,8 @@
 				}
 			});
 			terminate_subject_data_worker = true;
-			
-		} else {
+
+		} else if (countDownDate - now.getTime() <= settings.duration * 1000) {
 			coins.filter(c => !c.isCollected()).forEach(c => {
 				c.draw();
 			});
@@ -130,7 +131,6 @@
 
 	window.mouseClicked = function () {
 		var hit = false;
-
 		coins.filter(c => !c.isCollected()).forEach(c => {
 			if (c.isPressed()) {
 				remaining -= 1;

@@ -90,6 +90,7 @@ window.app_settings = {
 	coinCollectionTask: {
 		includeRocks: true,
 		duration: 10, // in seconds
+		openningAnimTime: 1.5, // in seconds
 		nStim: 2, // needs to be an even number here
 		bg_img_path: 'images/cave.jpg',
 		outcome_win_image_path: 'images/outcome_win.png',

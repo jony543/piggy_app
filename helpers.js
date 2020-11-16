@@ -237,19 +237,28 @@ var dialog_helper = {
 				document.getElementById('dialog_ok_button').onclick = undefined;
 				document.getElementById('dialog_response_text').oninput = undefined;
 
-				if (img_id === "cave") { // calling the coin collection task:
+				const isCave = img_id === "cave"
+				if (isCave) { // calling the coin collection task:
 					coinTaskElement = document.createElement('iframe');
 					coinTaskElement.setAttribute("id", 'coinTask');
 					coinTaskElement.setAttribute("src", 'coin_collection.html');
 					coinTaskElement.style.cssText = "position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
-					document.body.appendChild(coinTaskElement)	
+					document.body.appendChild(coinTaskElement)
+
+					dom_helper.hide('outcome_win')
+					dom_helper.hide('outcome_no_win')
+					dom_helper.hide('superimposed_outcome_sum')
+					dom_helper.hide('outcome_text_1_')
 				}
-				
-				if (!!img_id) {
-					dom_helper.hide(img_id);
-				}
-				dom_helper.hide('dialog_box');
-				dom_helper.hide("screen-disabled-mask");
+
+				const delayBeforeRemoval = isCave ? 2000 : 0;
+				setTimeout(() => {
+					if (!!img_id) {
+						dom_helper.hide(img_id);
+					}
+					dom_helper.hide('dialog_box');
+					dom_helper.hide("screen-disabled-mask");
+				}, delayBeforeRemoval)
 
 				subject_data_worker.postMessage({ isDialogOn: false });
 
