@@ -194,7 +194,6 @@ var logic = {
     } else {
         var isFirstTime = noDataYet;
     }
-
     // -------------------------------------------------------
 
     if (isDemo) {
@@ -205,14 +204,17 @@ var logic = {
       whichManipulation = demoVars.whichManipulation
       activateManipulation = demoVars.activateManipulation
       isUnderManipulation = demoVars.isUnderManipulation
+      consumptionTest = demoVars.consumptionTest
       var toHideOutcome = demoVars.toHideOutcome
       var resetContainer = demoVars.resetContainer
     } else {
+
       // Get counter-balanced stuff and Initialize variables:
       [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(jatos.workerId, app_settings);
       var isUnderManipulation = false;
       var whichManipulation = null;
       var activateManipulation = false;
+      var consumptionTest = false;
 
       if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
 
@@ -253,6 +255,7 @@ var logic = {
               (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
               (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
               activateManipulation = true;
+              consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...
             } else {
               isUnderManipulation = true;
@@ -287,6 +290,7 @@ var logic = {
       manipulationToday: whichManipulation,
       activateManipulation: activateManipulation,
       isUnderManipulation: isUnderManipulation,
+      consumptionTest: consumptionTest,
       hideOutcome: toHideOutcome,
       isFirstTime: isFirstTime,
       startTime: startTime,

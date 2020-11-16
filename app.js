@@ -198,6 +198,12 @@
 	}
 
 	//** Ineed to set this: */
+	if (true) { // If there is no data yet (hold for both cases where demo is used or not)
+		dialog_helper.random_code_confirmation(settings.text.dialog_coinCollection, 'cave'); // show message about the going to the coin collection task
+		//jatos.goToComponent("coin_collection");
+		//return;
+	}
+
 	//if (runData.coinCollectionTask) { // If there is no data yet (hold for both cases where demo is used or not)
 	//	jatos.goToComponent("coin_collection");
 	////return;

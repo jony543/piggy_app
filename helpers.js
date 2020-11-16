@@ -198,17 +198,17 @@ var ajax_helper = {
 var dialog_helper = {
 	makeid: function (length) { // adapted to generate random strings from : https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 		var result = '';
-		var characters = 'abcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
+		var characters = 'bcdfghjklmnpqrstvwxyz'; // I left only small letters and removed AEIOU letters to prevent word formation.
 		var charactersLength = characters.length;
 		for (var i = 0; i < length; i++) {
 			result += characters.charAt(Math.floor(Math.random() * charactersLength));
 		}
 		return result;
 	},
-	random_code_confirmation: function (msg) { // returns promise
-		return this.show(msg, this.makeid(3));
+	random_code_confirmation: function (msg, img_id) { // returns promise
+		return this.show(msg, img_id, this.makeid(3));
 	},
-	show: function (msg, confirmation) { // returns promise
+	show: function (msg, img_id, confirmation) { // returns promise
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
 				dom_helper.set_text("dialog_confirmation_msg", '.' + "'" + confirmation + "'" + ' כדי למשיך יש להקליד');
@@ -224,6 +224,9 @@ var dialog_helper = {
 				dom_helper.hide("dialog_response_text");
 				dom_helper.enable("dialog_ok_button")
 			}
+			if (!!img_id) {
+				dom_helper.show(img_id);
+			}
 			dom_helper.set_text("dialog_msg", msg);
 			dom_helper.show("screen-disabled-mask");
 			dom_helper.show('dialog_box');
@@ -232,6 +235,17 @@ var dialog_helper = {
 				document.getElementById('dialog_ok_button').onclick = undefined;
 				document.getElementById('dialog_response_text').oninput = undefined;
 
+				if (img_id === "cave") {
+					coinTaskElement = document.createElement('iframe');
+					coinTaskElement.setAttribute("id", 'coinTask');
+					coinTaskElement.setAttribute("src", 'coin_collection.html');
+					coinTaskElement.style.cssText = "position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
+					document.body.appendChild(coinTaskElement)			
+				}
+				
+				if (!!img_id) {
+					dom_helper.hide(img_id);
+				}
 				dom_helper.hide('dialog_box');
 				dom_helper.hide("screen-disabled-mask");
 

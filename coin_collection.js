@@ -24,6 +24,9 @@
 
 			jatos.appendResultData(currentRunData).then(function () {
 				console.log('finished');
+				if (!!document.referrer) { // this may needed to be adapted on the server
+					setTimeout(() => parent.dom_helper.hide('coinTask'), 1000)
+				}
 			});
 		}
 	};
@@ -113,6 +116,7 @@
 				}
 			});
 			terminate_subject_data_worker = true;
+			
 		} else {
 			coins.filter(c => !c.isCollected()).forEach(c => {
 				c.draw();
