@@ -48,6 +48,7 @@
 		stimH = stimW * settings.outcomeImageHeightWidthRatio;
 
 		Coin.prototype.setImage(settings.outcome_win_image_path, stimH, stimW)
+
 		if (settings.includeRocks) {
 			Rock.prototype.setImage(settings.outcome_no_win_image_path, stimH, stimW)
 		}
@@ -121,11 +122,29 @@
 
 		} else if (countDownDate - now.getTime() <= settings.duration * 1000) {
 			coins.filter(c => !c.isCollected()).forEach(c => {
-				c.draw();
+				c.draw(255);
 			});
 			rocks.filter(c => !c.isCollected()).forEach(c => {
-				c.draw();
+				c.draw(255);
 			});
+
+			// a fading effect for what picked up
+			coins.filter(c => !!c.isCollected()).forEach(c => {
+				var timeFromClick = now.getTime() - c.clickTime
+				if (timeFromClick <= (1 * 100)) {
+					alphaVal = (1 - (timeFromClick / (1 * 100))) * 255 //allpha values shoud be 0 to 255.
+					c.draw(alphaVal)
+				}
+			});
+
+			rocks.filter(c => !!c.isCollected()).forEach(c => {
+				var timeFromClick = now.getTime() - c.clickTime
+				if (timeFromClick <= (1 * 100)) {
+					alphaVal = (1 - (timeFromClick / (1 * 100))) * 255 //allpha values shoud be 0 to 255.
+					c.draw(alphaVal)
+				}
+			});
+
 		}
 	}
 
@@ -182,7 +201,8 @@
 
 		this.isCollected = () => !!this.clickTime;
 
-		this.draw = function () {
+		this.draw = function (alpha_value) {
+			tint(255, alpha_value)
 			image(Coin.prototype.img, this.x, this.y);
 		}
 
@@ -223,10 +243,11 @@
 
 			this.isCollected = () => !!this.clickTime;
 
-			this.draw = function () {
+			this.draw = function (alpha_value) {
+				tint(255, alpha_value)
 				image(Rock.prototype.img, this.x, this.y);
 			}
-
+	
 			this.isPressed = function () {
 				if (mouseX > this.x && mouseX < (this.x + Rock.prototype.w) &&
 					mouseY > this.y && mouseY < (this.y + Rock.prototype.h)) {
