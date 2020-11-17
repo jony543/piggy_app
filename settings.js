@@ -89,8 +89,9 @@ window.app_settings = {
 	},
 	coinCollectionTask: {
 		includeRocks: true,
-		duration: 1200, // in seconds
+		duration: 10, // in seconds
 		openningAnimTime: 1.5, // in seconds
+		element_disappearing_time: 0.1, // in seconds
 		nStim: 20, // needs to be an even number here
 		bg_img_path: 'images/cave.jpg',
 		outcome_win_image_path: 'images/outcome_win.png',
@@ -100,9 +101,9 @@ window.app_settings = {
 		textSizeProportionOfScreenWidth: 0.1,
 		ProportionOfScreenWidthToPlaceCounter: 0.9,
 		ProportionOfScreenHeightToPlaceCounter: 0.05,
-		counterTextColor: [255, 0, 0], // can be one value for gray, 3 for RGB, 4 to include alpha
+		counterTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessageTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
-		finishMessage: "BYE BYE",
+		finishMessage: "להתראות",
 	},
 	allowInstructions: true, // for debugging purpose.
 	allowDemo: true,

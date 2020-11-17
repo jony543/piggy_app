@@ -4,6 +4,83 @@
   background-size: 100vw 100vh;
 }
 
+/*                     APP LOADING                      */
+/* ---------------------------------------------------- */
+
+.lds-ellipsis { /* adapted from https://loading.io/css/ ; they have a license for a free use of it */
+  display: inline-block;
+  position: fixed;
+  left: 27.5vw;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 56vh;
+  width: 4vw;
+  height: 4vw;
+  border-radius: 50%;
+  background: dodgerblue;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 10vw;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 10vw;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 20vw;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 30vw;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(10vw, 0);
+  }
+}
+
+.appIsLoading{
+  position: absolute;
+  top: 50vh;
+  transform: translate(-50%, -50%);
+  
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  animation-name: alternate_appear_disappear;
+}
+@keyframes alternate_appear_disappear {
+0%   { opacity: 0 }
+100% { opacity :1 }
+}
+
+/* ---------------------------------------------------- */
+
+
 .landing_spaceship {
   position: absolute;
   top: 50vh;
@@ -287,13 +364,25 @@ h1 {
 .text_box {
   box-sizing: border-box;
   width: 70vw;
+  line-height: 5vw;
+  text-align: center;
+
   border: 0.5vw solid rgb(100, 100, 100);
   background-color: rgba(220, 220, 220, 0.75);
-  border-radius: 15px;
+  border-radius: 30px;
 }
 
 .goodByeMessageTextSize {
+  line-height: 5vw;
+  display: inline-block;
+  vertical-align: middle;
   font-size: 6vw;
+
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  animation-name: alternate_appear_disappear;
 }
 
 /*                     FOR INSTRUCTIONS                  */
@@ -593,6 +682,7 @@ hr {
   animation-name: openning_animation;
   animation-duration: 1.5s;
   animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
 @keyframes openning_animation {
   0% {width: 0%;   height: 0%; border-radius: 30vw; left: 50%; top: 50%}
@@ -603,6 +693,7 @@ hr {
   animation-name: closing_animation;
   animation-duration: 1.5s;
   animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
 @keyframes closing_animation {
   0%   {width: 100%;  height: 100%} /* top right bottom left */

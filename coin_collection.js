@@ -131,16 +131,16 @@
 			// a fading effect for what picked up
 			coins.filter(c => !!c.isCollected()).forEach(c => {
 				var timeFromClick = now.getTime() - c.clickTime
-				if (timeFromClick <= (1 * 100)) {
-					alphaVal = (1 - (timeFromClick / (1 * 100))) * 255 //allpha values shoud be 0 to 255.
+				if (timeFromClick <= (settings.element_disappearing_time * 1000)) {
+					alphaVal = (1 - (timeFromClick / (settings.element_disappearing_time * 1000))) * 255 //allpha values shoud be 0 to 255.
 					c.draw(alphaVal)
 				}
 			});
 
 			rocks.filter(c => !!c.isCollected()).forEach(c => {
 				var timeFromClick = now.getTime() - c.clickTime
-				if (timeFromClick <= (1 * 100)) {
-					alphaVal = (1 - (timeFromClick / (1 * 100))) * 255 //allpha values shoud be 0 to 255.
+				if (timeFromClick <= (settings.element_disappearing_time * 1000)) {
+					alphaVal = (1 - (timeFromClick / (settings.element_disappearing_time * 1000))) * 255 //allpha values shoud be 0 to 255.
 					c.draw(alphaVal)
 				}
 			});

@@ -195,6 +195,23 @@ var ajax_helper = {
 	}
 };
 
+// Used by app.js
+function finishTrial() {
+	//console.log(document.getElementById('coinTask').classList.contains('hidden'))
+	if (!document.getElementById('coinTask') || document.getElementById('coinTask').classList.contains('hidden')) {
+		dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
+		dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
+		dom_helper.set_text('welcome_msg_txt', "נתראה בפעם הבאה"); //**
+		dom_helper.show('welcome_msg'); // **
+
+		// collect end time and save subject data as results
+		subject_data_worker.postMessage({ endTime: new Date() });
+		terminate_subject_data_worker = true;
+	} else {
+		setTimeout(checkIfToFinish, 300);
+	}
+}
+
 var dialog_helper = {
 	makeid: function (length) { // adapted to generate random strings from : https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 		var result = '';
@@ -205,10 +222,10 @@ var dialog_helper = {
 		}
 		return result;
 	},
-	random_code_confirmation: function (msg, img_id) { // returns promise
-		return this.show(msg, img_id, this.makeid(3));
+	random_code_confirmation: function (msg, img_id, delayBeforeClosing = 0) { // returns promise
+		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing);
 	},
-	show: function (msg, img_id, confirmation) { // returns promise
+	show: function (msg, img_id, confirmation, delayBeforeClosing = 0) { // returns promise
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
 				dom_helper.set_text("dialog_confirmation_msg", '.' + "'" + confirmation + "'" + ' כדי למשיך יש להקליד');
@@ -237,28 +254,13 @@ var dialog_helper = {
 				document.getElementById('dialog_ok_button').onclick = undefined;
 				document.getElementById('dialog_response_text').oninput = undefined;
 
-				const isCave = img_id === "cave"
-				if (isCave) { // calling the coin collection task:
-					coinTaskElement = document.createElement('iframe');
-					coinTaskElement.setAttribute("id", 'coinTask');
-					coinTaskElement.setAttribute("src", 'coin_collection.html');
-					coinTaskElement.style.cssText = "position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
-					document.body.appendChild(coinTaskElement)
-
-					dom_helper.hide('outcome_win')
-					dom_helper.hide('outcome_no_win')
-					dom_helper.hide('superimposed_outcome_sum')
-					dom_helper.hide('outcome_text_1_')
-				}
-
-				const delayBeforeRemoval = isCave ? 2000 : 0;
 				setTimeout(() => {
 					if (!!img_id) {
 						dom_helper.hide(img_id);
 					}
 					dom_helper.hide('dialog_box');
 					dom_helper.hide("screen-disabled-mask");
-				}, delayBeforeRemoval)
+				}, delayBeforeClosing)
 
 				subject_data_worker.postMessage({ isDialogOn: false });
 

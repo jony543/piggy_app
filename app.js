@@ -197,36 +197,27 @@
 		}
 	}
 
-	//** Ineed to set this: */
-	if (true) { // If there is no data yet (hold for both cases where demo is used or not)
-		await dialog_helper.random_code_confirmation(settings.text.dialog_coinCollection, 'cave'); // ** The coins task will run through the helper ** show message about the going to the coin collection task 	
+	//** I need to set this: */
+	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
+		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000); // ** The coins task will run through the helper ** show message about the going to the coin collection task 	
+		
+		// calling the coin collection task:
+		// -----------------------------------
+		coinTaskElement = document.createElement('iframe');
+		coinTaskElement.setAttribute("id", 'coinTask');
+		coinTaskElement.setAttribute("src", 'coin_collection.html');
+		coinTaskElement.style.cssText = "position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
+		document.body.appendChild(coinTaskElement)
+
+		dom_helper.hide('outcome_win')
+		dom_helper.hide('outcome_no_win')
+		dom_helper.hide('superimposed_outcome_sum')
+		dom_helper.hide('outcome_text_1_')
+
 		//jatos.goToComponent("coin_collection");
 		//return;
 	}
 
-    
-console.log('WOW')
-	//if (runData.coinCollectionTask) { // If there is no data yet (hold for both cases where demo is used or not)
-	//	jatos.goToComponent("coin_collection");
-	////return;
-	//}
-
-	function checkIfToFinish() {
-		console.log(document.getElementById('coinTask').classList.contains('hidden'))
-		if (document.getElementById('coinTask').classList.contains('hidden')) {
-			dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
-			dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
-			dom_helper.set_text('welcome_msg_txt', "נתראה בפעם הבאה"); //**
-			dom_helper.show('welcome_msg'); // **
-		
-			// collect end time and save subject data as results
-			subject_data_worker.postMessage({ endTime: new Date() });
-			terminate_subject_data_worker = true;
-		} else {
-			setTimeout(checkIfToFinish, 300);
-		}
-	}
-	
-	checkIfToFinish()
+	finishTrial()
 
 })();
