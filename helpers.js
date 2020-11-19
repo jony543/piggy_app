@@ -195,7 +195,7 @@ var ajax_helper = {
 	}
 };
 
-// Used by app.js
+// Used by app.js and coin_collection.js:
 function finishTrial() {
 		// show goodbye message:
 		dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
@@ -206,6 +206,7 @@ function finishTrial() {
 		// collect end time and save subject data as results:
 		subject_data_worker.postMessage({ endTime: new Date() });
 		terminate_subject_data_worker = true;
+		console.log('Trial Completed')
 }
 
 var dialog_helper = {

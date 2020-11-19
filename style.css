@@ -27,7 +27,6 @@ body {
   transform: translate(-50%, -50%);
   width: 0;
   height: 0;
-  background-color: black;
   border-radius: 30vw;
   z-index: 1000;
 }

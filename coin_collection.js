@@ -127,7 +127,10 @@ async function run_coin_collection(settings) {
 
 			// when the task is over:
 			// ----------------------		
-			setTimeout(() => dom_helper.add_css_class('defaultCanvas0', 'closing'), 1000)
+
+			setTimeout(() => {
+				dom_helper.add_css_class('defaultCanvas0', 'closing')
+			}, 1000)
 			setTimeout(() => {
 				dom_helper.hide('defaultCanvas0')
 				finishTrial()

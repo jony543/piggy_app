@@ -197,7 +197,7 @@
 		}
 	}
 
-	//runData.consumptionTest = true; /**********************/
+	runData.consumptionTest = true; /**********************/
 	//** I need to set this: */
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
