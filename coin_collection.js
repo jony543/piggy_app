@@ -251,5 +251,4 @@ async function run_coin_collection(settings) {
 	var p5_script_element = document.createElement('script');
 	p5_script_element.setAttribute('src', 'js/p5.min.js');
 	document.head.appendChild(p5_script_element);
-
 };
