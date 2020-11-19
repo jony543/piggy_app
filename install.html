@@ -46,7 +46,9 @@
             <h2>It's very simple</h2>
         </div>   
         <div id="app_will_load_soon" class="centered appIsLoading" style="visibility: visible;"><h1>...טוען</h1></div>
-        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        <div id="loading_animation" style="visibility: visible;">
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
         <iframe id="iframe-element" src="/" onload="onMyFrameLoad(this)" style="visibility: hidden; position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
             Your browser doesn't support iframes
         </iframe>                        
@@ -71,6 +73,7 @@
         } else {
             document.getElementById('body-element').classList.remove('bg');                    
             document.getElementById('app_will_load_soon').style.visibility = 'hidden';
+            document.getElementById('loading_animation').style.visibility = 'hidden';
             document.getElementById('installInstructions').style.visibility = 'visible';
         }
 
@@ -78,6 +81,7 @@
             if ( isInWebAppiOS || isInWebAppChrome ) {
                 document.getElementById('iframe-element').style.visibility = 'visible';
                 document.getElementById('app_will_load_soon').style.visibility = 'hidden';
+                document.getElementById('loading_animation').style.visibility = 'hidden';
             }
         };
     </script>

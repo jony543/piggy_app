@@ -197,19 +197,15 @@ var ajax_helper = {
 
 // Used by app.js
 function finishTrial() {
-	//console.log(document.getElementById('coinTask').classList.contains('hidden'))
-	if (!document.getElementById('coinTask') || document.getElementById('coinTask').classList.contains('hidden')) {
+		// show goodbye message:
 		dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
 		dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
 		dom_helper.set_text('welcome_msg_txt', "נתראה בפעם הבאה"); //**
 		dom_helper.show('welcome_msg'); // **
 
-		// collect end time and save subject data as results
+		// collect end time and save subject data as results:
 		subject_data_worker.postMessage({ endTime: new Date() });
 		terminate_subject_data_worker = true;
-	} else {
-		setTimeout(checkIfToFinish, 300);
-	}
 }
 
 var dialog_helper = {

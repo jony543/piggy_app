@@ -1,6 +1,11 @@
-async function run_coin_collection(settings) {
+(async () => {
 
-	//parent.dom_helper.add_css_class('coinTask', 'openning') //** 
+	parent.dom_helper.add_css_class('coinTask', 'openning')
+	await jatos.loaded();
+
+	// get custom settings for component and batch
+	var settings = Object.assign({}, app_settings.coinCollectionTask, jatos.componentJsonInput, jatos.batchJsonInput);
+
 	// initialize parameters:
 	// ------------------------------
 	let coins = [];
@@ -11,38 +16,26 @@ async function run_coin_collection(settings) {
 	let counterYposition = null;
 	let text_size = null;
 
-	// remove outcome related stuff from the screen:
-	// ------------------------------
+	var terminate_subject_data_worker = false;
+	subject_data_worker.done = function (x) {
+		// when all messages are processed save the information as a JATOS result
+		if (terminate_subject_data_worker) {
+			var subData = data_helper.get_subject_data(false);
+			var currentRunData = subData[jatos.studyResultId];
 
-	dom_helper.hide('outcome_win')
-	dom_helper.hide('outcome_no_win')
-	dom_helper.hide('superimposed_outcome_sum')
-	dom_helper.hide('outcome_text_1_')
-
-
-	//subject_data_worker.done = function (x) { //** 
-	// when all messages are processed save the information as a JATOS result
-	//if (terminate_subject_data_worker) {
-	//	var subData = data_helper.get_subject_data(false);
-	//	var currentRunData = subData[jatos.studyResultId];
-
-	// jatos.appendResultData(currentRunData).then(function () {
-	// 	console.log('finished');
-	// 	if (!!document.referrer) { // this may needed to be adapted on the server
-	// 		setTimeout(() => parent.dom_helper.add_css_class('coinTask', 'closing'), 1000) //** 
-	// 		setTimeout(() => parent.dom_helper.hide('coinTask'), 2500)
-	// 	}
-	// });
-	//}
-	//};
-
-	//dom_helper.remove_css_class('background', 'bgApp')
-	//dom_helper.add_css_class('background', 'bgCoinTask')
-	//dom_helper.add_css_class('pseudoBackground', 'openning')
+			jatos.appendResultData(currentRunData).then(function () {
+				console.log('finished');
+				if (!!document.referrer) { // this may needed to be adapted on the server
+					setTimeout(() => parent.dom_helper.add_css_class('coinTask', 'closing'), 1000)
+					setTimeout(() => parent.dom_helper.hide('coinTask'), 2500)
+				}
+			});
+		}
+	};
 
 	window.setup = function () {
-		createCanvas(windowWidth, windowHeight); // The canvas does not start from the real x=0 and y=0 and this is why I do this. * to see the offsets of the body do document.body.getBoundingClientRect() in the console.
-		dom_helper.add_css_class('defaultCanvas0', 'openning')
+		createCanvas(windowWidth - 17, windowHeight - 20); // The canvas does not start from the real x=0 and y=0 and this is why I do this. * to see the offsets of the body do document.body.getBoundingClientRect() in the console.
+
 		// setting some important sizes:
 		counterXposition = windowWidth * settings.ProportionOfScreenWidthToPlaceCounter;
 		counterYposition = windowHeight * settings.ProportionOfScreenHeightToPlaceCounter;
@@ -109,9 +102,10 @@ async function run_coin_collection(settings) {
 		var distance = countDownDate - now.getTime();
 		var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+		fill(...settings.counterTextColor);
+		text(max(seconds + 1, 0), counterXposition, counterYposition); // seconds + relative x,y position of the counter
+
 		if (!remaining || now.getTime() > countDownDate) {
-			fill(...settings.counterTextColor);
-			text(max(seconds + 1, 0), counterXposition, counterYposition); // seconds + relative x,y position of the counter
 
 			noLoop();
 
@@ -124,19 +118,9 @@ async function run_coin_collection(settings) {
 					finish_time: now
 				}
 			});
-
-			// when the task is over:
-			// ----------------------		
-			setTimeout(() => dom_helper.add_css_class('defaultCanvas0', 'closing'), 1000)
-			setTimeout(() => {
-				dom_helper.hide('defaultCanvas0')
-				finishTrial()
-			}, 2500);
+			terminate_subject_data_worker = true;
 
 		} else if (countDownDate - now.getTime() <= settings.duration * 1000) {
-			fill(...settings.counterTextColor);
-			text(max(seconds + 1, 0), counterXposition, counterYposition); // seconds + relative x,y position of the counter
-
 			coins.filter(c => !c.isCollected()).forEach(c => {
 				c.draw(255);
 			});
@@ -174,6 +158,10 @@ async function run_coin_collection(settings) {
 				subject_data_worker.postMessage({
 					coins_task_coin_state: coins.map(c => c.serialize())
 				});
+
+				if (remaining == 0) {
+					terminate_subject_data_worker = true;
+				}
 			}
 		});
 
@@ -185,6 +173,10 @@ async function run_coin_collection(settings) {
 				subject_data_worker.postMessage({
 					coins_task_rock_state: rocks.map(c => c.serialize())
 				});
+
+				if (remaining == 0) {
+					terminate_subject_data_worker = true;
+				}
 			}
 		});
 
@@ -255,7 +247,7 @@ async function run_coin_collection(settings) {
 				tint(255, alpha_value)
 				image(Rock.prototype.img, this.x, this.y);
 			}
-
+	
 			this.isPressed = function () {
 				if (mouseX > this.x && mouseX < (this.x + Rock.prototype.w) &&
 					mouseY > this.y && mouseY < (this.y + Rock.prototype.h)) {
@@ -284,9 +276,4 @@ async function run_coin_collection(settings) {
 			Rock.prototype.w = width;
 		}
 	}
-
-	var p5_script_element = document.createElement('script');
-	p5_script_element.setAttribute('src', 'js/p5.min.js');
-	document.head.appendChild(p5_script_element);
-
-};
+})();
