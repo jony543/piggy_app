@@ -299,11 +299,11 @@ jatos.loaded().then(function () {
 		},
 		type: 'html-button-response',
 		trial_duration: undefined, // no time limit
-		choices: ['Repeat', 'Continue'],
+		choices: ['להמשיך', 'סיבוב נוסף'],
 		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
 		timeline: [
 			{
-				stimulus: '<p id="repeatOrContinueText">Do you want to continue?</p>',
+				stimulus: '<p id="repeatOrContinueText">ההדגמה הסתיימה.<br><br>האם ברצונך לבצע סיבוב נוסף או להמשיך?<br><br></p>',
 			}
 		]
 	};
@@ -311,7 +311,7 @@ jatos.loaded().then(function () {
 		timeline: [demo, continue_or_repeat_demo_cycle],
 		loop_function: function (data) {
 			console.log('YYYYY')
-			const subPressedContinue = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]);
+			const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
 			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
 				return false;
 			} else {
@@ -323,6 +323,24 @@ jatos.loaded().then(function () {
 
 	// SET TEST:
 	//------------------------------------------------------
+	var get_ready_for_the_test = {
+		data: {
+			trialType: 'get_ready_for_the_test',
+		},
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		choices: ['התחל'],
+		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+		timeline: [
+			{
+				stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
+				תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
+				אל דאגה, אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
+				לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
+				</p>',
+			}
+		]
+	};
 	var test = {
 		data: {
 			trialType: 'test',
@@ -388,7 +406,7 @@ jatos.loaded().then(function () {
 	// SET THE MAIN LOOP OF THE TUTORIAL:
 	//------------------------------------------------------
 	var completeTutorialLoop = {
-		timeline: [instructionsLoop, test, post_test_message],
+		timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, test, post_test_message],
 		loop_function: function (data) {
 			if (!testPassed) {
 				return true;
@@ -400,7 +418,6 @@ jatos.loaded().then(function () {
 
 	timeline.push(consentForm);
 	timeline.push(completeTutorialLoop);
-	timeline.push(post_test_message);
 
 	jatos.onLoad(function () {
 		jsPsych.init({

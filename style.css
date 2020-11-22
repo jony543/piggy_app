@@ -448,7 +448,7 @@ h1 {
 
 #post_test_msg {
   font-size: 6vw;
-  padding: 8vw;
+  padding: 6vw;
   line-height: normal;
   direction: rtl;
 }
@@ -586,21 +586,26 @@ h1 {
 
 .appClose {
   position: absolute;  
-  animation-name: appOpenClose_animation;
+  animation-name: appClose_animation;
   animation-duration: 0.3s;
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
 }
+@keyframes appClose_animation {
+  0%   { padding: 0px 0px 0px 0px; opacity:1.0;}
+  100% { padding: 0px 0px 20% 0px; opacity:0.0; width: 12vw; height: 6vh; top: 74.5%; left: 58%; border: none; border-radius: 15px;}
+}
+
 .appOpen {
   position: absolute;  
-  animation-name: appOpenClose_animation;
+  animation-name: appOpen_animation;
   animation-duration: 0.3s;
   animation-iteration-count: 1;
   animation-direction: reverse;
   animation-fill-mode: forwards;
 }
-@keyframes appOpenClose_animation {
+@keyframes appOpen_animation {
   0%   { padding: 0px 0px 0px 0px; opacity:1.0;}
   100% { padding: 0px 0px 20% 0px; opacity:0.0; width: 12vw; height: 6vh; top: 74.5%; left: 58%; border: none; border-radius: 15px;}
 }
@@ -622,13 +627,27 @@ hr {
 
 #repeatOrContinueButtons {
   position: relative;
-  font-size: 5vw;
+  width: 35vw;
+  background-color: rgba(200, 200, 200, 0.7);
+  border: 1vw solid rgb(50, 50, 50);
+  color: rgb(50, 50, 50);
+  font-size: 6vw;
+  border-radius: 30px;
+  outline: none;
+}
+#repeatOrContinueButtons:active {
+  background-color: #555555;
+  color: white;
 }
 
 #repeatOrContinueText {
   position: relative;
-  font-size: 4.5vw;
+  padding: 6vw;
+  line-height: normal;
+  font-size: 6vw;
+  direction: rtl;
 }
+
 
 /*                    DIALOG BOX STUFF                   */
 /* ----------------------------------------------------- */
