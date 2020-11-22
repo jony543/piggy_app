@@ -441,11 +441,31 @@ h1 {
   outline: none;
   z-index: 999;
 }
-
 #instructionsButtons:active {
   background-color: #555555;
   color: white;
 }
+
+#post_test_msg {
+  font-size: 6vw;
+  padding: 8vw;
+  line-height: normal;
+  direction: rtl;
+}
+
+#jspsych-instructions-next {
+  background-color: rgba(200, 200, 200, 0.7);
+  border: 1vw solid rgb(50, 50, 50);
+  color: rgb(50, 50, 50);
+  font-size: 6vw;
+  border-radius: 40px;
+  outline: none;
+}
+#jspsych-instructions-next:active {
+  background-color: #555555;
+  color: white;
+}
+
 
 /*                   EMBEDDED DEMO STUFF                 */
 /* ----------------------------------------------------- */

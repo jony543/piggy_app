@@ -196,6 +196,7 @@ var current_n_data_points = null; // used to navigate between embedded demo up s
 var target_n_data_points = null; // used to navigate between embedded demo up states
 var instructions_page = 1;
 var mainDemoTextDuplicateID = "mainDemoTextBox";
+var testPassed;
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
@@ -353,15 +354,43 @@ jatos.loaded().then(function () {
 		]
 	};
 
-	// SET THE MAIN LOOP OF THE TUTORIAL:
-	//------------------------------------------------------
-	var completeTutorialLoop = {
-		timeline: [instructionsLoop, big_demo_loop, test],
-		loop_function: function (data) {
+	var post_test_message = {
+		data: {
+			trialType: 'post_test_message',
+		},
+		type: 'instructions',
+		trial_duration: undefined, // no time limit
+		allow_keys: false,
+		allow_backward: false,
+		button_label_next: 'המשך',
+		pages: [],
+		on_start: function () {
 			// check if there is a single mistake return to start
 			const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
 			const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
-			if (relevantData.filter({ trialType: 'test', correct: false }).count() > 0) {
+			testPassed = !(relevantData.filter({ trialType: 'test', correct: false }).count() > 0)
+			if (testPassed) {
+				msg = 'ענית נכונה על השאלות.<br><br> \
+				החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
+				 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
+				 בהצלחה!';
+				jsPsych.endExperiment('The experiment was ended because the user passed the test.');
+			} else {
+				msg = 'לא כל השאלות נענו נכונה.<br><br> \
+				יש לעבור שוב על ההוראות וההדגמה.'
+				this.show_clickable_nav = true
+				//this.button_label_next = 'המשך'
+			}
+			this.pages = ['<h2 id="post_test_msg">' + msg + '</h2>']
+		}
+	};
+
+	// SET THE MAIN LOOP OF THE TUTORIAL:
+	//------------------------------------------------------
+	var completeTutorialLoop = {
+		timeline: [instructionsLoop, test, post_test_message],
+		loop_function: function (data) {
+			if (!testPassed) {
 				return true;
 			} else {
 				return false;
@@ -371,27 +400,32 @@ jatos.loaded().then(function () {
 
 	timeline.push(consentForm);
 	timeline.push(completeTutorialLoop);
+	timeline.push(post_test_message);
 
 	jatos.onLoad(function () {
 		jsPsych.init({
 			timeline: timeline,
 			//display_element: 'jspsych-display-element',
 			on_finish: function () {
-
-
 				// saving the data
 				// ---------------------
-				var instructionDataObject = { // get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
-					Instructions_Data: {
-						...jsPsych.data.get().filterCustom(function (trial) {
-							return trial.trialType !== "checkIfDemoCompleted"
-						}).values()
-					}
-				}
+				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+				
 				subject_data_worker.postMessage({ completedInstructions: true });
 				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
 				terminate_subject_data_worker = true;
+				console.log('Tutrial Completed')
+			},
+			on_close: function () { // in case the user gets out before it finishes.
+				// saving the data
+				// ---------------------
+				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+
+				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+				
+				terminate_subject_data_worker = true;
+				console.log('Tutrial Closed')
 			}
 		});
 	});

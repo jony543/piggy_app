@@ -125,7 +125,7 @@ jsPsych.plugins.instructions = (function() {
         }
         nav_html += "<button id='jspsych-instructions-next' class='jspsych-btn'"+
             "style='margin-left: 5px;'>"+trial.button_label_next+
-            " &gt;</button></div>";
+            "</button></div>"; // RANI removes a '&gt' and ';' that appeared here and attached a '>' sign to the text on the button.
 
         html += nav_html;
         display_element.innerHTML = html;
