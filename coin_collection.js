@@ -292,4 +292,14 @@ async function run_coin_collection(settings) {
 	p5_script_element.setAttribute('src', 'js/p5.min.js');
 	document.head.appendChild(p5_script_element);
 
+	// // check if it runs from Safari on IOS: (taken from: https://stackoverflow.com/questions/3007480/determine-if-user-navigated-from-mobile-safari/29696509#29696509)
+	// var ua = window.navigator.userAgent;
+	// var iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+	// var webkit = !!ua.match(/WebKit/i);
+	// var iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
+	// // if it is, this a solution to make the touch recorded:
+	// if (iOSSafari) {
+	// 	monitorEvents(document)
+	// }
+
 };

@@ -22,11 +22,9 @@ function exitAppDemo(appDemoID) {
 }
 
 function loadAppDemo() {
-	// first set the stuff to check when embedded app finshed running:
+	// check when to present again the button that closes the demo app:
 	var subData = data_helper.get_subject_data(true);
-	var target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
-
-	checkReady(target_n_data_points)
+	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
 	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
 		"batchId=" + jatos.batchId +
@@ -53,22 +51,9 @@ function loadAppDemo() {
 	dom_helper.hide('demoExitButton')
 
 	appClosed = false; // this to indicate that the app is closed
+	firstAppOpennedDetection = true; // this is to indicate when the button to open the was first pressed (for some relevant checks to rely on)
+	revealExitButton = true;
 	return appDemoID
-}
-
-
-function checkReady(target_n_data_points) {
-	var subData = data_helper.get_subject_data(true);
-	var current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
-
-	if (current_n_data_points === target_n_data_points && !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
-		wait(2000).then(() => {
-			dom_helper.show('demoExitButton')
-			dom_helper.remove_css_class('demoExitButton', 'disabled');
-		});
-	} else {
-		setTimeout('checkReady(' + target_n_data_points + ')', 300);
-	}
 }
 
 function createSmartphoneApperance() {
@@ -151,11 +136,64 @@ function removeSmartphoneApperance(appDemoID) {
 	document.getElementById("demoLoadButton").remove();
 }
 
+function monitorChangesInDemoAndReact(settings) {
+	console.log('check...')
+	var subData = data_helper.get_subject_data(true);
+
+	// check when to present again the button that closes the demo app:
+	// if (firstAppOpennedDetection) { // first set the stuff to check when embedded app finshed running:
+	// 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
+	// 	firstAppOpennedDetection = false;
+	// }
+	current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
+	if (revealExitButton &&
+		current_n_data_points === target_n_data_points
+		&& !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
+		revealExitButton = false;
+		wait(2000).then(() => {
+			dom_helper.show('demoExitButton')
+			dom_helper.remove_css_class('demoExitButton', 'disabled');
+		});
+	}
+
+	// construct here the demo instructions:
+	if (!!Object.keys(subData).length &&
+		!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+		appClosed && // app was closed
+		firstAppClosedDetection) {  // first detection after app was closed
+		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+		dom_helper.removeElement(oldMainDemoTextDuplicateID)
+		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+		dom_helper.show(mainDemoTextDuplicateID)
+		console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+		firstAppClosedDetection = false;
+	}
+
+	// check if demo cycle is finished:
+	if (!!Object.keys(subData).length &&
+		subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
+		!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+		appClosed) {  // app was closed
+		appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
+		dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
+		mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
+		wait(300).then(() => removeSmartphoneApperance());
+		syncWait(750)
+		jsPsych.resumeExperiment();
+	} else {
+		setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
+	}
+}
 // ****************************************************************
 //                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
-var appClosed = null; //indicator for when the embedded app is closed or open during the demo.
+var appClosed = true; //indicator for when the embedded app is closed or open during the demo.
 var firstAppClosedDetection = null; // indicator for when change the instruction above the embedded demo app.
+var firstAppOpennedDetection = null;
+var revealExitButton = null;
+var current_n_data_points = null; // used to navigate between embedded demo up states
+var target_n_data_points = null; // used to navigate between embedded demo up states
 var instructions_page = 1;
 var mainDemoTextDuplicateID = "mainDemoTextBox";
 // ****************************************************************
@@ -250,51 +288,10 @@ jatos.loaded().then(function () {
 			createSmartphoneApperance()
 			createExitAppButton(elementIdName = 'demoExitButton')
 			createLoadAppButton(elementIdName = 'demoLoadButton')
+			jsPsych.pauseExperiment()
+			monitorChangesInDemoAndReact(settings)
 		},
 	};
-	var checkIfDemoCompleted = {
-		data: {
-			trialType: 'checkIfDemoCompleted',
-		},
-		type: 'html-keyboard-response',
-		trial_duration: 400, // check every 0.4s
-		choices: jsPsych.NO_KEYS,
-		stimulus: '',
-	};
-	var demo_cycle_loop = {
-		timeline: [checkIfDemoCompleted],
-		loop_function: function (data) {
-			var subData = data_helper.get_subject_data(true);
-			// construct here the demo instructions:
-			if (!!Object.keys(subData).length &&
-				!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-				appClosed && // app was closed
-				firstAppClosedDetection) {  // first detection after app was closed
-				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-				dom_helper.removeElement(oldMainDemoTextDuplicateID)
-				dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-				dom_helper.show(mainDemoTextDuplicateID)
-				console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-				firstAppClosedDetection = false;
-			}
-			// check if demo cycle is finished:
-			if (!!Object.keys(subData).length &&
-				subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
-				!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-				appClosed) {  // app was closed
-				appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
-				dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
-				mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
-				wait(300).then(() => removeSmartphoneApperance());
-				syncWait(750)
-				return false;
-			} else {
-				return true;
-			}
-		}
-	};
-
 	var continue_or_repeat_demo_cycle = {
 		data: {
 			trialType: 'continue_or_repeat_demo_cycle',
@@ -310,7 +307,7 @@ jatos.loaded().then(function () {
 		]
 	};
 	var big_demo_loop = {
-		timeline: [demo, demo_cycle_loop, continue_or_repeat_demo_cycle],
+		timeline: [demo, continue_or_repeat_demo_cycle],
 		loop_function: function (data) {
 			console.log('YYYYY')
 			const subPressedContinue = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]);
@@ -390,7 +387,7 @@ jatos.loaded().then(function () {
 							return trial.trialType !== "checkIfDemoCompleted"
 						}).values()
 					}
-				} 
+				}
 				subject_data_worker.postMessage({ completedInstructions: true });
 				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
