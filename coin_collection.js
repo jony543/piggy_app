@@ -54,10 +54,9 @@ async function run_coin_collection(settings) {
 		stimW = width * settings.stimSizeProportionOfScreen;
 		stimH = stimW * settings.outcomeImageHeightWidthRatio;
 
-		Coin.prototype.setImage(settings.outcome_win_image_path, stimH, stimW)
-
+		CollectableObj.prototype.setImage("coin", settings.outcome_win_image_path, stimH, stimW);
 		if (settings.includeRocks) {
-			Rock.prototype.setImage(settings.outcome_no_win_image_path, stimH, stimW)
+			CollectableObj.prototype.setImage("rock", settings.outcome_no_win_image_path, stimH, stimW);
 		}
 
 		// limit nStim to half the theoretical max amount
@@ -85,9 +84,9 @@ async function run_coin_collection(settings) {
 				i -= 1
 			} else {
 				if (i % n_stimuli) {
-					rocks.push(new Rock(x, y));
+					rocks.push(new CollectableObj("rock", x, y));
 				} else {
-					coins.push(new Coin(x, y));
+					coins.push(new CollectableObj("coin", x, y));
 				}
 			}
 		}
@@ -204,22 +203,23 @@ async function run_coin_collection(settings) {
 		}
 	}
 
-	// Setup coin object
-	function Coin(x, y) {
+	// Setup obejct that can be coin or rock or anything else user can collect
+	function CollectableObj(t, x, y) {
 		this.x = x;
 		this.y = y;
+		this.type = t;
 		this.clickTime = null;
 
 		this.isCollected = () => !!this.clickTime;
 
 		this.draw = function (alpha_value) {
 			tint(255, alpha_value)
-			image(Coin.prototype.img, this.x, this.y);
+			image(CollectableObj.prototype.types[t].img, this.x, this.y);
 		}
 
 		this.isPressed = function () {
-			if (mouseX > this.x && mouseX < (this.x + Coin.prototype.w) &&
-				mouseY > this.y && mouseY < (this.y + Coin.prototype.h)) {
+			if (mouseX > this.x && mouseX < (this.x + CollectableObj.prototype.types[t].w) &&
+				mouseY > this.y && mouseY < (this.y + CollectableObj.prototype.types[t].h)) {
 				this.clickTime = new Date();
 				return true;
 			} else {
@@ -229,6 +229,7 @@ async function run_coin_collection(settings) {
 
 		this.serialize = function () {
 			return {
+				type: this.type,
 				x: this.x,
 				y: this.y,
 				clickTime: this.clickTime
@@ -236,56 +237,15 @@ async function run_coin_collection(settings) {
 		}
 	}
 
-	Coin.prototype.setImage = function (imgUrl, height, width) {
-		Coin.prototype.img = loadImage(imgUrl, img => {
-			img.resize(width, height);
-		});
-
-		Coin.prototype.h = height;
-		Coin.prototype.w = width;
-	}
-
-	if (settings.includeRocks) {
-		// Setup rock object
-		function Rock(x, y) {
-			this.x = x;
-			this.y = y;
-			this.clickTime = null;
-
-			this.isCollected = () => !!this.clickTime;
-
-			this.draw = function (alpha_value) {
-				tint(255, alpha_value)
-				image(Rock.prototype.img, this.x, this.y);
-			}
-
-			this.isPressed = function () {
-				if (mouseX > this.x && mouseX < (this.x + Rock.prototype.w) &&
-					mouseY > this.y && mouseY < (this.y + Rock.prototype.h)) {
-					this.clickTime = new Date();
-					return true;
-				} else {
-					return false;
-				}
-			}
-
-			this.serialize = function () {
-				return {
-					x: this.x,
-					y: this.y,
-					clickTime: this.clickTime
-				};
-			}
-		}
-
-		Rock.prototype.setImage = function (imgUrl, height, width) {
-			Rock.prototype.img = loadImage(imgUrl, img => {
-				img.resize(width, height);
-			});
-
-			Rock.prototype.h = height;
-			Rock.prototype.w = width;
-		}
+	CollectableObj.prototype.types = {};
+	CollectableObj.prototype.setImage = function (type, imgUrl, height, width) {		
+		CollectableObj.prototype.types.push[type] = {
+				img: loadImage(imgUrl, img => {
+						img.resize(width, height);
+					}),
+				h: height,
+				w: width
+		};	
 	}
 
 	var p5_script_element = document.createElement('script');

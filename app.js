@@ -129,7 +129,6 @@
 	// wait for 2 clicks to happen
 	await Promise.all([p1, p2]);
 
-
 	// hide game and show lottery animation
 	document.getElementById('lower_half').onclick = undefined;
 	document.getElementById('upper_half').onclick = undefined;
