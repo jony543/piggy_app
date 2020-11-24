@@ -13,6 +13,13 @@ window.app_settings = {
 	daysToBaseUponFirstDeval: [2],
 	daysToBaseUponLastDeval: [6, 7],
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
+	manipulationImageID: function (manipulationType) {
+		if (manipulationType == 'devaluation') {
+			return 'warehouse_full';
+		} else if (manipulationType == 'still_valued') { // i.e., 'still_valued'
+			return 'warehouse_half';
+		}
+	},
 	rewards: {
 		isRatioSchedule: true,
 		winningRate: 2, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
@@ -78,21 +85,21 @@ window.app_settings = {
 		confirmationCodeTextMessage: '\nכדי לאשר שקראת יש לכתוב את האותיות: ',
 		manipulationMessage: function (manipulationType) {
 			if (manipulationType == 'devaluation') {
-				return '** הקופה מלאה **\nלא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.';
+				return 'המחסן מלא!<br>לא ניתן לצבור בו עוד זהב עד שחללית המטען תרוקן אותו.';
 			} else if (manipulationType == 'still_valued') { // i.e., 'still_valued'
-				return '** הקופה חצי מלאה **\n\nלחצ/י על ok כדי לאשר.';
+				return 'המחסן מלא למחצה...';
 			}
 		},
 		completeDemo: 'ההדגמה הסתיימה. אם ברצונך לסיים חלק זה ולהתחיל במשחק האמיתי יש לכתוב yes.\n כל דבר אחר. כדי לבצע סיבוב הדגמה נוסף יש ללחוץ על',
 		realGameBegins: 'המשחק האמיתי מתחיל עכשיו.\nהזהב שייאסף מעכשיו שווה כסף אמיתי.\nבהצלחה!',
-		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 1 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 10 שניות לשהות בה.'
+		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 1 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.'
 	},
 	coinCollectionTask: {
 		includeRocks: true,
-		duration: 1000, // in seconds
+		duration: 5, // in seconds
 		openningAnimTime: 1.5, // in seconds
 		element_disappearing_time: 0.1, // in seconds
-		nStim: 4, // needs to be an even number here
+		nStim: 30, // needs to be an even number here
 		bg_img_path: 'images/cave.jpg',
 		outcome_win_image_path: 'images/outcome_win.png',
 		outcome_no_win_image_path: 'images/outcome_no_win.png',
@@ -108,16 +115,109 @@ window.app_settings = {
 	allowInstructions: true, // for debugging purpose.
 	allowDemo: true,
 	demoCycle: {
-		0: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false  },
-		1: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false  },
+		0: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		2: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		3: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: false, isUnderManipulation: true, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true, consumptionTest: false },
+		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: false },
+		7: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
 	},
 	demoCycleSupportingText: {
-		0: 'טקסט 1',
-		1: 'טקסט 2',
+		//0: 'הכנו לך הדגמה עם מסך וירטואלי שמדמה סמארטפון. לחצ/י על האפליקציה כדי לשגר את החללית שלך למשימת חיפוש זהב. תחילה תראה/י את החללית נוחתת ומימין למעלה תופיע עלות שליחת החללית למשימה (1-). לאחר מכן לחצ/י על חציו התחתון של המסך ואז על חלקו העליון כדי להסיר את הקרח ולאפשר את חיפוש הזהב. לאחר מספר שניות של חיפוש תופיע התוצאה. בסיבוב הזה מצאת זהב! מיד לאחר מכן תופיע הודעת הסיום ("נתראה בפעם הבאה"). כשזו הופיעה זה אומר שתוצאת החיפוש נשמרה ואפשר לצאת מהאפליקציה (יציאה לפני שהופיע הודעה זו תגרום לכך שהעלות תילקח בחשבון אבל לא תוצאת החיפוש). כדי לצאת מהאפליקציה בהדגמה לחצ/י על כפתור הבית הוירטואלי שמופיע על הסמארטפון.',
+		0: 'טקסט הסבר 1',
+		1: 'טקסט הסבר 2',
+		2: 'טקסט הסבר 3',
+		3: 'טקסט הסבר 4',
+		4: 'טקסט הסבר 5',
+		5: 'טקסט הסבר 6',
+		6: 'טקסט הסבר 7',
+		7: 'טקסט הסבר 8',
 	},
-
 	instructionsFileName: 'instructions.html',
 	n_instruction_pages: 1,
+	instructions_test_questions: {
+		toRandomizeQuestions: false,
+		dont_know_answer: 'לא יודע/ת.',
+		1: {
+			question: 'האם יש עלות כלשהי לכניסה לאפליקציה (כלומר לנסיון מציאת זהב)?',
+			correct_answer: 'כן, זה עולה 1 יחידות זהב.',
+			distractor_1: 'אין עלות לכניסה, יש עלות רק לנסיון להוציא דברים ממערה.',
+			distractor_2: 'כן, זה עולה 15 יחידות זהב.',
+			distractor_3: 'כן, העלות משתנה בכל פעם.',
+		},
+		2: {
+			question: 'האם הסיכוי למצוא זהב משתנה בזמנים מסויימים?',
+			correct_answer: 'לא, הסיכוי למצוא זהב זהה תמיד.',
+			distractor_1: 'הסיכוי למצוא זהב משתנה כל הזמן.',
+			distractor_2: 'הסיכוי למצוא זהב משתנה כשמעונן ואין אפשרות לראות אם מצאנו זהב.',
+			distractor_3: 'אם לאחרונה מצאנו הרבה זהב הסיכוי למצוא עוד זהב קטן יותר ולהפך.',
+		},
+		3: {
+			question: 'מה קורה אם המחסן מלא?',
+			correct_answer: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
+			distractor_1: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
+			distractor_2: 'זה אומר שהמשחק נגמר.',
+			distractor_3: 'המחסן לא יכול להתמלא אלא רק להתמלא באופן חלקי.',
+		},
+		4: {
+			question: 'מה קורה אם המחסן מלא באופן חלקי?',
+			correct_answer: 'שום דבר, זה רק עדכון. כל עוד המחסן אינו מלא לגמרי ניתן להמשיך לצבור בו זהב.',
+			distractor_1: 'זה לא משהו שאדע עליו מפני שאין דיווחים על כך שהמחסן מלא רק באופן חלקי.',
+			distractor_2: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
+			distractor_3: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
+		},
+		5: {
+			question: 'מה השווי של גושי הזהב שאני יכול/ה למצוא?',
+			correct_answer: '15 יחידות זהב.',
+			distractor_1: 'הסכום משתנה והוא יוצג בכל פעם בהתאם.',
+			distractor_2: '1 יחידות זהב.',
+			distractor_3: 'הסכום משתנה ואין לי אפשרות לדעת אותו.',
+		},
+		6: {
+			question: 'לאחר שנכנסתי לאפליקציה, מתי אוכל לצאת ממנה כדי על מנת שתוצאת החיפוש תיחשב לי?',
+			correct_answer: 'כאשר תופיעה הודעת הסיום (בה כתוב "נתראה בפעם הבאה").',
+			distractor_1: 'מיד לאחר הכניסה.',
+			distractor_2: 'מיד עם הופעתה של תוצאת החיפוש.',
+			distractor_3: 'כשמופיעים עננים.',
+		},
+		7: {
+			question: 'מה קורה כשמעונן על כוכב הלכת ואין לי אפשרות לראות את תוצאות החיפוש?',
+			correct_answer: 'הכל ממשיך בדיוק אותו דבר. אין שינוי מלבד זה שאיני יכול/ה לראות את תוצאת החיפוש.',
+			distractor_1: 'המשחק לא זמין בזמנים אלו ולכן עדיף לנסות מאוחר יותר.',
+			distractor_2: 'אין עלות לכניסה.',
+			distractor_3: 'אין לי אפשרות לצבור את הזהב במחסן.',
+		},
+		8: {
+			question: 'כיצד אוכל להרוויח כסף אמיתי?',
+			correct_answer: 'פשוט להיכנס לאפליקציה כדי לחפש זהב. במידה ומצאתי זהב ויש מקום במחסן, הזהב יילקח לכדור הארץ ויומר לכסף אמיתי. ככל שאצבור יותר זהב ארוויח יותר כסף.',
+			distractor_1: 'אין אפשרות להרוויח כסף אמיתי במשחק.',
+			distractor_2: 'פשוט להיכנס לאפליקציה כדי לחפש אבנים. במידה ומצאתי אבנים ויש מקום במחסן, האבנים יילקחו לכדור הארץ ויומרו לכסף אמיתי.',
+			distractor_3: 'להיכנס לאפליקציה ולהמתין בה זמן רב ככל שניתן לפני שאסגור אותה. ככל שהיא פתוחה יותר זמן ברצף, ארוויח יותר. ',
+		},
+		9: {
+			question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהם לפעמים?',
+			correct_answer: 'כל התשובות נכונות.',
+			distractor_1: 'יש לי 5 שניות בלבד לשהות במערה, בהן אוכל לאסוף מהדברים שבה.',
+			distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 1 יחידות זהב.',
+			distractor_3: 'שווי גושי הזהב והאבנים זהה לזה לשווי גושי הזהב והאבנים בחיפושי הזהב הרגילים.',
+		},
+		10: {
+			question: 'מהו משך המשחק?',
+			correct_answer: 'משך המשחק אינו קבוע מראש. הוא אורך בין ימים אחדים לחודש.',
+			distractor_1: 'יום אחד.',
+			distractor_2: 'שבוע.',
+			distractor_3: 'חודש.',
+		},
+		// [replace_here_ with_a_number]: {
+		// 	question: '',
+		// 	correct_answer: '',
+		// 	distractor_1: '',
+		// 	distractor_2: '',
+		// 	distractor_3: '',
+		// },
+	},
 	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.

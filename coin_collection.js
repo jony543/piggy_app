@@ -239,7 +239,7 @@ async function run_coin_collection(settings) {
 
 	CollectableObj.prototype.types = {};
 	CollectableObj.prototype.setImage = function (type, imgUrl, height, width) {		
-		CollectableObj.prototype.types.push[type] = {
+		CollectableObj.prototype.types[type] = {
 				img: loadImage(imgUrl, img => {
 						img.resize(width, height);
 					}),

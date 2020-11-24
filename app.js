@@ -174,26 +174,16 @@
 		subject_data_worker.postMessage({ viewedOutcome: true });
 	});
 
-
 	// show winning/loosing message for 2 seconds
 	await delay(settings.durations.outcomeAnim);
 	var manipulationOption = logic.isManipulation(runData, settings);
 	dom_helper.hide("welcome_msg");
 
+	// manipulationOption = 'devaluation' // 'still_valued' /**********************/
 	if (manipulationOption) {
 		subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
-		await dialog_helper.show(settings.text.manipulationMessage(manipulationOption));
+		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption));
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
-
-		if (manipulationOption == 'devaluation') {
-			dom_helper.show("warehouse_full");
-			dom_helper.add_css_class('warehouse_full', 'dance');
-		}
-
-		if (manipulationOption == 'still_valued') {
-			dom_helper.show("warehouse_half");
-			dom_helper.add_css_class('warehouse_half', 'dance');
-		}
 	}
 
 	//runData.consumptionTest = true; /**********************/

@@ -225,7 +225,7 @@ var dialog_helper = {
 	show: function (msg, img_id, confirmation, delayBeforeClosing = 0) { // returns promise
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
-				dom_helper.set_text("dialog_confirmation_msg", '.' + "'" + confirmation + "'" + ' כדי למשיך יש להקליד');
+				dom_helper.set_text("dialog_confirmation_msg", 'כדי להמשיך יש להקליד ' + "'" + confirmation + "'" + '.');
 				dom_helper.show("dialog_confirmation_msg")
 				dom_helper.show("dialog_response_text");
 				dom_helper.disable("dialog_ok_button");

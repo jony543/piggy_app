@@ -185,6 +185,7 @@ function monitorChangesInDemoAndReact(settings) {
 		setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
 	}
 }
+
 // ****************************************************************
 //                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
@@ -197,6 +198,8 @@ var target_n_data_points = null; // used to navigate between embedded demo up st
 var instructions_page = 1;
 var mainDemoTextDuplicateID = "mainDemoTextBox";
 var testPassed;
+var timeline = [];
+
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
@@ -216,15 +219,21 @@ jatos.loaded().then(function () {
 
 	// get custom settings for component and batch
 	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
-
 	// get subject data from batch session
 	var subData = data_helper.get_subject_data(true);
 
-	////// up to this point I copied it from the app.js ///////// **
 	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
-	///
 
-	var timeline = [];
+	// intialize test questions stuff:
+	//---------------------------------
+	var question_index = 0;
+	var questions = settings.instructions_test_questions;
+	var arrayOfQuestionNumbers = Object.keys(questions).map((x) => Number(x)).filter((x) => !isNaN(x))
+	var n_questions = arrayOfQuestionNumbers.length;
+	if (questions.toRandomizeQuestions) {
+		shuffle(arrayOfQuestionNumbers)
+	}
+	var question_number = arrayOfQuestionNumbers[question_index]
 
 	// SET INFORMED CONSENT:
 	//------------------------------------------------------
@@ -335,41 +344,51 @@ jatos.loaded().then(function () {
 			{
 				stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
 				תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
-				אל דאגה, אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
+				אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
 				לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
 				</p>',
 			}
 		]
 	};
-	var test = {
+	var test_question = {
 		data: {
-			trialType: 'test',
+			trialType: 'test_question',
 		},
 		type: 'html-button-response',
 		trial_duration: undefined, // no time limit
 		timeline: [
 			{
-				stimulus: '<h1>Q 1</h1>',
-				choices: () => shuffle(['A', 'B', 'C', 'D']),
+				stimulus: '',
+				choices: '',
+				on_start: function () {
+					this.stimulus = '<p id="test_question_text">' + questions[arrayOfQuestionNumbers[question_index]].question + '</p>'
+					this.choices = shuffle([questions[question_number].correct_answer, questions[question_number].distractor_1, questions[question_number].distractor_2, questions[question_number].distractor_3])
+					this.choices.unshift(questions.dont_know_answer)
+					this.button_html = '<button id="multipleChoiceQuestionsButtons">%choice%</button>'
+				},
 				on_finish: function (data) {
-					data.correct = data.button_pressed == this.choices.indexOf('B'); // option B
+					data.correct = data.button_pressed == this.choices.indexOf(questions[question_number].correct_answer); // option B
 				}
 			},
-			{
-				stimulus: '<h1>Q 2</h1>',
-				choices: () => shuffle(['A', 'B', 'C', 'D']),
-				on_finish: function (data) {
-					data.correct = data.button_pressed == this.choices.indexOf('D'); // option D
-				}
-			},
-			{
-				stimulus: '<h1>Q 3</h1>',
-				choices: () => shuffle(['A', 'B', 'C', 'D']),
-				on_finish: function (data) {
-					data.correct = data.button_pressed == this.choices.indexOf('A'); // option A
-				}
-			}
 		]
+	};
+	var testQuestionsSequenceManager = {
+		timeline: [test_question],
+		loop_function: function () {
+			if (question_index === (n_questions - 1)) {
+				// initialize stuff if more rounds of instructions will be run.
+				question_index = 0;
+				if (questions.toRandomizeQuestions) {
+					shuffle(arrayOfQuestionNumbers)
+				}
+				question_number = arrayOfQuestionNumbers[question_index]
+				return false;
+			} else {
+				question_index++
+				question_number = arrayOfQuestionNumbers[question_index]
+				return true;
+			}
+		}
 	};
 
 	var post_test_message = {
@@ -385,19 +404,19 @@ jatos.loaded().then(function () {
 		on_start: function () {
 			// check if there is a single mistake return to start
 			const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
-			const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
-			testPassed = !(relevantData.filter({ trialType: 'test', correct: false }).count() > 0)
+			const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - n_questions)
+			testPassed = !(relevantData.filter({ trialType: 'test_question', correct: false }).count() > 0)
 			if (testPassed) {
-				msg = 'ענית נכונה על השאלות.<br><br> \
+				msg = 'ענית נכון על כל השאלות.<br><br> \
 				החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
 				 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
-				 בהצלחה!';
+				 בהצלחה!<br><br> \
+				 <img id="post_instructions_test_image" src="images/instructions/after_test_passed.jpg" />';
 				jsPsych.endExperiment('The experiment was ended because the user passed the test.');
 			} else {
 				msg = 'לא כל השאלות נענו נכונה.<br><br> \
-				יש לעבור שוב על ההוראות וההדגמה.'
+				יש לעבור שוב על ההוראות וההדגמה.';
 				this.show_clickable_nav = true
-				//this.button_label_next = 'המשך'
 			}
 			this.pages = ['<h2 id="post_test_msg">' + msg + '</h2>']
 		}
@@ -406,7 +425,8 @@ jatos.loaded().then(function () {
 	// SET THE MAIN LOOP OF THE TUTORIAL:
 	//------------------------------------------------------
 	var completeTutorialLoop = {
-		timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, test, post_test_message],
+		timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, testQuestionsSequenceManager, post_test_message],
+		//timeline: [instructionsLoop, get_ready_for_the_test, testQuestionsSequenceManager, post_test_message],
 		loop_function: function (data) {
 			if (!testPassed) {
 				return true;
@@ -427,7 +447,7 @@ jatos.loaded().then(function () {
 				// saving the data
 				// ---------------------
 				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
-				
+
 				subject_data_worker.postMessage({ completedInstructions: true });
 				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
@@ -440,7 +460,7 @@ jatos.loaded().then(function () {
 				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
 				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
-				
+
 				terminate_subject_data_worker = true;
 				console.log('Tutrial Closed')
 			}
