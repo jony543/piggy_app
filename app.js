@@ -1,25 +1,14 @@
 (async () => {
-
-	await jatos.loaded();
-
-	var terminate_subject_data_worker = false;
-	subject_data_worker.done = function (x) {
-		// when all messages are processed save the information as a JATOS result
-		if (terminate_subject_data_worker) {
-			var subData = data_helper.get_subject_data(false);
-			var currentRunData = subData[jatos.studyResultId];
-
-			jatos.appendResultData(currentRunData).then(function () {
-				console.log('finished');
-			});
-		}
-	};
-
-	// get custom settings for component and batch
-	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+	var settings = Object.assign({}, app_settings); 
 
 	// get subject data from batch session
-	var subData = data_helper.get_subject_data(true);
+	var subData = {};
+	while(!subData)
+		subData = await data_helper.get_subject_data(true).catch(function (e) { 
+			console.log('error getting subject data');
+			console.log(e);
+		});
+	};
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
@@ -34,7 +23,7 @@
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		jatos.goToComponent("instructions");
+		location.href = 'instructions.html';
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		alert(settings.text.realGameBegins)

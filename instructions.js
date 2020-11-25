@@ -23,15 +23,17 @@ function exitAppDemo(appDemoID) {
 
 function loadAppDemo() {
 	// check when to present again the button that closes the demo app:
-	var subData = data_helper.get_subject_data(true);
+	var subData = {};
+	while(!subData)
+		subData = await data_helper.get_subject_data(true).catch(function (e) { 
+			console.log('error getting subject data');
+			console.log(e);
+		});
+	};
+	
 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
-
-	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
-		"batchId=" + jatos.batchId +
-		"&personalMultipleWorkerId=" + jatos.workerId;
-	if (!!jatos.isLocalhost) {
-		var demoUrl = "index.html";
-	}
+	
+	var demoUrl = "index.html";
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:
@@ -138,7 +140,13 @@ function removeSmartphoneApperance(appDemoID) {
 
 function monitorChangesInDemoAndReact(settings) {
 	console.log('check...')
-	var subData = data_helper.get_subject_data(true);
+	var subData = {};
+	while(!subData)
+		subData = await data_helper.get_subject_data(true).catch(function (e) { 
+			console.log('error getting subject data');
+			console.log(e);
+		});
+	};
 
 	// check when to present again the button that closes the demo app:
 	// if (firstAppOpennedDetection) { // first set the stuff to check when embedded app finshed running:
@@ -200,250 +208,239 @@ var testPassed;
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
-jatos.loaded().then(function () {
-	var terminate_subject_data_worker = false;
-	subject_data_worker.done = function (x) {
-		// when all messages are processed save the information as a JATOS result
-		if (terminate_subject_data_worker) {
-			var subData = data_helper.get_subject_data(false);
-			var currentRunData = subData[jatos.studyResultId];
 
-			jatos.appendResultData(currentRunData).then(function () {
-				console.log('finished');
-			});
-		}
-	};
+var settings = Object.assign({}, app_settings);
 
-	// get custom settings for component and batch
-	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+// get subject data from batch session
+var subData = {};
+while(!subData)
+	subData = await data_helper.get_subject_data(true).catch(function (e) { 
+		console.log('error getting subject data');
+		console.log(e);
+	});
+};
 
-	// get subject data from batch session
-	var subData = data_helper.get_subject_data(true);
+////// up to this point I copied it from the app.js ///////// **
+subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
+///
 
-	////// up to this point I copied it from the app.js ///////// **
-	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
-	///
+var timeline = [];
 
-	var timeline = [];
+// SET INFORMED CONSENT:
+//------------------------------------------------------
+var consentForm = {
+	type: 'external-html',
+	url: "informed_consent.html",
+	cont_btn: "start",
+	check_fn: check_consent
+};
 
-	// SET INFORMED CONSENT:
-	//------------------------------------------------------
-	var consentForm = {
-		type: 'external-html',
-		url: "informed_consent.html",
-		cont_btn: "start",
-		check_fn: check_consent
-	};
-
-	// SET WRITTEN INSTRUCTIONS:
-	//------------------------------------------------------
-	var instructions = {
-		data: {
-			trialType: 'instruction',
-		},
-		type: 'html-button-response',
-		trial_duration: undefined, // no time limit
-		choices: ['המשך', 'חזור'],
-		timeline: [
-			{
-				stimulus: '',
-				on_load: function () {
-					document.body.style.backgroundImage = "url('images/instructions/instructions_" + String(instructions_page) + ".jpg')";
-					document.getElementById("instructionsButtons").disabled = true;
-					document.getElementById("instructionsButtons").style.opacity = "0.5";
-					setTimeout(function () {
-						document.getElementById("instructionsButtons").disabled = false
-						document.getElementById("instructionsButtons").style.opacity = "1";
-					}, 1500);
-				}
-			}
-		],
-		button_html: '<button id="instructionsButtons">%choice%</button>',
-	};
-	var instructionsLoop = {
-		timeline: [instructions],
-		loop_function: function (data) {
-			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
-			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
-				document.body.style.backgroundImage = "none"
-				document.body.style.backgroundColor = "white"
-				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
-				return false;
-			} else {
-				if (goBack && instructions_page > 1) {
-					instructions_page--
-				} else if (!goBack) {
-					instructions_page++
-				}
-				return true;
+// SET WRITTEN INSTRUCTIONS:
+//------------------------------------------------------
+var instructions = {
+	data: {
+		trialType: 'instruction',
+	},
+	type: 'html-button-response',
+	trial_duration: undefined, // no time limit
+	choices: ['המשך', 'חזור'],
+	timeline: [
+		{
+			stimulus: '',
+			on_load: function () {
+				document.body.style.backgroundImage = "url('images/instructions/instructions_" + String(instructions_page) + ".jpg')";
+				document.getElementById("instructionsButtons").disabled = true;
+				document.getElementById("instructionsButtons").style.opacity = "0.5";
+				setTimeout(function () {
+					document.getElementById("instructionsButtons").disabled = false
+					document.getElementById("instructionsButtons").style.opacity = "1";
+				}, 1500);
 			}
 		}
-	};
-
-	// SET DEMO STUFF:
-	//------------------------------------------------------
-	var demo = {
-		type: 'call-function',
-		func: function () {
-			// Operate the embedded demo:
-			createSmartphoneApperance()
-			createExitAppButton(elementIdName = 'demoExitButton')
-			createLoadAppButton(elementIdName = 'demoLoadButton')
-			jsPsych.pauseExperiment()
-			monitorChangesInDemoAndReact(settings)
-		},
-	};
-	var continue_or_repeat_demo_cycle = {
-		data: {
-			trialType: 'continue_or_repeat_demo_cycle',
-		},
-		type: 'html-button-response',
-		trial_duration: undefined, // no time limit
-		choices: ['להמשיך', 'סיבוב נוסף'],
-		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
-		timeline: [
-			{
-				stimulus: '<p id="repeatOrContinueText">ההדגמה הסתיימה.<br><br>האם ברצונך לבצע סיבוב נוסף או להמשיך?<br><br></p>',
+	],
+	button_html: '<button id="instructionsButtons">%choice%</button>',
+};
+var instructionsLoop = {
+	timeline: [instructions],
+	loop_function: function (data) {
+		var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
+		if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
+			document.body.style.backgroundImage = "none"
+			document.body.style.backgroundColor = "white"
+			instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
+			return false;
+		} else {
+			if (goBack && instructions_page > 1) {
+				instructions_page--
+			} else if (!goBack) {
+				instructions_page++
 			}
-		]
-	};
-	var big_demo_loop = {
-		timeline: [demo, continue_or_repeat_demo_cycle],
-		loop_function: function (data) {
-			console.log('YYYYY')
-			const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
-			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
-				return false;
-			} else {
-				// Operate the embedded demo:
-				return true;
-			}
+			return true;
 		}
 	}
+};
 
-	// SET TEST:
-	//------------------------------------------------------
-	var get_ready_for_the_test = {
-		data: {
-			trialType: 'get_ready_for_the_test',
-		},
-		type: 'html-button-response',
-		trial_duration: undefined, // no time limit
-		choices: ['התחל'],
-		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
-		timeline: [
-			{
-				stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
-				תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
-				אל דאגה, אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
-				לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
-				</p>',
-			}
-		]
-	};
-	var test = {
-		data: {
-			trialType: 'test',
-		},
-		type: 'html-button-response',
-		trial_duration: undefined, // no time limit
-		timeline: [
-			{
-				stimulus: '<h1>Q 1</h1>',
-				choices: () => shuffle(['A', 'B', 'C', 'D']),
-				on_finish: function (data) {
-					data.correct = data.button_pressed == this.choices.indexOf('B'); // option B
-				}
-			},
-			{
-				stimulus: '<h1>Q 2</h1>',
-				choices: () => shuffle(['A', 'B', 'C', 'D']),
-				on_finish: function (data) {
-					data.correct = data.button_pressed == this.choices.indexOf('D'); // option D
-				}
-			},
-			{
-				stimulus: '<h1>Q 3</h1>',
-				choices: () => shuffle(['A', 'B', 'C', 'D']),
-				on_finish: function (data) {
-					data.correct = data.button_pressed == this.choices.indexOf('A'); // option A
-				}
-			}
-		]
-	};
-
-	var post_test_message = {
-		data: {
-			trialType: 'post_test_message',
-		},
-		type: 'instructions',
-		trial_duration: undefined, // no time limit
-		allow_keys: false,
-		allow_backward: false,
-		button_label_next: 'המשך',
-		pages: [],
-		on_start: function () {
-			// check if there is a single mistake return to start
-			const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
-			const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
-			testPassed = !(relevantData.filter({ trialType: 'test', correct: false }).count() > 0)
-			if (testPassed) {
-				msg = 'ענית נכונה על השאלות.<br><br> \
-				החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
-				 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
-				 בהצלחה!';
-				jsPsych.endExperiment('The experiment was ended because the user passed the test.');
-			} else {
-				msg = 'לא כל השאלות נענו נכונה.<br><br> \
-				יש לעבור שוב על ההוראות וההדגמה.'
-				this.show_clickable_nav = true
-				//this.button_label_next = 'המשך'
-			}
-			this.pages = ['<h2 id="post_test_msg">' + msg + '</h2>']
+// SET DEMO STUFF:
+//------------------------------------------------------
+var demo = {
+	type: 'call-function',
+	func: function () {
+		// Operate the embedded demo:
+		createSmartphoneApperance()
+		createExitAppButton(elementIdName = 'demoExitButton')
+		createLoadAppButton(elementIdName = 'demoLoadButton')
+		jsPsych.pauseExperiment()
+		monitorChangesInDemoAndReact(settings)
+	},
+};
+var continue_or_repeat_demo_cycle = {
+	data: {
+		trialType: 'continue_or_repeat_demo_cycle',
+	},
+	type: 'html-button-response',
+	trial_duration: undefined, // no time limit
+	choices: ['להמשיך', 'סיבוב נוסף'],
+	button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+	timeline: [
+		{
+			stimulus: '<p id="repeatOrContinueText">ההדגמה הסתיימה.<br><br>האם ברצונך לבצע סיבוב נוסף או להמשיך?<br><br></p>',
 		}
-	};
+	]
+};
+var big_demo_loop = {
+	timeline: [demo, continue_or_repeat_demo_cycle],
+	loop_function: function (data) {
+		console.log('YYYYY')
+		const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
+		if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
+			return false;
+		} else {
+			// Operate the embedded demo:
+			return true;
+		}
+	}
+}
 
-	// SET THE MAIN LOOP OF THE TUTORIAL:
-	//------------------------------------------------------
-	var completeTutorialLoop = {
-		timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, test, post_test_message],
-		loop_function: function (data) {
-			if (!testPassed) {
-				return true;
-			} else {
-				return false;
+// SET TEST:
+//------------------------------------------------------
+var get_ready_for_the_test = {
+	data: {
+		trialType: 'get_ready_for_the_test',
+	},
+	type: 'html-button-response',
+	trial_duration: undefined, // no time limit
+	choices: ['התחל'],
+	button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+	timeline: [
+		{
+			stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
+			תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
+			אל דאגה, אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
+			לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
+			</p>',
+		}
+	]
+};
+var test = {
+	data: {
+		trialType: 'test',
+	},
+	type: 'html-button-response',
+	trial_duration: undefined, // no time limit
+	timeline: [
+		{
+			stimulus: '<h1>Q 1</h1>',
+			choices: () => shuffle(['A', 'B', 'C', 'D']),
+			on_finish: function (data) {
+				data.correct = data.button_pressed == this.choices.indexOf('B'); // option B
+			}
+		},
+		{
+			stimulus: '<h1>Q 2</h1>',
+			choices: () => shuffle(['A', 'B', 'C', 'D']),
+			on_finish: function (data) {
+				data.correct = data.button_pressed == this.choices.indexOf('D'); // option D
+			}
+		},
+		{
+			stimulus: '<h1>Q 3</h1>',
+			choices: () => shuffle(['A', 'B', 'C', 'D']),
+			on_finish: function (data) {
+				data.correct = data.button_pressed == this.choices.indexOf('A'); // option A
 			}
 		}
-	};
+	]
+};
 
-	timeline.push(consentForm);
-	timeline.push(completeTutorialLoop);
+var post_test_message = {
+	data: {
+		trialType: 'post_test_message',
+	},
+	type: 'instructions',
+	trial_duration: undefined, // no time limit
+	allow_keys: false,
+	allow_backward: false,
+	button_label_next: 'המשך',
+	pages: [],
+	on_start: function () {
+		// check if there is a single mistake return to start
+		const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
+		const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
+		testPassed = !(relevantData.filter({ trialType: 'test', correct: false }).count() > 0)
+		if (testPassed) {
+			msg = 'ענית נכונה על השאלות.<br><br> \
+			החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
+			 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
+			 בהצלחה!';
+			jsPsych.endExperiment('The experiment was ended because the user passed the test.');
+		} else {
+			msg = 'לא כל השאלות נענו נכונה.<br><br> \
+			יש לעבור שוב על ההוראות וההדגמה.'
+			this.show_clickable_nav = true
+			//this.button_label_next = 'המשך'
+		}
+		this.pages = ['<h2 id="post_test_msg">' + msg + '</h2>']
+	}
+};
 
-	jatos.onLoad(function () {
-		jsPsych.init({
-			timeline: timeline,
-			//display_element: 'jspsych-display-element',
-			on_finish: function () {
-				// saving the data
-				// ---------------------
-				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
-				
-				subject_data_worker.postMessage({ completedInstructions: true });
-				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+// SET THE MAIN LOOP OF THE TUTORIAL:
+//------------------------------------------------------
+var completeTutorialLoop = {
+	timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, test, post_test_message],
+	loop_function: function (data) {
+		if (!testPassed) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+};
 
-				terminate_subject_data_worker = true;
-				console.log('Tutrial Completed')
-			},
-			on_close: function () { // in case the user gets out before it finishes.
-				// saving the data
-				// ---------------------
-				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+timeline.push(consentForm);
+timeline.push(completeTutorialLoop);
 
-				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
-				
-				terminate_subject_data_worker = true;
-				console.log('Tutrial Closed')
-			}
-		});
-	});
+jsPsych.init({
+	timeline: timeline,
+	//display_element: 'jspsych-display-element',
+	on_finish: function () {
+		// saving the data
+		// ---------------------
+		var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+		
+		subject_data_worker.postMessage({ completedInstructions: true });
+		subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+
+		terminate_subject_data_worker = true;
+		console.log('Tutrial Completed')
+	},
+	on_close: function () { // in case the user gets out before it finishes.
+		// saving the data
+		// ---------------------
+		var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+
+		subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+		
+		terminate_subject_data_worker = true;
+		console.log('Tutrial Closed')
+	}
 });

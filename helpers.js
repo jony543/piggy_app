@@ -45,45 +45,106 @@ var dom_helper = {
 };
 
 var data_helper = {
-	get_subject_data: function (asArray) {
-		var subjectData = jatos.batchSession.get(jatos.workerId + "_data");
+	get_subject_id: function () {
+		return /[&?]subId=([^&]+)/.exec(location.search)[1];
+	},	
+	get_subject_data: function (asArray) { // returns promise
+		return new Promise(resolve, reject) {
+			var xhr = new XMLHttpRequest();
 
-		if (!!asArray) {
-			//arr = []; for (v in subjectData) { arr.push(v); }
-			//return arr;
-			// ** COMMENTED (ABOVE) AND BY RANI AND CHANGED TO THE FOLLOWING: **
-			//initialize data
-			var data = {};
-			if (!!subjectData) {
-				// create one dictionnay for each line of data:
-				arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
-				// populate data variables:
-				app_settings.dataVarList.forEach(key => data[key] = []);
-				// fill dictionnary of arrays:
-				arrayOfObj.forEach(function (lineObject) {
-					for (const key of Object.keys(data)) {
-						data[key].push(lineObject[key]);
-					}
-				});
+			xhr.onload = function(e) {
+			  	var subjectData = oReq.response;
+				if (!!asArray) { 
+					var data = {};
+					if (!!subjectData) {
+						// create one dictionnay for each line of data:
+						arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
+						// populate data variables:
+						app_settings.dataVarList.forEach(key => data[key] = []);
+						// fill dictionnary of arrays:
+						arrayOfObj.forEach(function (lineObject) {
+							for (const key of Object.keys(data)) {
+								data[key].push(lineObject[key]);
+							}
+						});
+					};
+					resolve(data);
+				} else {
+					resolve((!!subjectData) ? subjectData : {});
+				}
 			};
-			return data;
 
-		} else {
-			return (!!subjectData) ? subjectData : {};
-		}
+			xhr.onerror = function (e) { reject(e); };
+			xhr.ontimeout = function (e) { reject(e); };
+			xhr.onabort = function (e) { reject(e); };
+
+			xhr.open("GET", '/app/session?subId=' + this.get_subject_id());
+			xhr.responseType = "json";
+			xhr.send();
+		};		
 	},
-	append_subject_data: function (data) { // returns promise
-		var subjectData = this.get_subject_data(false);
+	getWsUrl: function () {
+		var url = 'ws'
+		
+		if (location.protocol == 'https')
+			url += 's';
 
-		if (!!subjectData[jatos.studyResultId]) {
-			var runData = subjectData[jatos.studyResultId];
-			Object.assign(runData, data);
-			subjectData[jatos.studyResultId] = runData;
-		} else {
-			subjectData[jatos.studyResultId] = data;
-		}
+		url += '://' + location.hostname + '/app/session?subId=' +  data_helper.getSubjectId();
 
-		return jatos.batchSession.set(jatos.workerId + "_data", subjectData);
+		return url;
+	},
+	ws: {},
+	sessionId: '',
+	q: [],
+	init: function () {
+		this.ws = new WebSocket(this.getWsUrl());
+
+		this.ws.onopen = function (event) {
+			console.log('new session opened');
+	    };
+
+	    this.ws.onclose = function (event) {
+	    	// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
+	    	if (event.code != 1000) {
+	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
+	    		this.init();
+	    	}
+	    };
+
+	    this.ws.onerror = function (event) {
+	    	console.log('WS error!');
+	    	console.log(event);
+
+	    	if (this.ws.readyState == 3) { // status CLOSED
+	    		this.ws = undefined;
+	    		this.init();
+	    	}
+	    };
+
+	    this.ws.onmessage = function (event) {
+	        var data = JSON.parse(event.data);
+
+	        // if it is the first message in session get the current sessionId
+	        if ('_id' in data) {
+	            sessionId = data._id;
+	        }
+
+	        // if it is ack message remove the message from queue
+	        if ('messageId' in data) {
+	        	this.q = this.q.filter(m => m.messageId != data.messageId);
+	        }        
+	    }
+	},	
+	append_subject_data: function (data) {
+		// denerate new message id
+		const messageId = 'm' + (new Date()).getTime();
+		data['messageId'] = messageId;		
+		this.q.push(data);
+
+		// send all messages that sill in queue together
+		this.ws.send(
+			Object.assign({ _id: this.sessionId }, ...q)
+		);
 	}
 };
 
