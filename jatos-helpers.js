@@ -22,7 +22,7 @@ if (!window.jatos) {
 		onLoad: function(func) {
 			func();
 		},
-		workerId: '6',
+		workerId: '4',
 		batchId: '100',
 		isLocalhost: true, // if (!!jatos.isLocalhost)
 		studyResultId: Date.now(),

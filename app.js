@@ -1,5 +1,9 @@
 (async () => {
 
+	// ****************************************************************
+	//           SET STUFF:
+	// ----------------------------------------------------------------
+
 	await jatos.loaded();
 
 	var terminate_subject_data_worker = false;
@@ -32,6 +36,10 @@
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('superimposed_outcome_sum').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 
+	// ****************************************************************
+	//           RUN THE APP
+	// ----------------------------------------------------------------
+
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
 		jatos.goToComponent("instructions");
@@ -42,8 +50,6 @@
 		subject_data_worker.postMessage({ realGameBeginsConfirmationTime: new Date() }) // **
 	}
 
-	// RANI - please see if this is correct.
-	// Also - why send 2 consecutive messages of resetContainer? the second will override the first.
 	// reset the container at the beginning of the day:
 	if (runData.resetContainer) { // activating reseting container when relevant. **
 		subject_data_worker.postMessage({ resetContainerAlertTime: new Date() }) // **
@@ -117,7 +123,7 @@
 	});
 
 
-	// hide entrance graphics and start game
+	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
 	//dom_helper.hide("welcome_msg");
 	dom_helper.hide("spaceship");
@@ -128,7 +134,7 @@
 	// wait for 2 clicks to happen
 	await Promise.all([p1, p2]);
 
-	// hide game and show lottery animation
+	// hide sequence pressing inteface and show lottery animation
 	document.getElementById('lower_half').onclick = undefined;
 	document.getElementById('upper_half').onclick = undefined;
 
@@ -160,7 +166,7 @@
 		dom_helper.show('superimposed_outcome_sum', settings.durations.outcomeAnim); // **
 		dom_helper.add_css_class('superimposed_outcome_sum', 'goUpOutcomeImage'); // **
 
-		// add text about the outcome below
+		// add text about the outcome below the outcome image
 		dom_helper.show("outcome_text_1_", settings.durations.outcomeAnim);
 		dom_helper.add_css_class('outcome_text_1_', 'appearSlowlyOutcomeText'); // **
 	}
@@ -188,7 +194,9 @@
 	//runData.consumptionTest = true; /**********************/
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
+		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
+		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
 		run_coin_collection(settings.coinCollectionTask)
 	} else {
 		finishTrial()
