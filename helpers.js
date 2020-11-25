@@ -91,7 +91,12 @@ var data_helper = {
 //                 Helper functions (by Rani):
 // ---------------------------------------------------------------
 
-function dateDiff(date1, date2) {
+function dateDiff(date1, date2, experimentalDayStartingHour = 0) {
+	const adjustingTime = 1000 * 60 * 60 * experimentalDayStartingHour;
+	
+	date1 = new Date(date1 - adjustingTime)
+	date2 = new Date(date2 - adjustingTime)
+
 	date1.setHours(0, 0, 0, 0);
 	date2.setHours(0, 0, 0, 0);
 	const diffTime = Math.abs(date2 - date1);
@@ -242,7 +247,7 @@ var dialog_helper = {
 			if (!!img_id) {
 				dom_helper.show(img_id);
 			}
-			
+
 			dom_helper.set_text("dialog_msg", msg);
 			dom_helper.show("screen-disabled-mask");
 			dom_helper.show('dialog_box');

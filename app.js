@@ -37,16 +37,18 @@
 		jatos.goToComponent("instructions");
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
+		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
 		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		subject_data_worker.postMessage({ realGameBeginsConfirmationTime: new Date() }) // **
 	}
 
 	// RANI - please see if this is correct.
 	// Also - why send 2 consecutive messages of resetContainer? the second will override the first.
 	// reset the container at the beginning of the day:
 	if (runData.resetContainer) { // activating reseting container when relevant. **
-		subject_data_worker.postMessage({ resetContainer: false });
+		subject_data_worker.postMessage({ resetContainerAlertTime: new Date() }) // **
 		await dialog_helper.show(settings.text.rewardContainerClearingMessage, img_id = 'warehouse_empty', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
-		subject_data_worker.postMessage({ resetContainer: true })
+		subject_data_worker.postMessage({ resetContainerConfirmationTime: new Date() }) // **
 	}
 
 	// cover the outcome:

@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------
 
 window.app_settings = {
+	experimentalDayStartingHour: 5, // Possiblie assignments are 0-23. Assign 0 to simply seperate between days.  Relevant for example to determine the time at day to empty container according to a 24h watch. 
 	pressesRequired: 2,
 	isInstallation: false,
 	forceDeval: null, // for debugging purposes
@@ -41,7 +42,6 @@ window.app_settings = {
 		},
 
 		notifyRewardContainerReset: true,
-		hourAtDayToResetRewardContainer: 5, //time at day to empty container according to a 24h watch, thus possiblie assignments are 0-23. Assign 0 to simply seperate between days.
 	},
 	cost: {
 		isCost: true,
