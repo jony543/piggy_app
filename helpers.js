@@ -197,16 +197,16 @@ var ajax_helper = {
 
 // Used by app.js and coin_collection.js:
 function finishTrial() {
-		// show goodbye message:
-		dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
-		dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
-		dom_helper.set_text('welcome_msg_txt', "נתראה בפעם הבאה"); //**
-		dom_helper.show('welcome_msg'); // **
+	// show goodbye message:
+	dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
+	dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
+	dom_helper.set_text('welcome_msg_txt', "נתראה בפעם הבאה"); //**
+	dom_helper.show('welcome_msg'); // **
 
-		// collect end time and save subject data as results:
-		subject_data_worker.postMessage({ endTime: new Date() });
-		terminate_subject_data_worker = true;
-		console.log('Trial Completed')
+	// collect end time and save subject data as results:
+	subject_data_worker.postMessage({ endTime: new Date() });
+	terminate_subject_data_worker = true;
+	console.log('Trial Completed')
 }
 
 var dialog_helper = {
@@ -219,10 +219,10 @@ var dialog_helper = {
 		}
 		return result;
 	},
-	random_code_confirmation: function (msg, img_id, delayBeforeClosing = 0) { // returns promise
-		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing);
+	random_code_confirmation: function (msg, img_id, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing) { // returns promise
+		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing, resolveOnlyAfterDelayBeforeClosing);
 	},
-	show: function (msg, img_id, confirmation, delayBeforeClosing = 0) { // returns promise
+	show: function (msg, img_id, confirmation, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing) { // returns promise
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
 				dom_helper.set_text("dialog_confirmation_msg", 'כדי להמשיך יש להקליד ' + "'" + confirmation + "'" + '.');
@@ -238,9 +238,11 @@ var dialog_helper = {
 				dom_helper.hide("dialog_response_text");
 				dom_helper.enable("dialog_ok_button")
 			}
+
 			if (!!img_id) {
 				dom_helper.show(img_id);
 			}
+			
 			dom_helper.set_text("dialog_msg", msg);
 			dom_helper.show("screen-disabled-mask");
 			dom_helper.show('dialog_box');
@@ -257,11 +259,18 @@ var dialog_helper = {
 					}
 					dom_helper.hide('dialog_box');
 					dom_helper.hide("screen-disabled-mask");
+
+					document.getElementById("dialog_response_text").value = ''; // clean the text box (good for if a new text box is following)
+
+					subject_data_worker.postMessage({ isDialogOn: false });
+
+					if (resolveOnlyAfterDelayBeforeClosing) { // needed to make consecutive dialog boxes work sometimes
+						resolve();
+					}
 				}, delayBeforeClosing)
-
-				subject_data_worker.postMessage({ isDialogOn: false });
-
-				resolve();
+				if (!resolveOnlyAfterDelayBeforeClosing) { // needed to make consecutive dialog boxes work sometimes
+					resolve();
+				}
 			}
 		});
 	}

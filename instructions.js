@@ -61,7 +61,9 @@ function createSmartphoneApperance() {
 	demoText = document.createElement('h1');
 	demoText.setAttribute("id", "mainDemoText");
 	demoText.setAttribute("class", "demoText");
-	demoText.appendChild(document.createTextNode(app_settings.demoCycleSupportingText[0]));
+	demoText.appendChild(document.createTextNode(''));
+	is_firstDemoScreen_SuportingInstructions_changed_1 = false;
+	is_firstDemoScreen_SuportingInstructions_changed_2 = false;
 	// making the text box
 	demoTextBox = document.createElement('div');
 	demoTextBox.setAttribute("id", "mainDemoTextBox");
@@ -69,6 +71,7 @@ function createSmartphoneApperance() {
 
 	demoTextBox.appendChild(demoText);
 	document.body.appendChild(demoTextBox);
+	dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['a']);
 
 	// outer rectangle:
 	outerRectangle = document.createElement('div');
@@ -156,33 +159,59 @@ function monitorChangesInDemoAndReact(settings) {
 		});
 	}
 
-	// construct here the demo instructions:
-	if (!!Object.keys(subData).length &&
-		!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-		appClosed && // app was closed
-		firstAppClosedDetection) {  // first detection after app was closed
-		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-		dom_helper.removeElement(oldMainDemoTextDuplicateID)
-		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-		dom_helper.show(mainDemoTextDuplicateID)
-		console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-		firstAppClosedDetection = false;
-	}
+	if (!!current_n_data_points) { // if there is data
 
-	// check if demo cycle is finished:
-	if (!!Object.keys(subData).length &&
-		subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
-		!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-		appClosed) {  // app was closed
-		appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
-		dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
-		mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
-		wait(300).then(() => removeSmartphoneApperance());
-		syncWait(750)
-		jsPsych.resumeExperiment();
-	} else {
-		setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
+		// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
+		if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === 0) {  // first demo trial
+			if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
+				!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
+			) {  // first detection after app was closed
+				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+				dom_helper.removeElement(oldMainDemoTextDuplicateID)
+				dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['b'])
+				dom_helper.show(mainDemoTextDuplicateID)
+				is_firstDemoScreen_SuportingInstructions_changed_1 = true;
+			}
+			if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
+				!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
+			) {  // first detection after app was closed
+				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+				dom_helper.removeElement(oldMainDemoTextDuplicateID)
+				dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['c'])
+				dom_helper.show(mainDemoTextDuplicateID)
+				is_firstDemoScreen_SuportingInstructions_changed_2 = true;
+			}
+		}
+
+		// construct here the demo instructions:
+		if (!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+			appClosed && // app was closed
+			firstAppClosedDetection) {  // first detection after app was closed
+			var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+			mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+			dom_helper.removeElement(oldMainDemoTextDuplicateID)
+			dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+			dom_helper.show(mainDemoTextDuplicateID)
+			console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+			firstAppClosedDetection = false;
+		}
+
+		// check if demo cycle is finished:
+		if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
+			!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+			appClosed) {  // app was closed
+			appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
+			dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
+			mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
+			wait(500).then(() => removeSmartphoneApperance());
+			syncWait(750)
+			jsPsych.resumeExperiment();
+		} else {
+			setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
+		}
+
 	}
 }
 
@@ -197,6 +226,8 @@ var current_n_data_points = null; // used to navigate between embedded demo up s
 var target_n_data_points = null; // used to navigate between embedded demo up states
 var instructions_page = 1;
 var mainDemoTextDuplicateID = "mainDemoTextBox";
+var is_firstDemoScreen_SuportingInstructions_changed_1;
+var is_firstDemoScreen_SuportingInstructions_changed_2;
 var testPassed;
 var timeline = [];
 
@@ -223,7 +254,6 @@ jatos.loaded().then(function () {
 	var subData = data_helper.get_subject_data(true);
 
 	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
-
 	// intialize test questions stuff:
 	//---------------------------------
 	var question_index = 0;
@@ -411,7 +441,7 @@ jatos.loaded().then(function () {
 				החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
 				 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
 				 בהצלחה!<br><br> \
-				 <img id="post_instructions_test_image" src="images/instructions/after_test_passed.jpg" />';
+				 <img id="post_instructions_test_image" src="images/game_title_image.jpg" />';
 				jsPsych.endExperiment('The experiment was ended because the user passed the test.');
 			} else {
 				msg = 'לא כל השאלות נענו נכונה.<br><br> \

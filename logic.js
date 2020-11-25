@@ -197,6 +197,7 @@ var logic = {
     // -------------------------------------------------------
 
     if (isDemo) {
+
       var dayOfExperiment = null
       let demoVars = settings.demoCycle[demoTrialNum % Object.keys(settings.demoCycle).length]
       // assign the variables for the demo:
@@ -207,6 +208,7 @@ var logic = {
       consumptionTest = demoVars.consumptionTest
       var toHideOutcome = demoVars.toHideOutcome
       var resetContainer = demoVars.resetContainer
+      
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
@@ -253,7 +255,9 @@ var logic = {
             // check if this is the first time the outcome should be devalued that day
             if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
               (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-              (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
+              //(subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
+              // I replaced in the condition above the manipulationConfirmationTime variable with simply checking the endTime instead (the new line here below). If I'd want to change it back I also need to put it back in the settings in the definition of the variables.
+              (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.endTime[subData.endTime.length-1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
               activateManipulation = true;
               consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...

@@ -37,25 +37,22 @@
 		jatos.goToComponent("instructions");
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
-		alert(settings.text.realGameBegins)
+		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
 	}
 
 	// RANI - please see if this is correct.
 	// Also - why send 2 consecutive messages of resetContainer? the second will override the first.
+	// reset the container at the beginning of the day:
 	if (runData.resetContainer) { // activating reseting container when relevant. **
-		console.log('A');
 		subject_data_worker.postMessage({ resetContainer: false });
-		console.log('B');
-		await dialog_helper.show(settings.text.rewardContainerClearingMessage);
+		await dialog_helper.show(settings.text.rewardContainerClearingMessage, img_id = 'warehouse_empty', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
 		subject_data_worker.postMessage({ resetContainer: true })
-		console.log('C');
 	}
 
-	////
+	// cover the outcome:
 	if (runData.hideOutcome) {
 		dom_helper.show("cover");
 	}
-	////
 
 	// show cost on top right corner if needed [At entrance]
 	if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
@@ -179,16 +176,17 @@
 	var manipulationOption = logic.isManipulation(runData, settings);
 	dom_helper.hide("welcome_msg");
 
-	// manipulationOption = 'devaluation' // 'still_valued' /**********************/
+	//manipulationOption = 'devaluation' // 'still_valued' /**********************/
 	if (manipulationOption) {
 		subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
-		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption));
+		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 	}
 
 	//runData.consumptionTest = true; /**********************/
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
-		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
+		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
+		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
 		run_coin_collection(settings.coinCollectionTask)
 	} else {
 		finishTrial()

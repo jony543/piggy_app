@@ -74,15 +74,14 @@ window.app_settings = {
 		surface_disappearance: 700,
 	},
 	text: {
-		welcomeText: 'ששלום',
+		welcomeText: 'שלום',
 		winningText: 'זכית ב- ',
 		noWinningText: '...לא זכית הפעם',
 		goodbyeText: 'נתראה בפעם הבאה',
 		devaluationNotificationText: 'הקופה מלאה, לא ניתן לצבור בה עוד כסף עד מחר.\nלחצ/י על ok כדי לאשר.',
 		verifyBeginningText: 'לחצ/י אשר כדי להתחיל.',
 		// alerts, prompts etc:
-		rewardContainerClearingMessage: 'תא המטען של החללית פנוי לאיסוף זהב !',
-		confirmationCodeTextMessage: '\nכדי לאשר שקראת יש לכתוב את האותיות: ',
+		rewardContainerClearingMessage: 'חללית המטען רוקנה את המחסן וכעת הוא פנוי לצבירת זהב.',
 		manipulationMessage: function (manipulationType) {
 			if (manipulationType == 'devaluation') {
 				return 'המחסן מלא!<br>לא ניתן לצבור בו עוד זהב עד שחללית המטען תרוקן אותו.';
@@ -90,8 +89,9 @@ window.app_settings = {
 				return 'המחסן מלא למחצה...';
 			}
 		},
+		confirmationCodeTextMessage: '\nכדי לאשר שקראת יש לכתוב את האותיות: ',
 		completeDemo: 'ההדגמה הסתיימה. אם ברצונך לסיים חלק זה ולהתחיל במשחק האמיתי יש לכתוב yes.\n כל דבר אחר. כדי לבצע סיבוב הדגמה נוסף יש ללחוץ על',
-		realGameBegins: 'המשחק האמיתי מתחיל עכשיו.\nהזהב שייאסף מעכשיו שווה כסף אמיתי.\nבהצלחה!',
+		realGameBegins: 'המשחק האמיתי מתחיל עכשיו.<br>הזהב שתצבור/תצברי מעכשיו שווה כסף אמיתי.<br><br>בהצלחה!',
 		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 1 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.'
 	},
 	coinCollectionTask: {
@@ -119,21 +119,24 @@ window.app_settings = {
 		1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
 		2: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
 		3: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: false, isUnderManipulation: true, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true, consumptionTest: false },
-		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: false },
-		7: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
+		4: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true, consumptionTest: false },
+		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: false },
+		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
+		7: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: true },
 	},
 	demoCycleSupportingText: {
-		//0: 'הכנו לך הדגמה עם מסך וירטואלי שמדמה סמארטפון. לחצ/י על האפליקציה כדי לשגר את החללית שלך למשימת חיפוש זהב. תחילה תראה/י את החללית נוחתת ומימין למעלה תופיע עלות שליחת החללית למשימה (1-). לאחר מכן לחצ/י על חציו התחתון של המסך ואז על חלקו העליון כדי להסיר את הקרח ולאפשר את חיפוש הזהב. לאחר מספר שניות של חיפוש תופיע התוצאה. בסיבוב הזה מצאת זהב! מיד לאחר מכן תופיע הודעת הסיום ("נתראה בפעם הבאה"). כשזו הופיעה זה אומר שתוצאת החיפוש נשמרה ואפשר לצאת מהאפליקציה (יציאה לפני שהופיע הודעה זו תגרום לכך שהעלות תילקח בחשבון אבל לא תוצאת החיפוש). כדי לצאת מהאפליקציה בהדגמה לחצ/י על כפתור הבית הוירטואלי שמופיע על הסמארטפון.',
-		0: 'טקסט הסבר 1',
-		1: 'טקסט הסבר 2',
-		2: 'טקסט הסבר 3',
-		3: 'טקסט הסבר 4',
-		4: 'טקסט הסבר 5',
-		5: 'טקסט הסבר 6',
-		6: 'טקסט הסבר 7',
-		7: 'טקסט הסבר 8',
+		0: {
+			a: 'הכנו לך הדגמה עם מסך וירטואלי שמדמה סמארטפון.<br>לחצ/י על האפליקציה כדי לשגר את החללית שלך למשימת חיפוש זהב. תחילה תראה/י את החללית נוחתת ומימין למעלה תופיע עלות שליחת החללית למשימה (1-).',
+			b: 'כעת לחצ/י על חציו התחתון של המסך ואז על חלקו העליון כדי להסיר את הקרח ולאפשר את חיפוש הזהב. לאחר מספר שניות של חיפוש תופיע התוצאה.',
+			c: 'בסיבוב הזה מצאת זהב!<br>מיד לאחר מכן הופיעה הודעת הסיום ("נתראה בפעם הבאה"). כשההודעה מופיעה זה אומר שתוצאת החיפוש נשמרה ואפשר לצאת מהאפליקציה. כדי לצאת מהאפליקציה בהדגמה לחצ/י על כפתור הבית הוירטואלי שמופיע על ציור הסמארטפון.',
+		},
+		1: 'עכשיו תבצע/י מספר כניסות ויציאות מהאפליקציה ונדגים אפשרויות שונות.<br>כעת ניתן להיכנס ולהסיר את הקרח.<br>הפעם לא תמצא זהב (רק אבנים חסרות ערך).',
+		2: 'בכניסה הבאה נדגים קבלת דיווח שהמחסן מלא למחצה.',
+		3: 'הפעם נדגים קבלת דיווח שהמחסן מלא.',
+		4: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.',
+		5: 'בכניסה הבאה כוכב הזהב יהיה מכוסה בעננים ולא תוכל/י לראות את התוצאה של חיפוש הזהב<br>(גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר).',
+		6: 'בסיבוב הבא תיתקל/י במערה עתירת זהב.<br>תקבל/י על כך הודעה ולאחריה יהיו לך 5 שניות בתוכה, בהן תוכל/י לאסוף ממה שבמערה.',
+		7: 'לסיום: עד כה הדגמנו מקרים שונים לחוד אך במשחק עצמו הם יכולים להשתלב.<br>בלחיצה הבאה לדוגמא יהיה מעונן וגם תיתקל/י במערה עתירת זהב.',
 	},
 	instructionsFileName: 'instructions.html',
 	n_instruction_pages: 1,
@@ -218,7 +221,7 @@ window.app_settings = {
 		// 	distractor_3: '',
 		// },
 	},
-	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "manipulationConfirmationTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
+	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }

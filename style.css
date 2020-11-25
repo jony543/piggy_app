@@ -527,7 +527,6 @@ h1 {
 
 .demoTextBox {
   position: absolute;
-  /*align-items: center;*/
   background-color: rgb(225, 229, 235);
   top: 14vh;
   left: 50%;
@@ -539,12 +538,12 @@ h1 {
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
-  animation-name: typing;
+  animation-name: spreading;
 }
-@keyframes typing {
+@keyframes spreading {
   0%   { width: 0; height: 0 } /* top right bottom left */
-  50%  { width: 80vw; height: 0  }
-  100%  { width: 80vw; height: 10vh }
+  50%  { width: 82vw; max-height: 0 }
+  100%  { width: 82vw; max-height: 23vh }
 }
 .demoText {
   padding-left: 2vw;
@@ -552,7 +551,8 @@ h1 {
   line-height: normal;
   text-align: center;
   color: black;
-  font-size: 4.5vw;
+  font-size: 2vh;
+  font-family: Helvetica;
   direction: rtl;
   
   animation-duration: 1s;
@@ -782,6 +782,20 @@ hr {
 @keyframes dance_animation {
   0%   {opacity: 0; transform: rotateY(0deg)   } /* top right bottom left */
   100% {opacity: 1; transform: rotateY(360deg) }
+}
+
+#warehouse_empty {
+  margin-bottom: 2vh;
+}
+
+/* -- an image for the message that the real game begins -- */
+
+#game_begins_image {
+  border-radius: 0;    
+  width: 75vw;
+  height: auto;
+  margin-bottom: 2vh;
+  border-radius: 30px;
 }
 
 /* -------------- cave from the outside ------------------ */
