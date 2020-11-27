@@ -37,7 +37,6 @@ function recordPressData(event) {
 
 // save when leaving the app:
 function onUserExit() {
-    console.log(document.hidden)
     touchData = {
         screenInfo: screenInfo,
         pressEvents: pressEvents,

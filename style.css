@@ -31,6 +31,13 @@ body {
   z-index: 1000;
 }
 
+
+#installation_guide {
+  position: absolute;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
 /*                     APP LOADING                      */
 /* ---------------------------------------------------- */
 

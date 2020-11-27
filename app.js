@@ -184,14 +184,14 @@
 	var manipulationOption = logic.isManipulation(runData, settings);
 	dom_helper.hide("welcome_msg");
 
-	//manipulationOption = 'devaluation' // 'still_valued' /**********************/
+	// activate manipulation notification test:
 	if (manipulationOption) {
 		subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 	}
 
-	//runData.consumptionTest = true; /**********************/
+	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
