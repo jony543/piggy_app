@@ -97,15 +97,15 @@ window.app_settings = {
 	coinCollectionTask: {
 		includeRocks: true,
 		duration: 5, // in seconds
-		openningAnimTime: 1.5, // in seconds
-		element_disappearing_time: 0.1, // in seconds
-		nStim: 30, // needs to be an even number here
+		openningAnimTime: 1500, // in ms
+		element_disappearing_time: 150, // in ms
+		nStim: 6, // needs to be an even number here
 		bg_img_path: 'images/cave.jpg',
 		outcome_win_image_path: 'images/outcome_win.png',
 		outcome_no_win_image_path: 'images/outcome_no_win.png',
 		outcomeImageHeightWidthRatio: 325 / 349, // namely the height = 325 and width = 349	
 		stimSizeProportionOfScreen: 0.15, // will determine the size (width and height of the stimuli)
-		textSizeProportionOfScreenWidth: 0.1,
+		textSizeProportionOfScreenWidth: 0.15,
 		ProportionOfScreenWidthToPlaceCounter: 0.9,
 		ProportionOfScreenHeightToPlaceCounter: 0.05,
 		counterTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha

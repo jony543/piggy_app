@@ -20,17 +20,6 @@ body {
   z-index: 1000;
 }*/
 
-#defaultCanvas0 {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 0;
-  height: 0;
-  border-radius: 30vw;
-  z-index: 1000;
-}
-
 
 #installation_guide {
   position: absolute;
@@ -823,6 +812,17 @@ hr {
 }
 
 /* -------------- coins collection task ------------------ */
+#inside_cave_img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 30vw;
+  z-index: 1000;
+}
+
 .openning {
   animation-name: openning_animation;
   animation-duration: 1.5s;
@@ -843,6 +843,41 @@ hr {
 @keyframes closing_animation {
   0%   {width: 100%;  height: 100%} /* top right bottom left */
   100% {width: 0%;   height: 0%; border-radius: 30vw; left: 50%; top: 50%}
+}
+
+.inside_cave_text {
+  margin: 0;
+  position: absolute;
+  font-size: 15vw;
+  color: rgb(0,0,255);
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+}
+#time_left_counter {
+  left: 90vw;
+  top: 5vh;
+}
+#cave_goddbye_message {
+  left: 50vw;
+  top: 50vh;
+}
+
+.caveElement {
+  position: absolute;
+  width:80vw;
+  height:30vh;
+  z-index: 1001;
+}
+
+.disappearGradually {
+  animation-name: disappearGradually_animation;
+  animation-duration: 0.15s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes disappearGradually_animation {
+  0%   {opacity: 1;} 
+  100% {opacity: 0;}
 }
 
 

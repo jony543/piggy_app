@@ -30,9 +30,10 @@ function recordPressData(event) {
         }
         firstTouchDetected = true;
     }
-    event.touches.timeStamp = event.timeStamp
-    event.touches.pressTime = new Date()
-    pressEvents.push(event.touches)
+    event.touches.pressTime = new Date();
+    event.touches.timeStamp = event.timeStamp;
+    event.touches.type = event.type;
+    pressEvents.push(event.touches);
 }
 
 // save when leaving the app:

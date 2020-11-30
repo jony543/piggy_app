@@ -38,6 +38,17 @@ var dom_helper = {
 
 		return clone_id;
 	},
+	duplicateSerially: function (id, serialNumber) {
+		var original = document.getElementById(id);
+		var clone = original.cloneNode(true); // "deep" clone
+
+		var clone_id = id + serialNumber;
+		clone.id = clone_id;
+
+		original.parentNode.appendChild(clone);
+
+		return clone_id;
+	},
 	removeElement: function (id) {
 		var element = document.getElementById(id);
 		element.parentNode.removeChild(element);
@@ -93,7 +104,7 @@ var data_helper = {
 
 function dateDiff(date1, date2, experimentalDayStartingHour = 0) {
 	const adjustingTime = 1000 * 60 * 60 * experimentalDayStartingHour;
-	
+
 	date1 = new Date(date1 - adjustingTime)
 	date2 = new Date(date2 - adjustingTime)
 
