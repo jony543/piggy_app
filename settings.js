@@ -99,7 +99,7 @@ window.app_settings = {
 		duration: 5, // in seconds
 		openningAnimTime: 1500, // in ms
 		element_disappearing_time: 150, // in ms
-		nStim: 6, // needs to be an even number here
+		nStim: 30, // needs to be an even number here
 		bg_img_path: 'images/cave.jpg',
 		outcome_win_image_path: 'images/outcome_win.png',
 		outcome_no_win_image_path: 'images/outcome_no_win.png',
