@@ -2,9 +2,13 @@ body {
  margin: 0;
 }
 
+.bgInstallPage {
+  background-color: #666666ff;
+}
+
 .bgApp {
   background-image: url('images/context_A.jpg');
-  background-color: rgb(30, 30, 30, 0.7);
+  background-color: #666666ff;
   background-size: 100vw 100vh;
 }
 
@@ -19,7 +23,11 @@ body {
   border-radius: 30vw;
   z-index: 1000;
 }*/
-
+.error_message {
+  font-size: 3.1vw;
+  color: white;
+  direction: rtl;
+}
 
 #installation_guide {
   position: absolute;
