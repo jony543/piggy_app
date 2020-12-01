@@ -52,15 +52,14 @@ if (screen.availHeight < screen.availWidth) {
 
 window.addEventListener("orientationchange", function (event) {
     // if ortation is changed from the main portrait mode
-    if (event.target.screen.orientation.angle) {
+    if (window.orientation) { // originally I used this: event.target.screen.orientation.angle - but this does not work on iphones
         showOnlyPortraitMessage()
     } else { // device rotated back to the main portrait mode
         removeOnlyPortraitMessage()
     }
     // record data:
     screenOrientationEvents.push({
-        orientationAngle: event.target.screen.orientation.angle,
-        orientationType: event.target.screen.orientation.type,
+        orientationAngle: window.orientation,
         orientationTime: new Date(),
         OrientationTimeStamp: event.timeStamp,
     });

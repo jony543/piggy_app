@@ -23,8 +23,10 @@ body {
   border-radius: 30vw;
   z-index: 1000;
 }*/
+
 .error_message {
-  font-size: 3.1vw;
+  width: 90%;
+  font-size: 5vw;
   color: white;
   direction: rtl;
 }
