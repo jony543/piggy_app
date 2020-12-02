@@ -1,446 +1,446 @@
-// ****************************************************************
-//                           FUNCTIONS:
-// ----------------------------------------------------------------
-var check_consent = function (elem) {
-	if (document.getElementById('consent_checkbox').checked) {
-		return true;
-	}
-	else {
-		alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+(async () => {
+	data_helper.init();
+	// ****************************************************************
+	//                           FUNCTIONS:
+	// ----------------------------------------------------------------
+	var check_consent = function (elem) {
+		if (document.getElementById('consent_checkbox').checked) {
+			return true;
+		}
+		else {
+			alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+			return false;
+		}
 		return false;
+	};
+
+	function exitAppDemo(appDemoID) {
+		console.log('Exit THE APP')
+		dom_helper.remove_css_class(appDemoID, 'appOpen');
+		dom_helper.add_css_class(appDemoID, 'appClose');
+		wait(1000).then(() => dom_helper.hide(appDemoID));
+		appClosed = true; // this to indicate that the app is closed
+		firstAppClosedDetection = true;
 	}
-	return false;
-};
 
-function exitAppDemo(appDemoID) {
-	console.log('Exit THE APP')
-	dom_helper.remove_css_class(appDemoID, 'appOpen');
-	dom_helper.add_css_class(appDemoID, 'appClose');
-	wait(1000).then(() => dom_helper.hide(appDemoID));
-	appClosed = true; // this to indicate that the app is closed
-	firstAppClosedDetection = true;
-}
+	async function loadAppDemo() {
+		// check when to present again the button that closes the demo app:
+		var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+			console.log('error getting subject data');
+			console.log(e);
+		});
+		target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
+		
+		var demoUrl = "index.html"  + location.search;
 
-function loadAppDemo() {
-	// check when to present again the button that closes the demo app:
-	var subData = {};
-	while(!subData)
+		if (!document.getElementById("embedded_app")) { //i.e. it's the first time
+			// embed the app for demo purposes:
+			appDemoID = "embedded_app";
+			embeddedElement = document.createElement('iframe');
+			embeddedElement.setAttribute("id", appDemoID)
+			embeddedElement.setAttribute("src", demoUrl)
+			embeddedElement.className = "bigRectangle"
+			document.body.appendChild(embeddedElement)
+		} else {
+			var appDemoID = dom_helper.duplicate('embedded_app');
+		}
+
+		dom_helper.remove_css_class(appDemoID, 'appClose');
+		dom_helper.add_css_class(appDemoID, 'appOpen');
+		dom_helper.show(appDemoID);
+		dom_helper.hide('demoExitButton')
+
+		appClosed = false; // this to indicate that the app is closed
+		firstAppOpennedDetection = true; // this is to indicate when the button to open the was first pressed (for some relevant checks to rely on)
+		revealExitButton = true;
+		return appDemoID
+	}
+	window.loadAppDemo = loadAppDemo;
+
+	function createSmartphoneApperance() {
+		// create text above the "smartphone sketch":
+		demoText = document.createElement('h1');
+		demoText.setAttribute("id", "mainDemoText");
+		demoText.setAttribute("class", "demoText");
+		demoText.appendChild(document.createTextNode(app_settings.demoCycleSupportingText[0]));
+		// making the text box
+		demoTextBox = document.createElement('div');
+		demoTextBox.setAttribute("id", "mainDemoTextBox");
+		demoTextBox.setAttribute("class", "demoTextBox");
+
+		demoTextBox.appendChild(demoText);
+		document.body.appendChild(demoTextBox);
+
+		// outer rectangle:
+		outerRectangle = document.createElement('div');
+		outerRectangle.setAttribute("id", "outerRectangle");
+		outerRectangle.setAttribute("class", "bigRectangle");
+		// inner rectangles:
+		innerRectangle = document.createElement('div');
+		innerRectangle.setAttribute("id", "innerRectangle");
+		innerRectangle.setAttribute("class", "smallRectangle");
+		// put the inner rectangle in the outer rectangle
+		outerRectangle.appendChild(innerRectangle);
+		document.body.appendChild(outerRectangle);
+		// duplicate the small rectangles
+		for (i = 0; i < 13; i++) {
+			dom_helper.duplicate('innerRectangle');
+		}
+		// add the icon element:
+		appIconElement = document.createElement('img');
+		appIconElement.setAttribute("id", "appIcon");
+		appIconElement.setAttribute("class", "appIconSpecifics");
+		appIconElement.setAttribute("src", "icons/android-icon-72x72.png");
+		outerRectangle.appendChild(appIconElement);
+		// another app:
+		dom_helper.duplicate('innerRectangle');
+		// draw a line:
+		lineElement = document.createElement('hr');
+		outerRectangle.appendChild(lineElement);
+		// add another 5 regular rectangles:
+		for (i = 0; i < 4; i++) {
+			dom_helper.duplicate('innerRectangle');
+		}
+	}
+
+	function createExitAppButton(elementIdName) {
+		// button of exit the app:
+		exitAppElement = document.createElement('button');
+		exitAppElement.setAttribute("id", elementIdName);
+		exitAppElement.setAttribute("onclick", "exitAppDemo(appDemoID)");
+		//exitAppElement.appendChild(document.createTextNode("Exit the app"));
+		document.body.appendChild(exitAppElement);
+		dom_helper.add_css_class(elementIdName, 'demoButton');
+		dom_helper.add_css_class(elementIdName, 'disabled');
+	}
+
+	function createLoadAppButton(elementIdName) {
+		// button of openning the app:
+		loadTheAppElement = document.createElement('button');
+		loadTheAppElement.setAttribute("id", elementIdName);
+		loadTheAppElement.setAttribute("onclick", "appDemoID = loadAppDemo()");
+		loadTheAppElement.setAttribute("class", "loadButton");
+		//loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
+		document.body.appendChild(loadTheAppElement);
+
+		var appIconPosition = document.getElementById('appIcon').getBoundingClientRect()
+		document.getElementById(elementIdName).style.top = String(appIconPosition.top) + "px"
+		document.getElementById(elementIdName).style.left = String(appIconPosition.left) + "px"
+		document.getElementById(elementIdName).style.height = String(appIconPosition.height) + "px"
+		document.getElementById(elementIdName).style.width = String(appIconPosition.width) + "px"
+	}
+
+	function removeSmartphoneApperance(appDemoID) {
+		//document.getElementById(appDemoID).remove();
+		document.getElementById("outerRectangle").remove();
+		document.getElementById("demoExitButton").remove();
+		document.getElementById("demoLoadButton").remove();
+	}
+
+	async function monitorChangesInDemoAndReact(settings) {
+		console.log('check...')
+		var subData = undefined;
+		while(!subData) {
+			subData = await data_helper.get_subject_data(true).catch(function (e) { 
+				console.log('error getting subject data');
+				console.log(e);
+			});
+		};
+
+		// check when to present again the button that closes the demo app:
+		// if (firstAppOpennedDetection) { // first set the stuff to check when embedded app finshed running:
+		// 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
+		// 	firstAppOpennedDetection = false;
+		// }
+		current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
+		if (revealExitButton &&
+			current_n_data_points === target_n_data_points
+			&& !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
+			revealExitButton = false;
+			wait(2000).then(() => {
+				dom_helper.show('demoExitButton')
+				dom_helper.remove_css_class('demoExitButton', 'disabled');
+			});
+		}
+
+		// construct here the demo instructions:
+		if (!!Object.keys(subData).length &&
+			!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+			appClosed && // app was closed
+			firstAppClosedDetection) {  // first detection after app was closed
+			var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+			mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+			dom_helper.removeElement(oldMainDemoTextDuplicateID)
+			dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+			dom_helper.show(mainDemoTextDuplicateID)
+			console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+			firstAppClosedDetection = false;
+		}
+
+		// check if demo cycle is finished:
+		if (!!Object.keys(subData).length &&
+			subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
+			!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
+			appClosed) {  // app was closed
+			appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
+			dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
+			mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
+			wait(300).then(() => removeSmartphoneApperance());
+			syncWait(750)
+			jsPsych.resumeExperiment();
+		} else {
+			setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
+		}
+	}
+	// ****************************************************************
+	//                     INITIALIZE VARIABLES:
+	// ---------------------------------------------------------------
+	var appClosed = true; //indicator for when the embedded app is closed or open during the demo.
+	var firstAppClosedDetection = null; // indicator for when change the instruction above the embedded demo app.
+	var firstAppOpennedDetection = null;
+	var revealExitButton = null;
+	var current_n_data_points = null; // used to navigate between embedded demo up states
+	var target_n_data_points = null; // used to navigate between embedded demo up states
+	var instructions_page = 1;
+	var mainDemoTextDuplicateID = "mainDemoTextBox";
+	var testPassed;
+	// ****************************************************************
+	//                           PIPELINE:
+	// ---------------------------------------------------------------
+
+	var settings = Object.assign({}, app_settings);
+
+	// get subject data from batch session
+	var subData = undefined;
+	while(!subData) {
 		subData = await data_helper.get_subject_data(true).catch(function (e) { 
 			console.log('error getting subject data');
 			console.log(e);
 		});
 	};
-	
-	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
-	
-	var demoUrl = "index.html";
 
-	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
-		// embed the app for demo purposes:
-		appDemoID = "embedded_app";
-		embeddedElement = document.createElement('iframe');
-		embeddedElement.setAttribute("id", appDemoID)
-		embeddedElement.setAttribute("src", demoUrl)
-		embeddedElement.className = "bigRectangle"
-		document.body.appendChild(embeddedElement)
-	} else {
-		var appDemoID = dom_helper.duplicate('embedded_app');
-	}
+	////// up to this point I copied it from the app.js ///////// **
+	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
+	///
 
-	dom_helper.remove_css_class(appDemoID, 'appClose');
-	dom_helper.add_css_class(appDemoID, 'appOpen');
-	dom_helper.show(appDemoID);
-	dom_helper.hide('demoExitButton')
+	var timeline = [];
 
-	appClosed = false; // this to indicate that the app is closed
-	firstAppOpennedDetection = true; // this is to indicate when the button to open the was first pressed (for some relevant checks to rely on)
-	revealExitButton = true;
-	return appDemoID
-}
-
-function createSmartphoneApperance() {
-	// create text above the "smartphone sketch":
-	demoText = document.createElement('h1');
-	demoText.setAttribute("id", "mainDemoText");
-	demoText.setAttribute("class", "demoText");
-	demoText.appendChild(document.createTextNode(app_settings.demoCycleSupportingText[0]));
-	// making the text box
-	demoTextBox = document.createElement('div');
-	demoTextBox.setAttribute("id", "mainDemoTextBox");
-	demoTextBox.setAttribute("class", "demoTextBox");
-
-	demoTextBox.appendChild(demoText);
-	document.body.appendChild(demoTextBox);
-
-	// outer rectangle:
-	outerRectangle = document.createElement('div');
-	outerRectangle.setAttribute("id", "outerRectangle");
-	outerRectangle.setAttribute("class", "bigRectangle");
-	// inner rectangles:
-	innerRectangle = document.createElement('div');
-	innerRectangle.setAttribute("id", "innerRectangle");
-	innerRectangle.setAttribute("class", "smallRectangle");
-	// put the inner rectangle in the outer rectangle
-	outerRectangle.appendChild(innerRectangle);
-	document.body.appendChild(outerRectangle);
-	// duplicate the small rectangles
-	for (i = 0; i < 13; i++) {
-		dom_helper.duplicate('innerRectangle');
-	}
-	// add the icon element:
-	appIconElement = document.createElement('img');
-	appIconElement.setAttribute("id", "appIcon");
-	appIconElement.setAttribute("class", "appIconSpecifics");
-	appIconElement.setAttribute("src", "icons/android-icon-72x72.png");
-	outerRectangle.appendChild(appIconElement);
-	// another app:
-	dom_helper.duplicate('innerRectangle');
-	// draw a line:
-	lineElement = document.createElement('hr');
-	outerRectangle.appendChild(lineElement);
-	// add another 5 regular rectangles:
-	for (i = 0; i < 4; i++) {
-		dom_helper.duplicate('innerRectangle');
-	}
-}
-
-function createExitAppButton(elementIdName) {
-	// button of exit the app:
-	exitAppElement = document.createElement('button');
-	exitAppElement.setAttribute("id", elementIdName);
-	exitAppElement.setAttribute("onclick", "exitAppDemo(appDemoID)");
-	//exitAppElement.appendChild(document.createTextNode("Exit the app"));
-	document.body.appendChild(exitAppElement);
-	dom_helper.add_css_class(elementIdName, 'demoButton');
-	dom_helper.add_css_class(elementIdName, 'disabled');
-}
-
-function createLoadAppButton(elementIdName) {
-	// button of openning the app:
-	loadTheAppElement = document.createElement('button');
-	loadTheAppElement.setAttribute("id", elementIdName);
-	loadTheAppElement.setAttribute("onclick", "appDemoID = loadAppDemo()");
-	loadTheAppElement.setAttribute("class", "loadButton");
-	//loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
-	document.body.appendChild(loadTheAppElement);
-
-	var appIconPosition = document.getElementById('appIcon').getBoundingClientRect()
-	document.getElementById(elementIdName).style.top = String(appIconPosition.top) + "px"
-	document.getElementById(elementIdName).style.left = String(appIconPosition.left) + "px"
-	document.getElementById(elementIdName).style.height = String(appIconPosition.height) + "px"
-	document.getElementById(elementIdName).style.width = String(appIconPosition.width) + "px"
-}
-
-function removeSmartphoneApperance(appDemoID) {
-	//document.getElementById(appDemoID).remove();
-	document.getElementById("outerRectangle").remove();
-	document.getElementById("demoExitButton").remove();
-	document.getElementById("demoLoadButton").remove();
-}
-
-function monitorChangesInDemoAndReact(settings) {
-	console.log('check...')
-	var subData = {};
-	while(!subData)
-		subData = await data_helper.get_subject_data(true).catch(function (e) { 
-			console.log('error getting subject data');
-			console.log(e);
-		});
+	// SET INFORMED CONSENT:
+	//------------------------------------------------------
+	var consentForm = {
+		type: 'external-html',
+		url: "informed_consent.html",
+		cont_btn: "start",
+		check_fn: check_consent
 	};
 
-	// check when to present again the button that closes the demo app:
-	// if (firstAppOpennedDetection) { // first set the stuff to check when embedded app finshed running:
-	// 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
-	// 	firstAppOpennedDetection = false;
-	// }
-	current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
-	if (revealExitButton &&
-		current_n_data_points === target_n_data_points
-		&& !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
-		revealExitButton = false;
-		wait(2000).then(() => {
-			dom_helper.show('demoExitButton')
-			dom_helper.remove_css_class('demoExitButton', 'disabled');
-		});
-	}
-
-	// construct here the demo instructions:
-	if (!!Object.keys(subData).length &&
-		!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-		appClosed && // app was closed
-		firstAppClosedDetection) {  // first detection after app was closed
-		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-		dom_helper.removeElement(oldMainDemoTextDuplicateID)
-		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-		dom_helper.show(mainDemoTextDuplicateID)
-		console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-		firstAppClosedDetection = false;
-	}
-
-	// check if demo cycle is finished:
-	if (!!Object.keys(subData).length &&
-		subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
-		!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-		appClosed) {  // app was closed
-		appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
-		dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
-		mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
-		wait(300).then(() => removeSmartphoneApperance());
-		syncWait(750)
-		jsPsych.resumeExperiment();
-	} else {
-		setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
-	}
-}
-// ****************************************************************
-//                     INITIALIZE VARIABLES:
-// ---------------------------------------------------------------
-var appClosed = true; //indicator for when the embedded app is closed or open during the demo.
-var firstAppClosedDetection = null; // indicator for when change the instruction above the embedded demo app.
-var firstAppOpennedDetection = null;
-var revealExitButton = null;
-var current_n_data_points = null; // used to navigate between embedded demo up states
-var target_n_data_points = null; // used to navigate between embedded demo up states
-var instructions_page = 1;
-var mainDemoTextDuplicateID = "mainDemoTextBox";
-var testPassed;
-// ****************************************************************
-//                           PIPELINE:
-// ---------------------------------------------------------------
-
-var settings = Object.assign({}, app_settings);
-
-// get subject data from batch session
-var subData = {};
-while(!subData)
-	subData = await data_helper.get_subject_data(true).catch(function (e) { 
-		console.log('error getting subject data');
-		console.log(e);
-	});
-};
-
-////// up to this point I copied it from the app.js ///////// **
-subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
-///
-
-var timeline = [];
-
-// SET INFORMED CONSENT:
-//------------------------------------------------------
-var consentForm = {
-	type: 'external-html',
-	url: "informed_consent.html",
-	cont_btn: "start",
-	check_fn: check_consent
-};
-
-// SET WRITTEN INSTRUCTIONS:
-//------------------------------------------------------
-var instructions = {
-	data: {
-		trialType: 'instruction',
-	},
-	type: 'html-button-response',
-	trial_duration: undefined, // no time limit
-	choices: ['המשך', 'חזור'],
-	timeline: [
-		{
-			stimulus: '',
-			on_load: function () {
-				document.body.style.backgroundImage = "url('images/instructions/instructions_" + String(instructions_page) + ".jpg')";
-				document.getElementById("instructionsButtons").disabled = true;
-				document.getElementById("instructionsButtons").style.opacity = "0.5";
-				setTimeout(function () {
-					document.getElementById("instructionsButtons").disabled = false
-					document.getElementById("instructionsButtons").style.opacity = "1";
-				}, 1500);
+	// SET WRITTEN INSTRUCTIONS:
+	//------------------------------------------------------
+	var instructions = {
+		data: {
+			trialType: 'instruction',
+		},
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		choices: ['המשך', 'חזור'],
+		timeline: [
+			{
+				stimulus: '',
+				on_load: function () {
+					document.body.style.backgroundImage = "url('images/instructions/instructions_" + String(instructions_page) + ".jpg')";
+					document.getElementById("instructionsButtons").disabled = true;
+					document.getElementById("instructionsButtons").style.opacity = "0.5";
+					setTimeout(function () {
+						document.getElementById("instructionsButtons").disabled = false
+						document.getElementById("instructionsButtons").style.opacity = "1";
+					}, 1500);
+				}
+			}
+		],
+		button_html: '<button id="instructionsButtons">%choice%</button>',
+	};
+	var instructionsLoop = {
+		timeline: [instructions],
+		loop_function: function (data) {
+			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
+			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
+				document.body.style.backgroundImage = "none"
+				document.body.style.backgroundColor = "white"
+				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
+				return false;
+			} else {
+				if (goBack && instructions_page > 1) {
+					instructions_page--
+				} else if (!goBack) {
+					instructions_page++
+				}
+				return true;
 			}
 		}
-	],
-	button_html: '<button id="instructionsButtons">%choice%</button>',
-};
-var instructionsLoop = {
-	timeline: [instructions],
-	loop_function: function (data) {
-		var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
-		if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
-			document.body.style.backgroundImage = "none"
-			document.body.style.backgroundColor = "white"
-			instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
-			return false;
-		} else {
-			if (goBack && instructions_page > 1) {
-				instructions_page--
-			} else if (!goBack) {
-				instructions_page++
-			}
-			return true;
-		}
-	}
-};
+	};
 
-// SET DEMO STUFF:
-//------------------------------------------------------
-var demo = {
-	type: 'call-function',
-	func: function () {
-		// Operate the embedded demo:
-		createSmartphoneApperance()
-		createExitAppButton(elementIdName = 'demoExitButton')
-		createLoadAppButton(elementIdName = 'demoLoadButton')
-		jsPsych.pauseExperiment()
-		monitorChangesInDemoAndReact(settings)
-	},
-};
-var continue_or_repeat_demo_cycle = {
-	data: {
-		trialType: 'continue_or_repeat_demo_cycle',
-	},
-	type: 'html-button-response',
-	trial_duration: undefined, // no time limit
-	choices: ['להמשיך', 'סיבוב נוסף'],
-	button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
-	timeline: [
-		{
-			stimulus: '<p id="repeatOrContinueText">ההדגמה הסתיימה.<br><br>האם ברצונך לבצע סיבוב נוסף או להמשיך?<br><br></p>',
-		}
-	]
-};
-var big_demo_loop = {
-	timeline: [demo, continue_or_repeat_demo_cycle],
-	loop_function: function (data) {
-		console.log('YYYYY')
-		const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
-		if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
-			return false;
-		} else {
+	// SET DEMO STUFF:
+	//------------------------------------------------------
+	var demo = {
+		type: 'call-function',
+		func: function () {
 			// Operate the embedded demo:
-			return true;
-		}
-	}
-}
-
-// SET TEST:
-//------------------------------------------------------
-var get_ready_for_the_test = {
-	data: {
-		trialType: 'get_ready_for_the_test',
-	},
-	type: 'html-button-response',
-	trial_duration: undefined, // no time limit
-	choices: ['התחל'],
-	button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
-	timeline: [
-		{
-			stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
-			תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
-			אל דאגה, אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
-			לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
-			</p>',
-		}
-	]
-};
-var test = {
-	data: {
-		trialType: 'test',
-	},
-	type: 'html-button-response',
-	trial_duration: undefined, // no time limit
-	timeline: [
-		{
-			stimulus: '<h1>Q 1</h1>',
-			choices: () => shuffle(['A', 'B', 'C', 'D']),
-			on_finish: function (data) {
-				data.correct = data.button_pressed == this.choices.indexOf('B'); // option B
-			}
+			createSmartphoneApperance()
+			createExitAppButton(elementIdName = 'demoExitButton')
+			createLoadAppButton(elementIdName = 'demoLoadButton')
+			jsPsych.pauseExperiment()
+			monitorChangesInDemoAndReact(settings)
 		},
-		{
-			stimulus: '<h1>Q 2</h1>',
-			choices: () => shuffle(['A', 'B', 'C', 'D']),
-			on_finish: function (data) {
-				data.correct = data.button_pressed == this.choices.indexOf('D'); // option D
-			}
+	};
+	var continue_or_repeat_demo_cycle = {
+		data: {
+			trialType: 'continue_or_repeat_demo_cycle',
 		},
-		{
-			stimulus: '<h1>Q 3</h1>',
-			choices: () => shuffle(['A', 'B', 'C', 'D']),
-			on_finish: function (data) {
-				data.correct = data.button_pressed == this.choices.indexOf('A'); // option A
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		choices: ['להמשיך', 'סיבוב נוסף'],
+		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+		timeline: [
+			{
+				stimulus: '<p id="repeatOrContinueText">ההדגמה הסתיימה.<br><br>האם ברצונך לבצע סיבוב נוסף או להמשיך?<br><br></p>',
+			}
+		]
+	};
+	var big_demo_loop = {
+		timeline: [demo, continue_or_repeat_demo_cycle],
+		loop_function: function (data) {
+			console.log('YYYYY')
+			const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
+			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
+				return false;
+			} else {
+				// Operate the embedded demo:
+				return true;
 			}
 		}
-	]
-};
+	}
 
-var post_test_message = {
-	data: {
-		trialType: 'post_test_message',
-	},
-	type: 'instructions',
-	trial_duration: undefined, // no time limit
-	allow_keys: false,
-	allow_backward: false,
-	button_label_next: 'המשך',
-	pages: [],
-	on_start: function () {
-		// check if there is a single mistake return to start
-		const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
-		const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
-		testPassed = !(relevantData.filter({ trialType: 'test', correct: false }).count() > 0)
-		if (testPassed) {
-			msg = 'ענית נכונה על השאלות.<br><br> \
-			החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
-			 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
-			 בהצלחה!';
-			jsPsych.endExperiment('The experiment was ended because the user passed the test.');
-		} else {
-			msg = 'לא כל השאלות נענו נכונה.<br><br> \
-			יש לעבור שוב על ההוראות וההדגמה.'
-			this.show_clickable_nav = true
-			//this.button_label_next = 'המשך'
+	// SET TEST:
+	//------------------------------------------------------
+	var get_ready_for_the_test = {
+		data: {
+			trialType: 'get_ready_for_the_test',
+		},
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		choices: ['התחל'],
+		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+		timeline: [
+			{
+				stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
+				תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
+				אל דאגה, אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
+				לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
+				</p>',
+			}
+		]
+	};
+	var test = {
+		data: {
+			trialType: 'test',
+		},
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		timeline: [
+			{
+				stimulus: '<h1>Q 1</h1>',
+				choices: () => shuffle(['A', 'B', 'C', 'D']),
+				on_finish: function (data) {
+					data.correct = data.button_pressed == this.choices.indexOf('B'); // option B
+				}
+			},
+			{
+				stimulus: '<h1>Q 2</h1>',
+				choices: () => shuffle(['A', 'B', 'C', 'D']),
+				on_finish: function (data) {
+					data.correct = data.button_pressed == this.choices.indexOf('D'); // option D
+				}
+			},
+			{
+				stimulus: '<h1>Q 3</h1>',
+				choices: () => shuffle(['A', 'B', 'C', 'D']),
+				on_finish: function (data) {
+					data.correct = data.button_pressed == this.choices.indexOf('A'); // option A
+				}
+			}
+		]
+	};
+
+	var post_test_message = {
+		data: {
+			trialType: 'post_test_message',
+		},
+		type: 'instructions',
+		trial_duration: undefined, // no time limit
+		allow_keys: false,
+		allow_backward: false,
+		button_label_next: 'המשך',
+		pages: [],
+		on_start: function () {
+			// check if there is a single mistake return to start
+			const lastTrialIndex = jsPsych.data.get().last().select('trial_index').values[0];
+			const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - test.timeline.length) // test.timeline.length gets the number of questions in the quiz.
+			testPassed = !(relevantData.filter({ trialType: 'test', correct: false }).count() > 0)
+			if (testPassed) {
+				msg = 'ענית נכונה על השאלות.<br><br> \
+				החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
+				 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
+				 בהצלחה!';
+				jsPsych.endExperiment('The experiment was ended because the user passed the test.');
+			} else {
+				msg = 'לא כל השאלות נענו נכונה.<br><br> \
+				יש לעבור שוב על ההוראות וההדגמה.'
+				this.show_clickable_nav = true
+				//this.button_label_next = 'המשך'
+			}
+			this.pages = ['<h2 id="post_test_msg">' + msg + '</h2>']
 		}
-		this.pages = ['<h2 id="post_test_msg">' + msg + '</h2>']
-	}
-};
+	};
 
-// SET THE MAIN LOOP OF THE TUTORIAL:
-//------------------------------------------------------
-var completeTutorialLoop = {
-	timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, test, post_test_message],
-	loop_function: function (data) {
-		if (!testPassed) {
-			return true;
-		} else {
-			return false;
+	// SET THE MAIN LOOP OF THE TUTORIAL:
+	//------------------------------------------------------
+	var completeTutorialLoop = {
+		timeline: [instructionsLoop, big_demo_loop, get_ready_for_the_test, test, post_test_message],
+		loop_function: function (data) {
+			if (!testPassed) {
+				return true;
+			} else {
+				return false;
+			}
 		}
-	}
-};
+	};
 
-timeline.push(consentForm);
-timeline.push(completeTutorialLoop);
+	timeline.push(consentForm);
+	timeline.push(completeTutorialLoop);
 
-jsPsych.init({
-	timeline: timeline,
-	//display_element: 'jspsych-display-element',
-	on_finish: function () {
-		// saving the data
-		// ---------------------
-		var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
-		
-		subject_data_worker.postMessage({ completedInstructions: true });
-		subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+	jsPsych.init({
+		timeline: timeline,
+		//display_element: 'jspsych-display-element',
+		on_finish: function () {
+			// saving the data
+			// ---------------------
+			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+			
+			subject_data_worker.postMessage({ completedInstructions: true });
+			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
-		terminate_subject_data_worker = true;
-		console.log('Tutrial Completed')
-	},
-	on_close: function () { // in case the user gets out before it finishes.
-		// saving the data
-		// ---------------------
-		var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+			terminate_subject_data_worker = true;
+			console.log('Tutrial Completed')
+		},
+		on_close: function () { // in case the user gets out before it finishes.
+			// saving the data
+			// ---------------------
+			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
-		subject_data_worker.postMessage(instructionDataObject) // save the instructions data
-		
-		terminate_subject_data_worker = true;
-		console.log('Tutrial Closed')
-	}
-});
+			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+			
+			terminate_subject_data_worker = true;
+			console.log('Tutrial Closed')
+		}
+	});
+})();

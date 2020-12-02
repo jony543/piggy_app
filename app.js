@@ -1,9 +1,11 @@
 (async () => {
 	var settings = Object.assign({}, app_settings); 
 
+	data_helper.init();
+
 	// get subject data from batch session
 	var subData = {};
-	while(!subData)
+	while(!subData) {
 		subData = await data_helper.get_subject_data(true).catch(function (e) { 
 			console.log('error getting subject data');
 			console.log(e);
@@ -23,7 +25,7 @@
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		location.href = 'instructions.html';
+		location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		alert(settings.text.realGameBegins)

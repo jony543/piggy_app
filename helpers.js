@@ -41,6 +41,10 @@ var dom_helper = {
 	removeElement: function (id) {
 		var element = document.getElementById(id);
 		element.parentNode.removeChild(element);
+	},
+	goTo: function (relativeUrl) {
+		debugger;
+		location.href = relativeUrl + location.search;
 	}
 };
 
@@ -49,11 +53,11 @@ var data_helper = {
 		return /[&?]subId=([^&]+)/.exec(location.search)[1];
 	},	
 	get_subject_data: function (asArray) { // returns promise
-		return new Promise(resolve, reject) {
+		return new Promise((function (resolve, reject) { 
 			var xhr = new XMLHttpRequest();
 
-			xhr.onload = function(e) {
-			  	var subjectData = oReq.response;
+			xhr.onload = (function(e) {
+			  	var subjectData = xhr.response;
 				if (!!asArray) { 
 					var data = {};
 					if (!!subjectData) {
@@ -72,24 +76,29 @@ var data_helper = {
 				} else {
 					resolve((!!subjectData) ? subjectData : {});
 				}
-			};
+			}).bind(this);
 
 			xhr.onerror = function (e) { reject(e); };
 			xhr.ontimeout = function (e) { reject(e); };
 			xhr.onabort = function (e) { reject(e); };
 
-			xhr.open("GET", '/app/session?subId=' + this.get_subject_id());
+			xhr.open("GET", '/app/api/session/list?subId=' + this.get_subject_id());
 			xhr.responseType = "json";
 			xhr.send();
-		};		
+		}).bind(this));		
 	},
 	getWsUrl: function () {
 		var url = 'ws'
 		
 		if (location.protocol == 'https')
-			url += 's';
+			url += 's';		
 
-		url += '://' + location.hostname + '/app/session?subId=' +  data_helper.getSubjectId();
+		url += '://' + location.hostname;
+
+		if (location.port)
+			url += ":" + location.port;
+
+		url += '/app/session?subId=' +  this.get_subject_id();
 
 		return url;
 	},
@@ -99,19 +108,21 @@ var data_helper = {
 	init: function () {
 		this.ws = new WebSocket(this.getWsUrl());
 
-		this.ws.onopen = function (event) {
+		this.ws.onopen = (function (event) {
 			console.log('new session opened');
-	    };
+			this.try_flush();
+	    }).bind(this);
 
-	    this.ws.onclose = function (event) {
+	    this.ws.onclose = (function (event) {
 	    	// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
 	    	if (event.code != 1000) {
 	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
+	    		console.log('WS clode. re opening');
 	    		this.init();
 	    	}
-	    };
+	    }).bind(this);
 
-	    this.ws.onerror = function (event) {
+	    this.ws.onerror = (function (event) {
 	    	console.log('WS error!');
 	    	console.log(event);
 
@@ -119,21 +130,23 @@ var data_helper = {
 	    		this.ws = undefined;
 	    		this.init();
 	    	}
-	    };
+	    }).bind(this);
 
-	    this.ws.onmessage = function (event) {
+	    this.ws.onmessage = (function (event) {
+	    	console.log('WS message: ' + event.data);
+
 	        var data = JSON.parse(event.data);
 
 	        // if it is the first message in session get the current sessionId
 	        if ('_id' in data) {
-	            sessionId = data._id;
+	            this.sessionId = data._id;
 	        }
 
 	        // if it is ack message remove the message from queue
 	        if ('messageId' in data) {
 	        	this.q = this.q.filter(m => m.messageId != data.messageId);
 	        }        
-	    }
+	    }).bind(this);
 	},	
 	append_subject_data: function (data) {
 		// denerate new message id
@@ -142,9 +155,18 @@ var data_helper = {
 		this.q.push(data);
 
 		// send all messages that sill in queue together
-		this.ws.send(
-			Object.assign({ _id: this.sessionId }, ...q)
-		);
+		this.try_flush();		
+	},
+	try_flush: function () {
+		if (this.q.length) {
+			if (this.ws.readyState == 1) {
+				const dataToSend = JSON.stringify(
+					Object.assign({ _id: this.sessionId }, ...this.q)
+				);
+				console.log('sending to WS: ' + dataToSend);
+				this.ws.send(dataToSend);
+			}
+		}
 	}
 };
 
