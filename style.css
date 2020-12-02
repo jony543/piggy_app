@@ -2,9 +2,13 @@ body {
  margin: 0;
 }
 
+.bgInstallPage {
+  background-color: #666666ff;
+}
+
 .bgApp {
   background-image: url('images/context_A.jpg');
-  background-color: rgb(30, 30, 30, 0.7);
+  background-color: #666666ff;
   background-size: 100vw 100vh;
 }
 
@@ -20,17 +24,19 @@ body {
   z-index: 1000;
 }*/
 
-#defaultCanvas0 {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 0;
-  height: 0;
-  border-radius: 30vw;
-  z-index: 1000;
+.error_message {
+  width: 90%;
+  font-size: 5vw;
+  color: white;
+  direction: rtl;
 }
 
+#installation_guide {
+  position: absolute;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
 /*                     APP LOADING                      */
 /* ---------------------------------------------------- */
 
@@ -453,6 +459,11 @@ h1 {
   direction: rtl;
 }
 
+#post_instructions_test_image {
+  width: 70vw;
+  height: auto;
+}
+
 #jspsych-instructions-next {
   background-color: rgba(200, 200, 200, 0.7);
   border: 1vw solid rgb(50, 50, 50);
@@ -466,12 +477,62 @@ h1 {
   color: white;
 }
 
+/* Instructions Tests stuff: */
+#test_question_text {
+  font-size: 8vw;
+  line-height: normal;
+  direction: rtl;
+  margin-bottom: 12vh;
+}
+
+#multipleChoiceQuestionsButtons {
+  position: relative;
+  width: 90vw;
+  border: 0.3vw solid rgb(50, 50, 50);
+  color: rgb(50, 50, 50);
+  font-size: 6vw;
+  direction: rtl;
+  text-align: right;
+  border-radius: 15px;
+  margin: 1vh;
+  padding: 1.5vh;
+  outline: none;
+}
+#multipleChoiceQuestionsButtons:active {
+  background-color: #555555;
+  color: white;
+}
+
 
 /*                   EMBEDDED DEMO STUFF                 */
 /* ----------------------------------------------------- */
+/* TEMP TEMP TEMP maybe take stuff from here
 .demoTextBox {
   position: absolute;
-  /*align-items: center;*/
+  /*align-items: center;*-/
+  background-color: rgb(225, 229, 235);
+  top: 14vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  border-radius: 35px;
+  border: 0.8vw solid rgb(50,50,50);
+
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+  animation-name: spreading;
+}
+@keyframes spreading {
+  0%   { width: 0; max-height: 0 } /* top right bottom left *-/
+  50%  { width: 80vw; max-height: 0 }
+  100%  { width: 80vw; max-height: 20vh }
+}
+ TEMP TEMP TEMP */
+
+.demoTextBox {
+  position: absolute;
   background-color: rgb(225, 229, 235);
   top: 14vh;
   left: 50%;
@@ -483,12 +544,12 @@ h1 {
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
-  animation-name: typing;
+  animation-name: spreading;
 }
-@keyframes typing {
+@keyframes spreading {
   0%   { width: 0; height: 0 } /* top right bottom left */
-  50%  { width: 80vw; height: 0  }
-  100%  { width: 80vw; height: 10vh }
+  50%  { width: 82vw; max-height: 0 }
+  100%  { width: 82vw; max-height: 23vh }
 }
 .demoText {
   padding-left: 2vw;
@@ -496,7 +557,9 @@ h1 {
   line-height: normal;
   text-align: center;
   color: black;
-  font-size: 4.5vw;
+  font-size: 2vh;
+  font-family: Helvetica;
+  direction: rtl;
   
   animation-duration: 1s;
   animation-iteration-count: 1;
@@ -665,6 +728,7 @@ hr {
   font-size: 5vw;
   padding-left: 4vw;
   padding-right: 4vw;
+  direction: rtl;
 }
 
 #dialog_msg {
@@ -726,6 +790,20 @@ hr {
   100% {opacity: 1; transform: rotateY(360deg) }
 }
 
+#warehouse_empty {
+  margin-bottom: 2vh;
+}
+
+/* -- an image for the message that the real game begins -- */
+
+#game_begins_image {
+  border-radius: 0;    
+  width: 75vw;
+  height: auto;
+  margin-bottom: 2vh;
+  border-radius: 30px;
+}
+
 /* -------------- cave from the outside ------------------ */
 
 #cave {
@@ -744,6 +822,17 @@ hr {
 }
 
 /* -------------- coins collection task ------------------ */
+#inside_cave_img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 30vw;
+  z-index: 1000;
+}
+
 .openning {
   animation-name: openning_animation;
   animation-duration: 1.5s;
@@ -764,6 +853,41 @@ hr {
 @keyframes closing_animation {
   0%   {width: 100%;  height: 100%} /* top right bottom left */
   100% {width: 0%;   height: 0%; border-radius: 30vw; left: 50%; top: 50%}
+}
+
+.inside_cave_text {
+  margin: 0;
+  position: absolute;
+  font-size: 15vw;
+  color: rgb(0,0,255);
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+}
+#time_left_counter {
+  left: 90vw;
+  top: 5vh;
+}
+#cave_goddbye_message {
+  left: 50vw;
+  top: 50vh;
+}
+
+.caveElement {
+  position: absolute;
+  width:80vw;
+  height:30vh;
+  z-index: 1001;
+}
+
+.disappearGradually {
+  animation-name: disappearGradually_animation;
+  animation-duration: 0.15s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes disappearGradually_animation {
+  0%   {opacity: 1;} 
+  100% {opacity: 0;}
 }
 
 

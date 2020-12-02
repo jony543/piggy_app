@@ -19,7 +19,7 @@
 </head>
 
 <body id="background" class="bgApp">
-    <!-- <img id="pseudoBackground" src="images/cave.jpg" /> --> 
+    <!-- <img id="pseudoBackground" src="images/cave.jpg" /> -->
     <div id="main_container" class="container">
         <img id="spaceship" class="hidden" src="images/spaceship_flying.png" />
         <img id="ice_upper" class="ice" src="images/ice.jpg" />
@@ -44,12 +44,23 @@
             <img id="warehouse_half" class="warehouse dance hidden" src="images/container_gold_half.png" />
             <img id="warehouse_full" class="warehouse dance hidden" src="images/container_gold_full.png" />
             <img id="cave" class="appear hidden" src="images/cave_from_outside.png" />
+            <img id="game_begins_image" class="appear hidden" src="images/game_title_image.jpg" />
             <p id="dialog_confirmation_msg" class="dialog_text hidden">Hello, this is a dialog confirmation message</p>
             <input id="dialog_response_text" type="text" autocomplete="off" />
             <div><button id="dialog_ok_button">אישור</button></div>
         </div>
+        <div id="coin_collection_task" class="">
+            <img id="inside_cave_img" class="openning hidden" src="images/cave.jpg"/>
+            <img id="cave_coin" class="caveElement hidden"  src="images/outcome_win.png" />
+            <img id="cave_rock" class="caveElement hidden" src="images/outcome_no_win.png" />
+            <p id="time_left_counter" class="inside_cave_text"></p>
+            <p id="cave_goddbye_message" class="inside_cave_text"></p>
+        </div>
     </div>
 </body>
+
+<script src="handle_events.js"></script>
 <script src="app.js"></script>
 <script src="coin_collection.js"></script>
+
 </html>

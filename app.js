@@ -23,30 +23,31 @@
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('superimposed_outcome_sum').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 
+	// ****************************************************************
+	//           RUN THE APP
+	// ----------------------------------------------------------------
+
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
 		location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
-		alert(settings.text.realGameBegins)
+		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
+		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		subject_data_worker.postMessage({ realGameBeginsConfirmationTime: new Date() }) // **
 	}
 
-	// RANI - please see if this is correct.
-	// Also - why send 2 consecutive messages of resetContainer? the second will override the first.
+	// reset the container at the beginning of the day:
 	if (runData.resetContainer) { // activating reseting container when relevant. **
-		console.log('A');
-		subject_data_worker.postMessage({ resetContainer: false });
-		console.log('B');
-		await dialog_helper.show(settings.text.rewardContainerClearingMessage);
-		subject_data_worker.postMessage({ resetContainer: true })
-		console.log('C');
+		subject_data_worker.postMessage({ resetContainerAlertTime: new Date() }) // **
+		await dialog_helper.show(settings.text.rewardContainerClearingMessage, img_id = 'warehouse_empty', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		subject_data_worker.postMessage({ resetContainerConfirmationTime: new Date() }) // **
 	}
 
-	////
+	// cover the outcome:
 	if (runData.hideOutcome) {
 		dom_helper.show("cover");
 	}
-	////
 
 	// show cost on top right corner if needed [At entrance]
 	if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
@@ -109,7 +110,7 @@
 	});
 
 
-	// hide entrance graphics and start game
+	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
 	//dom_helper.hide("welcome_msg");
 	dom_helper.hide("spaceship");
@@ -120,7 +121,7 @@
 	// wait for 2 clicks to happen
 	await Promise.all([p1, p2]);
 
-	// hide game and show lottery animation
+	// hide sequence pressing inteface and show lottery animation
 	document.getElementById('lower_half').onclick = undefined;
 	document.getElementById('upper_half').onclick = undefined;
 
@@ -152,7 +153,7 @@
 		dom_helper.show('superimposed_outcome_sum', settings.durations.outcomeAnim); // **
 		dom_helper.add_css_class('superimposed_outcome_sum', 'goUpOutcomeImage'); // **
 
-		// add text about the outcome below
+		// add text about the outcome below the outcome image
 		dom_helper.show("outcome_text_1_", settings.durations.outcomeAnim);
 		dom_helper.add_css_class('outcome_text_1_', 'appearSlowlyOutcomeText'); // **
 	}
@@ -165,31 +166,24 @@
 		subject_data_worker.postMessage({ viewedOutcome: true });
 	});
 
-
 	// show winning/loosing message for 2 seconds
 	await delay(settings.durations.outcomeAnim);
 	var manipulationOption = logic.isManipulation(runData, settings);
 	dom_helper.hide("welcome_msg");
 
+	// activate manipulation notification test:
 	if (manipulationOption) {
 		subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
-		await dialog_helper.show(settings.text.manipulationMessage(manipulationOption));
+		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
-
-		if (manipulationOption == 'devaluation') {
-			dom_helper.show("warehouse_full");
-			dom_helper.add_css_class('warehouse_full', 'dance');
-		}
-
-		if (manipulationOption == 'still_valued') {
-			dom_helper.show("warehouse_half");
-			dom_helper.add_css_class('warehouse_half', 'dance');
-		}
 	}
-
-	//runData.consumptionTest = true; /**********************/
+	runData.consumptionTest=true
+	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
-		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
+		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
+		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
+		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
+		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
 		run_coin_collection(settings.coinCollectionTask)
 	} else {
 		finishTrial()

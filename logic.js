@@ -129,12 +129,13 @@ function checkIfToHideOutcome(hideOutcome) {
   return false;
 }
 
-function checkIfResetContainer(subData, hourAtDayToResetRewardContainer) {
-  // check if reset of the container was already done today:
-  const dayBeginning = new Date(new Date().setHours(0, 0, 0, 0)); // get the date of ths day but with hours 00:00:00
-  const firstToday = subData.startTime.find((x) => new Date(x) > dayBeginning); // get the first entry of this day
-  const resetContainerToday = subData.resetContainer.slice(subData.startTime.indexOf(firstToday)) // slice the resetContainer part according to all entries of today
-  return !resetContainerToday.some((x) => !!x) && new Date().getHours() > hourAtDayToResetRewardContainer ? true : false;
+function checkIfResetContainer(subData, dayOfExperiment) {
+  if (!subData.day.filter((day) => day === dayOfExperiment).length || // if there were no entries today (i.e., it's the first one)
+    subData.resetContainer[subData.resetContainer.length - 1] && !subData.endTime[subData.endTime.length - 1]) { // or there were entries but the trial was not finished
+    return true
+  } else {
+    return false
+  }
 }
 
 // ****************************************************************
@@ -172,8 +173,8 @@ var logic = {
     if (settings.allowDemo) { // check if demo is available and set variables accordingly      
       if (isCalledFromInstructions) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
         isDemo = true;
-        
-        if (subData.instructionsStartedFlag[subData.instructionsStartedFlag.length-1] || // I think those below are redundant after I added this condition
+
+        if (subData.instructionsStartedFlag[subData.instructionsStartedFlag.length - 1] || // I think those below are redundant after I added this condition
           noDataYet || subData.demoTrialNum[subData.demoTrialNum.length - 1] === null || subData.demoTrialNum[subData.demoTrialNum.length - 1] === undefined) { // if this is the first demo trial after instructions
           demoTrialNum = 0
         } else {
@@ -186,13 +187,14 @@ var logic = {
     // CHECK IF THIS IS THE FIRST REAL TRIAL
     // -------------------------------------------------------  
     if (settings.allowDemo) { // if there is no demo (and instructions)
-      var isFirstTime = !noDataYet && subData.isDemo[subData.isDemo.length - 1] && !isCalledFromInstructions ? true : false;
+      var isFirstTime = !noDataYet && ((subData.isDemo[subData.isDemo.length - 1] && !isCalledFromInstructions) || (subData.isFirstTime[subData.isFirstTime.length - 1] && !subData.endTime[subData.endTime.length - 1])) ? true : false;
     } else {
-        var isFirstTime = noDataYet;
+      var isFirstTime = noDataYet || (subData.isFirstTime[subData.isFirstTime.length - 1] && !subData.endTime[subData.endTime.length - 1]);
     }
     // -------------------------------------------------------
 
     if (isDemo) {
+
       var dayOfExperiment = null
       let demoVars = settings.demoCycle[demoTrialNum % Object.keys(settings.demoCycle).length]
       // assign the variables for the demo:
@@ -203,6 +205,7 @@ var logic = {
       consumptionTest = demoVars.consumptionTest
       var toHideOutcome = demoVars.toHideOutcome
       var resetContainer = demoVars.resetContainer
+
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
@@ -218,8 +221,8 @@ var logic = {
 
         // DEVALUATION / STILL-VALUED tests(check and set)
         // -------------------------------------------------------
-        const expStartingTime = new Date(subData["startTime"][0]);
-        daysFromBeginning = dateDiff(expStartingTime, new Date()); // "new Date()" is getting the current time.
+        const expStartingTime = new Date(subData["startTime"].find((x) => !!x)); // finds the first element with a valid IDBCursorWithValue.
+        daysFromBeginning = dateDiff(expStartingTime, new Date(), settings.experimentalDayStartingHour); // "new Date()" is getting the current time.
         dayOfExperiment = daysFromBeginning + 1;
         devalueToday = dayOfExperiment === firstDevalDay || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
         comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment    
@@ -249,7 +252,9 @@ var logic = {
             // check if this is the first time the outcome should be devalued that day
             if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
               (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-              (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
+              //(subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
+              // I replaced in the condition above the manipulationConfirmationTime variable with simply checking the endTime instead (the new line here below). If I'd want to change it back I also need to put it back in the settings in the definition of the variables.
+              (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.endTime[subData.endTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
               activateManipulation = true;
               consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...
@@ -265,7 +270,7 @@ var logic = {
 
         // Reset container
         // ---------------------------
-        var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, settings.rewards.hourAtDayToResetRewardContainer) : false; // check if reset container
+        var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, dayOfExperiment) : false; // check if reset container
 
       } else { // if it is the first entry
         isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
