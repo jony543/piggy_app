@@ -6,7 +6,7 @@ var check_consent = function (elem) {
 		return true;
 	}
 	else {
-		alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+		alert("אם ברצונך להשתתף יש לסמן את תיבת הסימון שבסמוך ל'אני מסכימ/ה להשתתף במחקר זה'.");
 		return false;
 	}
 	return false;
@@ -30,8 +30,11 @@ function loadAppDemo() {
 		"batchId=" + jatos.batchId +
 		"&personalMultipleWorkerId=" + jatos.workerId;
 	if (!!jatos.isLocalhost) {
-		var demoUrl = "index.html";
+		var demoUrl = "index.html?" +
+		"batchId=" + jatos.batchId +
+		"&userId=" + jatos.workerId;;
 	}
+
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:

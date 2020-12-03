@@ -22,8 +22,8 @@ if (!window.jatos) {
 		onLoad: function(func) {
 			func();
 		},
-		workerId: '6',
-		batchId: '100',
+		workerId: /[&?]userId=([^&]+)/.exec(location.search)[1],
+		batchId: /[&?]batchId=([^&]+)/.exec(location.search)[1],
 		isLocalhost: true, // if (!!jatos.isLocalhost)
 		studyResultId: Date.now(),
 		componentList: [{ title: "c1", id: 1 }, { title: "c2", id: 2 }],

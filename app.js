@@ -1,5 +1,4 @@
 (async () => {
-
 	// ****************************************************************
 	//           SET STUFF:
 	// ----------------------------------------------------------------
@@ -42,7 +41,14 @@
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		jatos.goToComponent("instructions");
+		if (!!jatos.isLocalhost) {
+			var intructions_url = "instructions.html?" +
+			"batchId=" + jatos.batchId +
+			"&userId=" + jatos.workerId;;
+			location = intructions_url;
+			} else {
+			jatos.goToComponent("instructions");
+		}
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
@@ -190,7 +196,7 @@
 		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 	}
-	runData.consumptionTest=true
+	// runData.consumptionTest=true
 	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.

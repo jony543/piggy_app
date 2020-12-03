@@ -147,7 +147,7 @@ var logic = {
 
     // check if running localy or on the server and determine if called from within the instructions (for the the embedded demo):
     if (!!jatos.isLocalhost)
-      var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName;
+      var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '').split('?')[0] === settings.instructionsFileName;
     else {
       var isCalledFromInstructions = document.referrer.includes('srid') // this returns true only if called from the instructions as it is currently designed
     }

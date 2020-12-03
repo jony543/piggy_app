@@ -479,7 +479,7 @@ h1 {
 
 /* Instructions Tests stuff: */
 #test_question_text {
-  font-size: 8vw;
+  font-size: 7vw;
   line-height: normal;
   direction: rtl;
   margin-bottom: 12vh;
@@ -490,7 +490,7 @@ h1 {
   width: 90vw;
   border: 0.3vw solid rgb(50, 50, 50);
   color: rgb(50, 50, 50);
-  font-size: 6vw;
+  font-size: 5vw;
   direction: rtl;
   text-align: right;
   border-radius: 15px;
@@ -690,7 +690,7 @@ hr {
 
 #repeatOrContinueButtons {
   position: relative;
-  width: 35vw;
+  width: 40vw;
   background-color: rgba(200, 200, 200, 0.7);
   border: 1vw solid rgb(50, 50, 50);
   color: rgb(50, 50, 50);

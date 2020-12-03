@@ -3,11 +3,12 @@
 // ****************************************************************************************
 //  Listen to touch events and record the data and to page leaving events to save the data:
 // ----------------------------------------------------------------------------------------
-
 // initialize variables:
 var screenInfo = {};
 var pressEvents = [];
 var firstTouchDetected = false;
+// // initialize No SCreen Sleep controller
+// var noSleep = new NoSleep();
 
 // detect touch events:
 document.body.addEventListener("touchstart", recordPressData, false);
@@ -27,6 +28,10 @@ function recordPressData(event) {
             window_outerHeight: window.outerHeight,
             window_outerWidth: window.outerWidth,
         }
+
+        // // activate no Screen Sleep:
+        // noSleep.enable(); // keep the screen on!
+
         firstTouchDetected = true;
     }
     event.touches.pressTime = new Date();
@@ -41,6 +46,16 @@ function recordPressData(event) {
 // initialize variables:
 var screenOrientationEvents = [];
 var screenInitialOrientation = '';
+
+// get current html to determine relevant id for orientation switches
+switch (document.title) {
+    case 'Instructions':
+        var element_ID_to_Hide = "jspsych-content";
+        break;
+    case 'Space Gold':
+        var element_ID_to_Hide = "main_container";
+        break;
+}
 
 // check upon entry if it is on portrait mode:
 if (screen.availHeight < screen.availWidth) {
@@ -65,12 +80,12 @@ window.addEventListener("orientationchange", function (event) {
     });
 });
 function showOnlyPortraitMessage() {
-    dom_helper.hide("main_container")
+    dom_helper.hide(element_ID_to_Hide)
     document.body.style.backgroundImage = 'none'
     if (!document.getElementById("support_only_portrait_msg")) { // if the message element has not been formed already
         supportOnlyPortraitMessageElement = document.createElement('h2');
         supportOnlyPortraitMessageElement.setAttribute("id", 'support_only_portrait_msg')
-        
+
         supportOnlyPortraitMessageElement.classList.add('centered')
         supportOnlyPortraitMessageElement.classList.add('error_message')
         supportOnlyPortraitMessageElement.appendChild(document.createTextNode("האפליקציה עובדת רק במצב מאונך."))
@@ -84,7 +99,7 @@ function showOnlyPortraitMessage() {
     }
 }
 function removeOnlyPortraitMessage() {
-    dom_helper.show("main_container")
+    dom_helper.show(element_ID_to_Hide)
     document.body.style.backgroundImage = ''
     dom_helper.hide('support_only_portrait_msg')
 }
@@ -93,7 +108,16 @@ function removeOnlyPortraitMessage() {
 //  Handle data saving
 // ----------------------------------------------------------------------------------------
 // detect leaving the page events:
-document.addEventListener("visibilitychange", () => { if (document.hidden) { onUserExit() } }, false);
+document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+        console.log('screen closed')
+        onUserExit()
+    } else {
+        console.log('screen openned')
+        refreshScreen()
+    }
+}, false);
+
 window.onunload = onUserExit;
 
 // save data when leaving the app:
@@ -108,4 +132,8 @@ function onUserExit() {
     }
     subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData }) // **
     console.log('meta data was saved');
+}
+
+function refreshScreen() {
+    location.reload()
 }
