@@ -24,6 +24,19 @@ body {
   z-index: 1000;
 }*/
 
+.error_message_screen {
+  position: absolute;
+  background-color: black;
+  width: 95vw;
+  height: 95vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 35px;
+  border: 0.8vw solid rgb(50,50,50);
+  z-index: 9999;
+}
+
 .error_message {
   width: 90%;
   font-size: 5vw;
@@ -119,7 +132,7 @@ body {
   top: 50vh;
   transform: translate(-50%, -50%);
   
-  animation-duration: 1.5s;
+  animation-duration: 0.8s;
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
@@ -558,7 +571,6 @@ h1 {
   text-align: center;
   color: black;
   font-size: 2vh;
-  font-family: Helvetica;
   direction: rtl;
   
   animation-duration: 1s;
@@ -607,6 +619,7 @@ h1 {
   background-color: transparent;
   border-radius: 15px;
   outline: none;
+  border-width: 0;
 }
 
 .loadButton:active {

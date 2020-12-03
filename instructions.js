@@ -31,8 +31,8 @@ function loadAppDemo() {
 		"&personalMultipleWorkerId=" + jatos.workerId;
 	if (!!jatos.isLocalhost) {
 		var demoUrl = "index.html?" +
-		"batchId=" + jatos.batchId +
-		"&userId=" + jatos.workerId;;
+			"batchId=" + jatos.batchId +
+			"&userId=" + jatos.workerId;;
 	}
 
 
@@ -64,6 +64,7 @@ function createSmartphoneApperance() {
 	demoText = document.createElement('h1');
 	demoText.setAttribute("id", "mainDemoText");
 	demoText.setAttribute("class", "demoText");
+	demoText.innerHTML = app_settings.demoCycleSupportingText[0]['a'];
 	demoText.appendChild(document.createTextNode(''));
 	is_firstDemoScreen_SuportingInstructions_changed_1 = false;
 	is_firstDemoScreen_SuportingInstructions_changed_2 = false;
@@ -74,7 +75,6 @@ function createSmartphoneApperance() {
 
 	demoTextBox.appendChild(demoText);
 	document.body.appendChild(demoTextBox);
-	dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['a']);
 
 	// outer rectangle:
 	outerRectangle = document.createElement('div');
@@ -167,6 +167,7 @@ function monitorChangesInDemoAndReact(settings) {
 		// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
 		if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === 0) {  // first demo trial
 			if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
+				document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
 				!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
 			) {  // first detection after app was closed
 				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID

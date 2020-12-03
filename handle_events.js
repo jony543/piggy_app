@@ -1,5 +1,12 @@
 // This script is aimed to record and handle touch and change in device orientation events
 
+// First thing first:
+// ---------------------
+// get custom settings for component and batch
+var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+// check if triggered from within instructions:
+var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '').split('?')[0] === settings.instructionsFileName;
+
 // ****************************************************************************************
 //  Listen to touch events and record the data and to page leaving events to save the data:
 // ----------------------------------------------------------------------------------------
@@ -48,14 +55,11 @@ var screenOrientationEvents = [];
 var screenInitialOrientation = '';
 
 // get current html to determine relevant id for orientation switches
-switch (document.title) {
-    case 'Instructions':
-        var element_ID_to_Hide = "jspsych-content";
-        break;
-    case 'Space Gold':
-        var element_ID_to_Hide = "main_container";
-        break;
-}
+if (document.title === settings.instructions_HTML_title) {
+     var element_ID_to_Hide = settings.instructions_main_HTML_element;
+} else if (document.title === settings.App_HTML_title && !isCalledFromInstructions) {
+    var element_ID_to_Hide = settings.App_main_HTML_element;
+} 
 
 // check upon entry if it is on portrait mode:
 if (screen.availHeight < screen.availWidth) {
@@ -83,25 +87,31 @@ function showOnlyPortraitMessage() {
     dom_helper.hide(element_ID_to_Hide)
     document.body.style.backgroundImage = 'none'
     if (!document.getElementById("support_only_portrait_msg")) { // if the message element has not been formed already
+        // set the text message:
         supportOnlyPortraitMessageElement = document.createElement('h2');
         supportOnlyPortraitMessageElement.setAttribute("id", 'support_only_portrait_msg')
-
         supportOnlyPortraitMessageElement.classList.add('centered')
         supportOnlyPortraitMessageElement.classList.add('error_message')
         supportOnlyPortraitMessageElement.appendChild(document.createTextNode("האפליקציה עובדת רק במצב מאונך."))
         supportOnlyPortraitMessageElement.appendChild(document.createElement("br"))
         supportOnlyPortraitMessageElement.appendChild(document.createElement("br"))
         supportOnlyPortraitMessageElement.appendChild(document.createTextNode("סובב/י את המכשיר בבקשה."))
+        // set the text box:
+        supportOnlyPortraitBoxElement = document.createElement('div');
+        supportOnlyPortraitBoxElement.setAttribute("id", "support_only_portrait_box");
+        supportOnlyPortraitBoxElement.setAttribute("class", "error_message_screen");
 
-        document.body.appendChild(supportOnlyPortraitMessageElement)
+        // append stuff:
+        supportOnlyPortraitBoxElement.appendChild(supportOnlyPortraitMessageElement);
+        document.body.appendChild(supportOnlyPortraitBoxElement)
     } else {
-        dom_helper.show('support_only_portrait_msg')
+        dom_helper.show('support_only_portrait_box')
     }
 }
 function removeOnlyPortraitMessage() {
     dom_helper.show(element_ID_to_Hide)
     document.body.style.backgroundImage = ''
-    dom_helper.hide('support_only_portrait_msg')
+    dom_helper.hide('support_only_portrait_box')
 }
 
 // ****************************************************************************************
@@ -135,5 +145,7 @@ function onUserExit() {
 }
 
 function refreshScreen() {
-    location.reload()
+    if (document.title === 'Space Gold' && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
+        location.reload()
+    }
 }

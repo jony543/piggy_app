@@ -43,10 +43,10 @@
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (!!jatos.isLocalhost) {
 			var intructions_url = "instructions.html?" +
-			"batchId=" + jatos.batchId +
-			"&userId=" + jatos.workerId;;
+				"batchId=" + jatos.batchId +
+				"&userId=" + jatos.workerId;;
 			location = intructions_url;
-			} else {
+		} else {
 			jatos.goToComponent("instructions");
 		}
 		return;
@@ -131,7 +131,6 @@
 
 	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
-	//dom_helper.hide("welcome_msg");
 	dom_helper.hide("spaceship");
 	dom_helper.show("upper_half");
 	dom_helper.show("lower_half");
@@ -149,30 +148,32 @@
 
 	dom_helper.append_html('main_container',
 		'<img id="lottery" class="waiting_for_outcome_gif" src="images/lottery.gif"/>');
-	document.getElementById('lottery').style.animationDuration = String(settings.durations.waitingForOutcomeAnim / 1000) + 's' // ** // add animation duration
-
+	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
 
 	// wait until gif animation is finished
-	await delay(settings.durations.waitingForOutcomeAnim)
-	dom_helper.hide("lottery");
+	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
+	setTimeout(() => dom_helper.hide("lottery"), settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (!runData.hideOutcome) { // presenting the outcome:
 		if (runData.isWin) {
-			dom_helper.set_text('outcome_text_1_', "מצאת " + runData.reward + " יחידות זהב"); //**
-			dom_helper.show('outcome_win', settings.durations.outcomeAnim); // **
-			dom_helper.add_css_class('outcome_win', 'goUpOutcomeImage'); // **
+			var outcomeText = "מצאת " + runData.reward + " יחידות זהב"
+			var outcomeElementID = 'outcome_win'
 		} else {
-			dom_helper.set_text('outcome_text_1_', "לא מצאת זהב הפעם");
-			dom_helper.show('outcome_no_win', settings.durations.outcomeAnim); // **
-			dom_helper.add_css_class('outcome_no_win', 'goUpOutcomeImage'); // **
+			var outcomeText = "לא מצאת זהב הפעם"
+			var outcomeElementID = 'outcome_no_win'
 		}
 
-		// add a superimposed text on the outcome
+		// show outcome:
+		dom_helper.show(outcomeElementID, settings.durations.outcomeAnim); // **
+		dom_helper.add_css_class(outcomeElementID, 'goUpOutcomeImage'); // **
+
+		// add a superimposed text on the outcome:
 		dom_helper.set_text('superimposed_outcome_sum_txt', runData.reward);
 		dom_helper.show('superimposed_outcome_sum', settings.durations.outcomeAnim); // **
 		dom_helper.add_css_class('superimposed_outcome_sum', 'goUpOutcomeImage'); // **
 
-		// add text about the outcome below the outcome image
+		// add text about the outcome below the outcome image:
+		dom_helper.set_text('outcome_text_1_', outcomeText);
 		dom_helper.show("outcome_text_1_", settings.durations.outcomeAnim);
 		dom_helper.add_css_class('outcome_text_1_', 'appearSlowlyOutcomeText'); // **
 	}
@@ -186,9 +187,8 @@
 	});
 
 	// show winning/loosing message for 2 seconds
-	await delay(settings.durations.outcomeAnim);
+	await delay(settings.durations.intervalBetweenOutcomeAndNextThing);
 	var manipulationOption = logic.isManipulation(runData, settings);
-	dom_helper.hide("welcome_msg");
 
 	// activate manipulation notification test:
 	if (manipulationOption) {
@@ -196,7 +196,7 @@
 		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 	}
-	// runData.consumptionTest=true
+
 	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.

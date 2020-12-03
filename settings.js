@@ -64,11 +64,13 @@ window.app_settings = {
 	},
 	durations: { //in ms
 		// every trial:
-		entranceMessage: 1500,
-		waitingForOutcomeAnim: 3500,
+		entranceMessage: 800,
+		lotteryAnim: 3500,
+		intervalBetweenLotteryAndOutcomeAnim: 2800,
 		minTimeToIndicateOutcomeViewing: 250,
 		// manipulation:
 		outcomeAnim: 2000,
+		intervalBetweenOutcomeAndNextThing: 1000,
 		// animations:
 		costAnim: 1500,
 		surface_disappearance: 700,
@@ -116,6 +118,13 @@ window.app_settings = {
 	allowDemo: true,
 	demoCycle: {
 		0: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		2: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		3: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		4: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true, consumptionTest: false },
+		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: false },
+		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
+		7: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: true },
 	},
 	demoCycleSupportingText: {
 		0: {
@@ -143,7 +152,69 @@ window.app_settings = {
 			distractor_2: 'כן, זה עולה 15 יחידות זהב.',
 			distractor_3: 'כן, העלות משתנה בכל פעם.',
 		},
-
+		2: {
+			question: 'האם הסיכוי למצוא זהב משתנה בזמנים מסויימים?',
+			correct_answer: 'לא, הסיכוי למצוא זהב זהה תמיד.',
+			distractor_1: 'הסיכוי למצוא זהב משתנה כל הזמן.',
+			distractor_2: 'הסיכוי למצוא זהב משתנה כשמעונן ואין אפשרות לראות אם מצאנו זהב.',
+			distractor_3: 'אם לאחרונה מצאנו הרבה זהב הסיכוי למצוא עוד זהב קטן יותר ולהפך.',
+		},
+		3: {
+			question: 'מה קורה אם המחסן מלא?',
+			correct_answer: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
+			distractor_1: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
+			distractor_2: 'זה אומר שהמשחק נגמר.',
+			distractor_3: 'המחסן לא יכול להתמלא אלא רק להתמלא באופן חלקי.',
+		},
+		4: {
+			question: 'מה קורה אם המחסן מלא באופן חלקי?',
+			correct_answer: 'שום דבר, זה רק עדכון. כל עוד המחסן אינו מלא לגמרי ניתן להמשיך לצבור בו זהב.',
+			distractor_1: 'זה לא משהו שאדע עליו מפני שאין דיווחים על כך שהמחסן מלא רק באופן חלקי.',
+			distractor_2: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
+			distractor_3: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
+		},
+		5: {
+			question: 'מה השווי של גושי הזהב שאני יכול/ה למצוא?',
+			correct_answer: '15 יחידות זהב.',
+			distractor_1: 'הסכום משתנה והוא יוצג בכל פעם בהתאם.',
+			distractor_2: '1 יחידות זהב.',
+			distractor_3: 'הסכום משתנה ואין לי אפשרות לדעת אותו.',
+		},
+		6: {
+			question: 'לאחר שנכנסתי לאפליקציה, מתי אוכל לצאת ממנה כך שתוצאת החיפוש תיחשב לי?',
+			correct_answer: 'כאשר תופיעה הודעת הסיום (בה כתוב "נתראה בפעם הבאה").',
+			distractor_1: 'מיד לאחר הכניסה.',
+			distractor_2: 'מיד עם הופעתה של תוצאת החיפוש.',
+			distractor_3: 'כשמופיעים עננים.',
+		},
+		7: {
+			question: 'מה קורה כשמעונן על כוכב הלכת ואין לי אפשרות לראות את תוצאות החיפוש?',
+			correct_answer: 'הכל ממשיך בדיוק אותו דבר. אין שינוי מלבד זה שאיני יכול/ה לראות את תוצאת החיפוש.',
+			distractor_1: 'המשחק לא זמין בזמנים אלו ולכן עדיף לנסות מאוחר יותר.',
+			distractor_2: 'אין עלות לכניסה.',
+			distractor_3: 'אין לי אפשרות לצבור את הזהב במחסן.',
+		},
+		8: {
+			question: 'כיצד אוכל להרוויח כסף אמיתי?',
+			correct_answer: 'פשוט להיכנס לאפליקציה כדי לחפש זהב. במידה ומצאתי זהב ויש מקום במחסן, הזהב יילקח לכדור הארץ ויומר לכסף אמיתי. ככל שאצבור יותר זהב ארוויח יותר כסף.',
+			distractor_1: 'אין אפשרות להרוויח כסף אמיתי במשחק.',
+			distractor_2: 'פשוט להיכנס לאפליקציה כדי לחפש אבנים. במידה ומצאתי אבנים ויש מקום במחסן, האבנים יילקחו לכדור הארץ ויומרו לכסף אמיתי.',
+			distractor_3: 'להיכנס לאפליקציה ולהמתין בה זמן רב ככל שניתן לפני שאסגור אותה. ככל שהיא פתוחה יותר זמן ברצף, ארוויח יותר. ',
+		},
+		9: {
+			question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהן לפעמים?',
+			correct_answer: 'כל התשובות נכונות (למעט לא יודע/ת).',
+			distractor_1: 'יש לי 5 שניות בלבד לשהות במערה, בהן אוכל לאסוף מהדברים שבה.',
+			distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 1 יחידות זהב.',
+			distractor_3: 'שווי גושי הזהב והאבנים זהה לזה לשווי גושי הזהב והאבנים בחיפושי הזהב הרגילים.',
+		},
+		10: {
+			question: 'מהו משך המשחק?',
+			correct_answer: 'משך המשחק אינו קבוע מראש. הוא אורך בין ימים אחדים לחודש.',
+			distractor_1: 'יום אחד.',
+			distractor_2: 'שבוע.',
+			distractor_3: 'חודש.',
+		},
 		// [replace_here_ with_a_number]: {
 		// 	question: '',
 		// 	correct_answer: '',
@@ -152,6 +223,11 @@ window.app_settings = {
 		// 	distractor_3: '',
 		// },
 	},
+	// Meta stuff:
+	instructions_HTML_title: 'Instructions',
+	instructions_main_HTML_element: "jspsych-content",
+	App_HTML_title: 'Space Gold',
+	App_main_HTML_element: "main_container",
 	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
