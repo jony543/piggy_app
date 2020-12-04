@@ -101,7 +101,7 @@ var data_helper = {
 	getWsUrl: function (sessionName) {
 		var url = 'ws'
 		
-		if (location.protocol == 'https')
+		if (location.protocol.includes('https'))
 			url += 's';		
 
 		url += '://' + location.hostname;
@@ -111,16 +111,19 @@ var data_helper = {
 
 		url += '/app/session?subId=' +  this.get_subject_id();
 		url += '&sName=' + sessionName;
+		url += 'transport=websocket';
 
 		return url;
 	},
 	ws: {},
+	sessionName: '',
 	sessionId: '',
 	q: [],
 	get_timestamp: function () {
 		return (new Date()).getTime();
 	},
 	init: function (sessionName) {
+		this.sessionName = sessionName;
 		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
 
 		this.ws.onopen = (function (event) {
@@ -133,7 +136,7 @@ var data_helper = {
 	    	if (event.code != 1000) {
 	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
 	    		console.log('WS clode. re opening');
-	    		this.init();
+	    		this.init(this.sessionName);
 	    	}
 	    }).bind(this);
 
@@ -143,13 +146,11 @@ var data_helper = {
 
 	    	if (this.ws.readyState == 3) { // status CLOSED
 	    		this.ws = undefined;
-	    		this.init();
+	    		this.init(this.sessionName);
 	    	}
 	    }).bind(this);
 
 	    this.ws.onmessage = (function (event) {
-	    	console.log('WS message: ' + event.data);
-
 	        var data = JSON.parse(event.data);
 
 	        // if it is the first message in session get the current sessionId
@@ -184,7 +185,6 @@ var data_helper = {
 				const dataToSend = JSON.stringify(
 					Object.assign({ _id: this.sessionId }, ...this.q)
 				);
-				console.log('sending to WS: ' + dataToSend);
 				this.ws.send(dataToSend);
 			}
 		}

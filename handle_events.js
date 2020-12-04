@@ -3,9 +3,9 @@
 // First thing first:
 // ---------------------
 // get custom settings for component and batch
-var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+var settings = Object.assign({}, app_settings);
 // check if triggered from within instructions:
-var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '').split('?')[0] === settings.instructionsFileName;
+var isCalledFromInstructions = document.referrer.includes(settings.instructionsFileName);
 
 // ****************************************************************************************
 //  Listen to touch events and record the data and to page leaving events to save the data:
