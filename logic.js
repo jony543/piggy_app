@@ -146,11 +146,7 @@ var logic = {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
 
     // check if running localy or on the server and determine if called from within the instructions (for the the embedded demo):
-    if (!!jatos.isLocalhost)
-      var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '').split('?')[0] === settings.instructionsFileName;
-    else {
-      var isCalledFromInstructions = document.referrer.includes('srid') // this returns true only if called from the instructions as it is currently designed
-    }
+    var isCalledFromInstructions = document.referrer.includes(settings.instructionsFileName);
 
     // CHECK IF INSTRUCTIONS
     // -------------------------------------------------------
@@ -161,7 +157,7 @@ var logic = {
       }
       if (!isCalledFromInstructions && (noDataYet || !instructionCompletion)) {
         var dataToSave = {
-          subID: jatos.workerId,
+          subID: data_helper.get_subject_id(),
           startInstructionsTime: startTime,
           showInstructions: true,
         };
@@ -213,7 +209,7 @@ var logic = {
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
-      [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(jatos.workerId, app_settings);
+      [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(data_helper.get_subject_id(), app_settings);
       var isUnderManipulation = false;
       var whichManipulation = null;
       var activateManipulation = false;
@@ -286,7 +282,7 @@ var logic = {
     let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
 
     var dataToSave = {
-      subID: jatos.workerId,
+      subID: data_helper.get_subject_id(),
       day: dayOfExperiment,
       isWin: isWin,
       reward: reward,

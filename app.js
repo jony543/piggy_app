@@ -1,31 +1,18 @@
 (async () => {
-	// ****************************************************************
-	//           SET STUFF:
-	// ----------------------------------------------------------------
-
-	await jatos.loaded();
-
-	var terminate_subject_data_worker = false;
-	subject_data_worker.done = function (x) {
-		// when all messages are processed save the information as a JATOS result
-		if (terminate_subject_data_worker) {
-			var subData = data_helper.get_subject_data(false);
-			var currentRunData = subData[jatos.studyResultId];
-
-			jatos.appendResultData(currentRunData).then(function () {
-				console.log('finished');
-			});
-		}
-	};
-
-	// get custom settings for component and batch
-	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+	var settings = Object.assign({}, app_settings); 	
 
 	// get subject data from batch session
-	var subData = data_helper.get_subject_data(true);
+	var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+		console.log('error getting subject data');
+		console.log(e);
+	});
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
+
+	// create new session with server only after logic is called! (important for demo to work)
+	data_helper.init('app');
+
 	subject_data_worker.postMessage(runData);
 
 	// assign animation times according to settings:
@@ -41,14 +28,7 @@
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		if (!!jatos.isLocalhost) {
-			var intructions_url = "instructions.html?" +
-				"batchId=" + jatos.batchId +
-				"&userId=" + jatos.workerId;;
-			location = intructions_url;
-		} else {
-			jatos.goToComponent("instructions");
-		}
+		window.location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
@@ -206,9 +186,9 @@
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
 		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
-		run_coin_collection(settings.coinCollectionTask)
+		run_coin_collection(settings.coinCollectionTask, runData)
 	} else {
-		finishTrial()
+		finishTrial(runData)
 	}
 
 })();
