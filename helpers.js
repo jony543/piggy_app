@@ -31,7 +31,7 @@ var dom_helper = {
 		var original = document.getElementById(id);
 		var clone = original.cloneNode(true); // "deep" clone
 
-		var clone_id = id + (new Date()).getTime();
+		var clone_id = id + data_helper.get_timestamp();
 		clone.id = clone_id;
 
 		original.parentNode.appendChild(clone);
@@ -98,7 +98,7 @@ var data_helper = {
 			xhr.send();
 		}).bind(this));		
 	},
-	getWsUrl: function () {
+	getWsUrl: function (sessionName) {
 		var url = 'ws'
 		
 		if (location.protocol == 'https')
@@ -110,14 +110,18 @@ var data_helper = {
 			url += ":" + location.port;
 
 		url += '/app/session?subId=' +  this.get_subject_id();
+		url += '&sName=' + sessionName;
 
 		return url;
 	},
 	ws: {},
 	sessionId: '',
 	q: [],
-	init: function () {
-		this.ws = new WebSocket(this.getWsUrl());
+	get_timestamp: function () {
+		return (new Date()).getTime();
+	},
+	init: function (sessionName) {
+		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
 
 		this.ws.onopen = (function (event) {
 			console.log('new session opened');
@@ -156,12 +160,18 @@ var data_helper = {
 	        // if it is ack message remove the message from queue
 	        if ('messageId' in data) {
 	        	this.q = this.q.filter(m => m.messageId != data.messageId);
+	        } 
+
+	        if ('broadcast' in data) {
+	        	if (this.on_broadcast) 
+	        		this.on_broadcast(data);
 	        }        
 	    }).bind(this);
-	},	
+	},
+	on_broadcast: undefined,	
 	append_subject_data: function (data) {
 		// denerate new message id
-		const messageId = 'm' + (new Date()).getTime();
+		const messageId = 'm' + this.get_timestamp();
 		data['messageId'] = messageId;		
 		this.q.push(data);
 
@@ -295,7 +305,7 @@ var ajax_helper = {
 };
 
 // Used by app.js and coin_collection.js:
-function finishTrial() {
+function finishTrial(runData) {
 	// show goodbye message:
 	dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
 	dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
@@ -303,7 +313,12 @@ function finishTrial() {
 	dom_helper.show('welcome_msg'); // **
 
 	// collect end time and save subject data as results:
-	subject_data_worker.postMessage({ endTime: new Date() });
+	var dataToSend = { endTime: new Date(), commitSession: true };
+	if (runData.isDemo) {
+		dataToSend.broadcast = 'demo trial ended';
+	}
+	
+	subject_data_worker.postMessage(dataToSend);
 	terminate_subject_data_worker = true;
 	console.log('Trial Completed')
 }

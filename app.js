@@ -1,19 +1,18 @@
 (async () => {
-	var settings = Object.assign({}, app_settings); 
-
-	data_helper.init();
+	var settings = Object.assign({}, app_settings); 	
 
 	// get subject data from batch session
-	var subData = {};
-	while(!subData) {
-		subData = await data_helper.get_subject_data(true).catch(function (e) { 
-			console.log('error getting subject data');
-			console.log(e);
-		});
-	};
+	var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+		console.log('error getting subject data');
+		console.log(e);
+	});
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
+
+	// create new session with server only after logic is called! (important for demo to work)
+	data_helper.init('app');
+
 	subject_data_worker.postMessage(runData);
 
 	// assign animation times according to settings:
@@ -184,9 +183,9 @@
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
 		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
-		run_coin_collection(settings.coinCollectionTask)
+		run_coin_collection(settings.coinCollectionTask, runData)
 	} else {
-		finishTrial()
+		finishTrial(runData)
 	}
 
 })();

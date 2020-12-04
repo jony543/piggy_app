@@ -1,4 +1,4 @@
-async function run_coin_collection(settings) {
+async function run_coin_collection(settings, runData) {
 
 	// ========================================================
 	// 						FUCNTIONS
@@ -39,7 +39,7 @@ async function run_coin_collection(settings) {
 		}, 1000)
 		setTimeout(() => {
 			dom_helper.hide('inside_cave_img')
-			finishTrial()
+			finishTrial(runData)
 		}, 2500);
 	}
 

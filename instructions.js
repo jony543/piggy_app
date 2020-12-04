@@ -21,17 +21,12 @@ function exitAppDemo(appDemoID) {
 	firstAppClosedDetection = true;
 }
 
-function loadAppDemo() {
+async function loadAppDemo() {
 	// check when to present again the button that closes the demo app:
-	var subData = data_helper.get_subject_data(true);
+	var subData = await data_helper.get_subject_data(true);
 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
-	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
-		"batchId=" + jatos.batchId +
-		"&personalMultipleWorkerId=" + jatos.workerId;
-	if (!!jatos.isLocalhost) {
-		var demoUrl = "index.html";
-	}
+	var demoUrl = "index.html" + location.search;
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:
@@ -139,9 +134,9 @@ function removeSmartphoneApperance(appDemoID) {
 	document.getElementById("demoLoadButton").remove();
 }
 
-function monitorChangesInDemoAndReact(settings) {
+async function monitorChangesInDemoAndReact(broadcastMessage) {
 	console.log('check...')
-	var subData = data_helper.get_subject_data(true);
+	var subData = await data_helper.get_subject_data(true);
 
 	// check when to present again the button that closes the demo app:
 	// if (firstAppOpennedDetection) { // first set the stuff to check when embedded app finshed running:
@@ -207,9 +202,8 @@ function monitorChangesInDemoAndReact(settings) {
 			mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
 			wait(500).then(() => removeSmartphoneApperance());
 			syncWait(750)
+			data_helper.on_broadcast = undefined;
 			jsPsych.resumeExperiment();
-		} else {
-			setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
 		}
 
 	}
@@ -231,29 +225,18 @@ var is_firstDemoScreen_SuportingInstructions_changed_2;
 var testPassed;
 var timeline = [];
 
+var settings = Object.assign({}, app_settings);
+
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
-jatos.loaded().then(function () {
-	var terminate_subject_data_worker = false;
-	subject_data_worker.done = function (x) {
-		// when all messages are processed save the information as a JATOS result
-		if (terminate_subject_data_worker) {
-			var subData = data_helper.get_subject_data(false);
-			var currentRunData = subData[jatos.studyResultId];
-
-			jatos.appendResultData(currentRunData).then(function () {
-				console.log('finished');
-			});
-		}
-	};
-
-	// get custom settings for component and batch
-	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+(async () => {
+	data_helper.init('instructions');
+	
 	// get subject data from batch session
-	var subData = data_helper.get_subject_data(true);
+	var subData = await data_helper.get_subject_data(true);
 
-	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
+	subject_data_worker.postMessage({ instructionsStartedFlag: true, commitSession: true }); // this is used to restart the demo cycle.
 	// intialize test questions stuff:
 	//---------------------------------
 	var question_index = 0;
@@ -329,7 +312,7 @@ jatos.loaded().then(function () {
 			createExitAppButton(elementIdName = 'demoExitButton')
 			createLoadAppButton(elementIdName = 'demoLoadButton')
 			jsPsych.pauseExperiment()
-			monitorChangesInDemoAndReact(settings)
+			data_helper.on_broadcast = monitorChangesInDemoAndReact;
 		},
 	};
 	var continue_or_repeat_demo_cycle = {
@@ -469,31 +452,29 @@ jatos.loaded().then(function () {
 	timeline.push(consentForm);
 	timeline.push(completeTutorialLoop);
 
-	jatos.onLoad(function () {
-		jsPsych.init({
-			timeline: timeline,
-			//display_element: 'jspsych-display-element',
-			on_finish: function () {
-				// saving the data
-				// ---------------------
-				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+	jsPsych.init({
+		timeline: timeline,
+		//display_element: 'jspsych-display-element',
+		on_finish: function () {
+			// saving the data
+			// ---------------------
+			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
-				subject_data_worker.postMessage({ completedInstructions: true });
-				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+			subject_data_worker.postMessage({ completedInstructions: true });
+			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
-				terminate_subject_data_worker = true;
-				console.log('Tutrial Completed')
-			},
-			on_close: function () { // in case the user gets out before it finishes.
-				// saving the data
-				// ---------------------
-				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+			terminate_subject_data_worker = true;
+			console.log('Tutrial Completed')
+		},
+		on_close: function () { // in case the user gets out before it finishes.
+			// saving the data
+			// ---------------------
+			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
-				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
-				terminate_subject_data_worker = true;
-				console.log('Tutrial Closed')
-			}
-		});
+			terminate_subject_data_worker = true;
+			console.log('Tutrial Closed')
+		}
 	});
-});
+})();

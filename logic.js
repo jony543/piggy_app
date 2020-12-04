@@ -146,7 +146,7 @@ var logic = {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
 
     // check if running localy or on the server and determine if called from within the instructions (for the the embedded demo):
-    var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '') === settings.instructionsFileName;
+    var isCalledFromInstructions = document.referrer.includes(settings.instructionsFileName);
 
     // CHECK IF INSTRUCTIONS
     // -------------------------------------------------------
