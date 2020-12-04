@@ -140,7 +140,7 @@ window.app_settings = {
 		7: 'לסיום: עד כה הדגמנו מקרים שונים לחוד אך במשחק עצמו הם יכולים להשתלב.<br>בלחיצה הבאה לדוגמא יהיה מעונן וגם תיתקל/י במערה עתירת זהב.',
 	},
 	instructionsFileName: 'instructions.html',
-	n_instruction_pages: 1,
+	n_instruction_pages: 21,
 	instructions_test_questions: {
 		toRandomizeQuestions: false,
 		dont_know_answer: 'לא יודע/ת.',

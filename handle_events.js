@@ -56,10 +56,10 @@ var screenInitialOrientation = '';
 
 // get current html to determine relevant id for orientation switches
 if (document.title === settings.instructions_HTML_title) {
-     var element_ID_to_Hide = settings.instructions_main_HTML_element;
+    var element_ID_to_Hide = settings.instructions_main_HTML_element;
 } else if (document.title === settings.App_HTML_title && !isCalledFromInstructions) {
     var element_ID_to_Hide = settings.App_main_HTML_element;
-} 
+}
 
 // check upon entry if it is on portrait mode:
 if (screen.availHeight < screen.availWidth) {
@@ -145,7 +145,9 @@ function onUserExit() {
 }
 
 function refreshScreen() {
-    if (document.title === 'Space Gold' && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
-        location.reload()
+    if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
+        location.reload();
+    } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
+        location = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'install.html' + location.search; // change to main URL upon the next entry
     }
 }

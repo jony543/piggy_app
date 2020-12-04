@@ -234,6 +234,8 @@ var is_firstDemoScreen_SuportingInstructions_changed_1;
 var is_firstDemoScreen_SuportingInstructions_changed_2;
 var testPassed;
 var timeline = [];
+// a global var to comunicate with the handle_events.js:
+tutorialCompleted = false;
 
 // ****************************************************************
 //                           PIPELINE:
@@ -486,6 +488,7 @@ jatos.loaded().then(function () {
 				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
 				terminate_subject_data_worker = true;
+				tutorialCompleted = true;
 				console.log('Tutrial Completed')
 			},
 			on_close: function () { // in case the user gets out before it finishes.
