@@ -73,6 +73,7 @@
 		var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 		dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
 		dom_helper.show(indicator_id);
+		setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
 	}
 
 	//show spacechip landing animation:
@@ -90,10 +91,11 @@
 				subject_data_worker.postMessage({ press1Time: new Date() });
 
 				// show cost on top right corner if needed [After 1st click]
-				if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+				if (!!logic.getCost(runData, settings, logic.cost_on.click1)) {
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click1));
 					dom_helper.show(indicator_id);
+					setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
 				}
 
 				document.getElementById('ice_lower').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
@@ -114,10 +116,11 @@
 				subject_data_worker.postMessage({ press2Time: new Date() });
 
 				// show cost on top right corner if needed [After 2nd click]
-				if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+				if (!!logic.getCost(runData, settings, logic.cost_on.click2)) {
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click2));
 					dom_helper.show(indicator_id);
+					setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
 				}
 
 				document.getElementById('ice_upper').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
@@ -152,7 +155,7 @@
 
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
-	setTimeout(() => dom_helper.hide("lottery"), settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
+	setTimeout(() => dom_helper.removeElement("lottery"), settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (!runData.hideOutcome) { // presenting the outcome:
 		if (runData.isWin) {

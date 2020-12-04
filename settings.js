@@ -5,14 +5,13 @@
 window.app_settings = {
 	experimentalDayStartingHour: 5, // Possiblie assignments are 0-23. Assign 0 to simply seperate between days.  Relevant for example to determine the time at day to empty container according to a 24h watch. 
 	pressesRequired: 2,
-	isInstallation: false,
 	forceDeval: null, // for debugging purposes
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
 	optionalDaysForLastDeval: [8, 9], // The day not chosen for devaluation will be used as a comparable valued day
 	// days to base upon first devluation time:
 	daysToBaseUponFirstDeval: [2],
-	daysToBaseUponLastDeval: [6, 7],
+	daysToBaseUponLastDeval: [7], //[6, 7],
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	manipulationImageID: function (manipulationType) {
 		if (manipulationType == 'devaluation') {
@@ -23,7 +22,7 @@ window.app_settings = {
 	},
 	rewards: {
 		isRatioSchedule: true,
-		winningRate: 2, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
+		winningRate: 3, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
 		winningChancePerUnit: function () {
 			return 1 / this.winningRate;
 		},
@@ -45,7 +44,7 @@ window.app_settings = {
 	},
 	cost: {
 		isCost: true,
-		isCostPerPress: true,
+		isCostPerPress: false,
 		isVariableCost: false,
 		minCostSum: 1,
 		maxCostSum: 5,
@@ -54,12 +53,12 @@ window.app_settings = {
 		presentCost: true, // O'Doherty did not use visual feedback for the cost, Gillan did (in their MB-MF with devaluation study)
 	},
 	hideOutcome: {
-		hide: false,
+		hide: true,
 		// option 1:
-		hideOnlyUnderManipulationPeriods: true, // if false will hide every day from what set in daysToHideAt
+		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
 		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
-		daysToHideAt: [2, 3, 4, 5, 8, 10, 12],
-		daysToBaseUponHidingTime: [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+		daysToHideAt: [3, 4, 8, 9], // [2, 3, 4, 5, 8, 10, 12],
+		daysToBaseUponHidingTime: [[2], [2], [7], [7]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
 	durations: { //in ms
