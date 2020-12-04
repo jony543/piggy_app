@@ -115,7 +115,7 @@ function InitializeCost(cost_settings) {
   }
 }
 
-function checkIfToHideOutcome(hideOutcome) {
+function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderManipulation) {
   if (hideOutcome.hide) { // If to hide outcomes
     if (isUnderManipulation && hideOutcome.hideOnlyUnderManipulationPeriods) { // If it's manipulation time and hiding is on only during manipulations.
       return true;
@@ -266,7 +266,7 @@ var logic = {
 
         // Hide outcome
         // ---------------------------
-        var toHideOutcome = checkIfToHideOutcome(settings.hideOutcome);
+        var toHideOutcome = checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation);
 
         // Reset container
         // ---------------------------
@@ -313,7 +313,7 @@ var logic = {
   getCost: function (runData, settings, cost_on) {
     return settings.cost.isCost
       && settings.cost.presentCost
-      && (runData.cost.length > (cost_on - 1))
+      && (runData.cost.length > cost_on)
       && runData.cost[cost_on];
   },
   cost_on: {

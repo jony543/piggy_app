@@ -6,7 +6,7 @@ var check_consent = function (elem) {
 		return true;
 	}
 	else {
-		alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+		alert("אם ברצונך להשתתף יש לסמן את תיבת הסימון שבסמוך ל'אני מסכימ/ה להשתתף במחקר זה'.");
 		return false;
 	}
 	return false;
@@ -56,6 +56,7 @@ function createSmartphoneApperance() {
 	demoText = document.createElement('h1');
 	demoText.setAttribute("id", "mainDemoText");
 	demoText.setAttribute("class", "demoText");
+	demoText.innerHTML = app_settings.demoCycleSupportingText[0]['a'];
 	demoText.appendChild(document.createTextNode(''));
 	is_firstDemoScreen_SuportingInstructions_changed_1 = false;
 	is_firstDemoScreen_SuportingInstructions_changed_2 = false;
@@ -66,7 +67,6 @@ function createSmartphoneApperance() {
 
 	demoTextBox.appendChild(demoText);
 	document.body.appendChild(demoTextBox);
-	dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['a']);
 
 	// outer rectangle:
 	outerRectangle = document.createElement('div');
@@ -159,6 +159,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 		// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
 		if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === 0) {  // first demo trial
 			if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
+				document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
 				!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
 			) {  // first detection after app was closed
 				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
@@ -224,6 +225,8 @@ var is_firstDemoScreen_SuportingInstructions_changed_1;
 var is_firstDemoScreen_SuportingInstructions_changed_2;
 var testPassed;
 var timeline = [];
+// a global var to comunicate with the handle_events.js:
+tutorialCompleted = false;
 
 var settings = Object.assign({}, app_settings);
 
@@ -464,6 +467,7 @@ var settings = Object.assign({}, app_settings);
 			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
 			terminate_subject_data_worker = true;
+			tutorialCompleted = true;
 			console.log('Tutrial Completed')
 		},
 		on_close: function () { // in case the user gets out before it finishes.

@@ -1,13 +1,21 @@
 // This script is aimed to record and handle touch and change in device orientation events
 
+// First thing first:
+// ---------------------
+// get custom settings for component and batch
+var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
+// check if triggered from within instructions:
+var isCalledFromInstructions = document.referrer.replace(/^.*[\\\/]/, '').split('?')[0] === settings.instructionsFileName;
+
 // ****************************************************************************************
 //  Listen to touch events and record the data and to page leaving events to save the data:
 // ----------------------------------------------------------------------------------------
-
 // initialize variables:
 var screenInfo = {};
 var pressEvents = [];
 var firstTouchDetected = false;
+// // initialize No SCreen Sleep controller
+// var noSleep = new NoSleep();
 
 // detect touch events:
 document.body.addEventListener("touchstart", recordPressData, false);
@@ -27,6 +35,10 @@ function recordPressData(event) {
             window_outerHeight: window.outerHeight,
             window_outerWidth: window.outerWidth,
         }
+
+        // // activate no Screen Sleep:
+        // noSleep.enable(); // keep the screen on!
+
         firstTouchDetected = true;
     }
     event.touches.pressTime = new Date();
@@ -41,6 +53,13 @@ function recordPressData(event) {
 // initialize variables:
 var screenOrientationEvents = [];
 var screenInitialOrientation = '';
+
+// get current html to determine relevant id for orientation switches
+if (document.title === settings.instructions_HTML_title) {
+    var element_ID_to_Hide = settings.instructions_main_HTML_element;
+} else if (document.title === settings.App_HTML_title && !isCalledFromInstructions) {
+    var element_ID_to_Hide = settings.App_main_HTML_element;
+}
 
 // check upon entry if it is on portrait mode:
 if (screen.availHeight < screen.availWidth) {
@@ -65,35 +84,50 @@ window.addEventListener("orientationchange", function (event) {
     });
 });
 function showOnlyPortraitMessage() {
-    dom_helper.hide("main_container")
+    dom_helper.hide(element_ID_to_Hide)
     document.body.style.backgroundImage = 'none'
     if (!document.getElementById("support_only_portrait_msg")) { // if the message element has not been formed already
+        // set the text message:
         supportOnlyPortraitMessageElement = document.createElement('h2');
         supportOnlyPortraitMessageElement.setAttribute("id", 'support_only_portrait_msg')
-        
         supportOnlyPortraitMessageElement.classList.add('centered')
         supportOnlyPortraitMessageElement.classList.add('error_message')
         supportOnlyPortraitMessageElement.appendChild(document.createTextNode("האפליקציה עובדת רק במצב מאונך."))
         supportOnlyPortraitMessageElement.appendChild(document.createElement("br"))
         supportOnlyPortraitMessageElement.appendChild(document.createElement("br"))
         supportOnlyPortraitMessageElement.appendChild(document.createTextNode("סובב/י את המכשיר בבקשה."))
+        // set the text box:
+        supportOnlyPortraitBoxElement = document.createElement('div');
+        supportOnlyPortraitBoxElement.setAttribute("id", "support_only_portrait_box");
+        supportOnlyPortraitBoxElement.setAttribute("class", "error_message_screen");
 
-        document.body.appendChild(supportOnlyPortraitMessageElement)
+        // append stuff:
+        supportOnlyPortraitBoxElement.appendChild(supportOnlyPortraitMessageElement);
+        document.body.appendChild(supportOnlyPortraitBoxElement)
     } else {
-        dom_helper.show('support_only_portrait_msg')
+        dom_helper.show('support_only_portrait_box')
     }
 }
 function removeOnlyPortraitMessage() {
-    dom_helper.show("main_container")
+    dom_helper.show(element_ID_to_Hide)
     document.body.style.backgroundImage = ''
-    dom_helper.hide('support_only_portrait_msg')
+    dom_helper.hide('support_only_portrait_box')
 }
 
 // ****************************************************************************************
 //  Handle data saving
 // ----------------------------------------------------------------------------------------
 // detect leaving the page events:
-document.addEventListener("visibilitychange", () => { if (document.hidden) { onUserExit() } }, false);
+document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+        console.log('screen closed')
+        onUserExit()
+    } else {
+        console.log('screen openned')
+        refreshScreen()
+    }
+}, false);
+
 window.onunload = onUserExit;
 
 // save data when leaving the app:
@@ -108,4 +142,12 @@ function onUserExit() {
     }
     subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData }) // **
     console.log('meta data was saved');
+}
+
+function refreshScreen() {
+    if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
+        location.reload();
+    } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
+        location = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'install.html' + location.search; // change to main URL upon the next entry
+    }
 }

@@ -5,14 +5,13 @@
 window.app_settings = {
 	experimentalDayStartingHour: 5, // Possiblie assignments are 0-23. Assign 0 to simply seperate between days.  Relevant for example to determine the time at day to empty container according to a 24h watch. 
 	pressesRequired: 2,
-	isInstallation: false,
 	forceDeval: null, // for debugging purposes
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
 	optionalDaysForLastDeval: [8, 9], // The day not chosen for devaluation will be used as a comparable valued day
 	// days to base upon first devluation time:
 	daysToBaseUponFirstDeval: [2],
-	daysToBaseUponLastDeval: [6, 7],
+	daysToBaseUponLastDeval: [7], //[6, 7],
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	manipulationImageID: function (manipulationType) {
 		if (manipulationType == 'devaluation') {
@@ -23,7 +22,7 @@ window.app_settings = {
 	},
 	rewards: {
 		isRatioSchedule: true,
-		winningRate: 2, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
+		winningRate: 3, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
 		winningChancePerUnit: function () {
 			return 1 / this.winningRate;
 		},
@@ -45,7 +44,7 @@ window.app_settings = {
 	},
 	cost: {
 		isCost: true,
-		isCostPerPress: true,
+		isCostPerPress: false,
 		isVariableCost: false,
 		minCostSum: 1,
 		maxCostSum: 5,
@@ -54,21 +53,23 @@ window.app_settings = {
 		presentCost: true, // O'Doherty did not use visual feedback for the cost, Gillan did (in their MB-MF with devaluation study)
 	},
 	hideOutcome: {
-		hide: false,
+		hide: true,
 		// option 1:
-		hideOnlyUnderManipulationPeriods: true, // if false will hide every day from what set in daysToHideAt
+		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
 		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
-		daysToHideAt: [2, 3, 4, 5, 8, 10, 12],
-		daysToBaseUponHidingTime: [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+		daysToHideAt: [3, 4, 8, 9], // [2, 3, 4, 5, 8, 10, 12],
+		daysToBaseUponHidingTime: [[2], [2], [7], [7]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
 	durations: { //in ms
 		// every trial:
-		entranceMessage: 1500,
-		waitingForOutcomeAnim: 3500,
+		entranceMessage: 800,
+		lotteryAnim: 3500,
+		intervalBetweenLotteryAndOutcomeAnim: 2800,
 		minTimeToIndicateOutcomeViewing: 250,
 		// manipulation:
 		outcomeAnim: 2000,
+		intervalBetweenOutcomeAndNextThing: 1000,
 		// animations:
 		costAnim: 1500,
 		surface_disappearance: 700,
@@ -139,7 +140,7 @@ window.app_settings = {
 		7: 'לסיום: עד כה הדגמנו מקרים שונים לחוד אך במשחק עצמו הם יכולים להשתלב.<br>בלחיצה הבאה לדוגמא יהיה מעונן וגם תיתקל/י במערה עתירת זהב.',
 	},
 	instructionsFileName: 'instructions.html',
-	n_instruction_pages: 1,
+	n_instruction_pages: 21,
 	instructions_test_questions: {
 		toRandomizeQuestions: false,
 		dont_know_answer: 'לא יודע/ת.',
@@ -179,7 +180,7 @@ window.app_settings = {
 			distractor_3: 'הסכום משתנה ואין לי אפשרות לדעת אותו.',
 		},
 		6: {
-			question: 'לאחר שנכנסתי לאפליקציה, מתי אוכל לצאת ממנה כדי על מנת שתוצאת החיפוש תיחשב לי?',
+			question: 'לאחר שנכנסתי לאפליקציה, מתי אוכל לצאת ממנה כך שתוצאת החיפוש תיחשב לי?',
 			correct_answer: 'כאשר תופיעה הודעת הסיום (בה כתוב "נתראה בפעם הבאה").',
 			distractor_1: 'מיד לאחר הכניסה.',
 			distractor_2: 'מיד עם הופעתה של תוצאת החיפוש.',
@@ -200,8 +201,8 @@ window.app_settings = {
 			distractor_3: 'להיכנס לאפליקציה ולהמתין בה זמן רב ככל שניתן לפני שאסגור אותה. ככל שהיא פתוחה יותר זמן ברצף, ארוויח יותר. ',
 		},
 		9: {
-			question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהם לפעמים?',
-			correct_answer: 'כל התשובות נכונות.',
+			question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהן לפעמים?',
+			correct_answer: 'כל התשובות נכונות (למעט לא יודע/ת).',
 			distractor_1: 'יש לי 5 שניות בלבד לשהות במערה, בהן אוכל לאסוף מהדברים שבה.',
 			distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 1 יחידות זהב.',
 			distractor_3: 'שווי גושי הזהב והאבנים זהה לזה לשווי גושי הזהב והאבנים בחיפושי הזהב הרגילים.',
@@ -221,6 +222,11 @@ window.app_settings = {
 		// 	distractor_3: '',
 		// },
 	},
+	// Meta stuff:
+	instructions_HTML_title: 'Instructions',
+	instructions_main_HTML_element: "jspsych-content",
+	App_HTML_title: 'Space Gold',
+	App_main_HTML_element: "main_container",
 	dataVarList: ["serial", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.

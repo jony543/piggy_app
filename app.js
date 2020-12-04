@@ -28,7 +28,7 @@
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
+		window.location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
@@ -53,6 +53,7 @@
 		var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 		dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
 		dom_helper.show(indicator_id);
+		setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
 	}
 
 	//show spacechip landing animation:
@@ -70,10 +71,11 @@
 				subject_data_worker.postMessage({ press1Time: new Date() });
 
 				// show cost on top right corner if needed [After 1st click]
-				if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+				if (!!logic.getCost(runData, settings, logic.cost_on.click1)) {
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click1));
 					dom_helper.show(indicator_id);
+					setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
 				}
 
 				document.getElementById('ice_lower').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
@@ -94,10 +96,11 @@
 				subject_data_worker.postMessage({ press2Time: new Date() });
 
 				// show cost on top right corner if needed [After 2nd click]
-				if (!!logic.getCost(runData, settings, logic.cost_on.entrance)) {
+				if (!!logic.getCost(runData, settings, logic.cost_on.click2)) {
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click2));
 					dom_helper.show(indicator_id);
+					setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
 				}
 
 				document.getElementById('ice_upper').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
@@ -111,7 +114,6 @@
 
 	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
-	//dom_helper.hide("welcome_msg");
 	dom_helper.hide("spaceship");
 	dom_helper.show("upper_half");
 	dom_helper.show("lower_half");
@@ -129,30 +131,32 @@
 
 	dom_helper.append_html('main_container',
 		'<img id="lottery" class="waiting_for_outcome_gif" src="images/lottery.gif"/>');
-	document.getElementById('lottery').style.animationDuration = String(settings.durations.waitingForOutcomeAnim / 1000) + 's' // ** // add animation duration
-
+	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
 
 	// wait until gif animation is finished
-	await delay(settings.durations.waitingForOutcomeAnim)
-	dom_helper.hide("lottery");
+	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
+	setTimeout(() => dom_helper.removeElement("lottery"), settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (!runData.hideOutcome) { // presenting the outcome:
 		if (runData.isWin) {
-			dom_helper.set_text('outcome_text_1_', "מצאת " + runData.reward + " יחידות זהב"); //**
-			dom_helper.show('outcome_win', settings.durations.outcomeAnim); // **
-			dom_helper.add_css_class('outcome_win', 'goUpOutcomeImage'); // **
+			var outcomeText = "מצאת " + runData.reward + " יחידות זהב"
+			var outcomeElementID = 'outcome_win'
 		} else {
-			dom_helper.set_text('outcome_text_1_', "לא מצאת זהב הפעם");
-			dom_helper.show('outcome_no_win', settings.durations.outcomeAnim); // **
-			dom_helper.add_css_class('outcome_no_win', 'goUpOutcomeImage'); // **
+			var outcomeText = "לא מצאת זהב הפעם"
+			var outcomeElementID = 'outcome_no_win'
 		}
 
-		// add a superimposed text on the outcome
+		// show outcome:
+		dom_helper.show(outcomeElementID, settings.durations.outcomeAnim); // **
+		dom_helper.add_css_class(outcomeElementID, 'goUpOutcomeImage'); // **
+
+		// add a superimposed text on the outcome:
 		dom_helper.set_text('superimposed_outcome_sum_txt', runData.reward);
 		dom_helper.show('superimposed_outcome_sum', settings.durations.outcomeAnim); // **
 		dom_helper.add_css_class('superimposed_outcome_sum', 'goUpOutcomeImage'); // **
 
-		// add text about the outcome below the outcome image
+		// add text about the outcome below the outcome image:
+		dom_helper.set_text('outcome_text_1_', outcomeText);
 		dom_helper.show("outcome_text_1_", settings.durations.outcomeAnim);
 		dom_helper.add_css_class('outcome_text_1_', 'appearSlowlyOutcomeText'); // **
 	}
@@ -166,9 +170,8 @@
 	});
 
 	// show winning/loosing message for 2 seconds
-	await delay(settings.durations.outcomeAnim);
+	await delay(settings.durations.intervalBetweenOutcomeAndNextThing);
 	var manipulationOption = logic.isManipulation(runData, settings);
-	dom_helper.hide("welcome_msg");
 
 	// activate manipulation notification test:
 	if (manipulationOption) {
@@ -176,7 +179,7 @@
 		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
 	}
-	runData.consumptionTest=true
+
 	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
