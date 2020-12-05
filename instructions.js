@@ -202,7 +202,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 			dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
 			mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
 			wait(500).then(() => removeSmartphoneApperance());
-			syncWait(750)
+			await delay(750)
 			data_helper.on_broadcast = undefined;
 			jsPsych.resumeExperiment();
 		}

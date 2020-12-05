@@ -142,11 +142,14 @@ function checkIfResetContainer(subData, dayOfExperiment) {
 //           LOGIC / Run Data (calculate run parameters):
 // ----------------------------------------------------------------
 var logic = {
+  isCalledFromInstructions: function () {
+    return document.referrer.includes(settings.instructionsFileName);
+  },
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
 
     // check if running localy or on the server and determine if called from within the instructions (for the the embedded demo):
-    var isCalledFromInstructions = document.referrer.includes(settings.instructionsFileName);
+    var isCalledFromInstructions = this.isCalledFromInstructions();
 
     // CHECK IF INSTRUCTIONS
     // -------------------------------------------------------

@@ -5,7 +5,7 @@
 // get custom settings for component and batch
 var settings = Object.assign({}, app_settings);
 // check if triggered from within instructions:
-var isCalledFromInstructions = document.referrer.includes(settings.instructionsFileName);
+var isCalledFromInstructions = logic.isCalledFromInstructions();
 
 // ****************************************************************************************
 //  Listen to touch events and record the data and to page leaving events to save the data:

@@ -65,38 +65,28 @@ var data_helper = {
 	},	
 	get_subject_data: function (asArray) { // returns promise
 		return new Promise((function (resolve, reject) { 
-			var xhr = new XMLHttpRequest();
-
-			xhr.onload = (function(e) {
-			  	var subjectData = xhr.response;
-				if (!!asArray) { 
-					var data = {};
-					if (!!subjectData) {
-						// create one dictionnay for each line of data:
-						arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
-						// populate data variables:
-						app_settings.dataVarList.forEach(key => data[key] = []);
-						// fill dictionnary of arrays:
-						arrayOfObj.forEach(function (lineObject) {
-							for (const key of Object.keys(data)) {
-								data[key].push(lineObject[key]);
-							}
-						});
-					};
-					resolve(data);
-				} else {
-					resolve((!!subjectData) ? subjectData : {});
-				}
-			}).bind(this);
-
-			xhr.onerror = function (e) { reject(e); };
-			xhr.ontimeout = function (e) { reject(e); };
-			xhr.onabort = function (e) { reject(e); };
-
-			xhr.open("GET", '/app/api/session/list?subId=' + this.get_subject_id());
-			xhr.responseType = "json";
-			xhr.send();
-		}).bind(this));		
+			return ajax_helper.get('/app/api/session/list?subId=' + this.get_subject_id())
+				.then(function (subjectData) {
+					if (!!asArray) { 
+						var data = {};
+						if (!!subjectData) {
+							// create one dictionnay for each line of data:
+							arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
+							// populate data variables:
+							app_settings.dataVarList.forEach(key => data[key] = []);
+							// fill dictionnary of arrays:
+							arrayOfObj.forEach(function (lineObject) {
+								for (const key of Object.keys(data)) {
+									data[key].push(lineObject[key]);
+								}
+							});
+						};
+						resolve(data);
+					} else {
+						resolve((!!subjectData) ? subjectData : {});
+					}
+				});
+			}));
 	},
 	getWsUrl: function (sessionName) {
 		var url = 'ws'
@@ -191,6 +181,7 @@ var data_helper = {
 	}
 };
 
+
 // ***************************************************************
 //                 Helper functions (by Rani):
 // ---------------------------------------------------------------
@@ -220,15 +211,6 @@ function delay(delay) {
 	return wait(delay);
 }
 
-function syncWait(ms) {
-	var start = Date.now(),
-		now = start;
-	while (now - start < ms) {
-		now = Date.now();
-	}
-}
-
-
 Array.prototype.multiIndexOf = function (el) {
 	var idxs = [];
 	for (var i = this.length - 1; i >= 0; i--) {
@@ -247,6 +229,7 @@ function shuffle(a) {
 	return a;
 }
 
+
 // A function to sort with indices I got from: https://stackoverflow.com/questions/3730510/javascript-sort-array-and-return-an-array-of-indicies-that-indicates-the-positi
 function sortWithIndices(toSort) {
 	for (var i = 0; i < toSort.length; i++) {
@@ -263,18 +246,6 @@ function sortWithIndices(toSort) {
 	return toSort;
 }
 
-function getConfirmation(msg, type) {
-	if (type === "prompt") {
-		confirmationCode = makeid(3);
-		confirmation = '';
-		while (!confirmation || confirmation.toLowerCase() !== confirmationCode) {
-			confirmation = prompt(msg + confirmationCode);
-		}
-	} else if (type === "alert") {
-		alert(msg)
-	}
-}
-
 var ajax_helper = {
 	get: function (url) {
 		return this.request("GET", url);
@@ -282,7 +253,10 @@ var ajax_helper = {
 	request: function (method, url) {
 		return new Promise(function (resolve, reject) {
 			let xhr = new XMLHttpRequest();
+			
 			xhr.open(method, url);
+			xhr.responseType = "json";
+
 			xhr.onload = function () {
 				if (this.status >= 200 && this.status < 300) {
 					resolve(xhr.response);
@@ -293,12 +267,16 @@ var ajax_helper = {
 					});
 				}
 			};
+
 			xhr.onerror = function () {
 				reject({
 					status: this.status,
 					statusText: xhr.statusText
 				});
 			};
+			xhr.ontimeout = function (e) { reject(e); };
+			xhr.onabort = function (e) { reject(e); };
+
 			xhr.send();
 		});
 	}
@@ -319,7 +297,6 @@ function finishTrial(runData) {
 	}
 	
 	subject_data_worker.postMessage(dataToSend);
-	terminate_subject_data_worker = true;
 	console.log('Trial Completed')
 }
 
