@@ -11,7 +11,7 @@
 	var runData = logic.initialize(subData, settings);
 
 	// create new session with server only after logic is called! (important for demo to work)
-	data_helper.init('app');
+	data_helper.init_session('app');
 
 	subject_data_worker.postMessage(runData);
 

@@ -101,7 +101,12 @@ var data_helper = {
 
 		url += '/app/session?subId=' +  this.get_subject_id();
 		url += '&sName=' + sessionName;
-		url += 'transport=websocket';
+
+		if (!!this.sessionId) {
+			url += '&sessionId=' += this.sessionId;
+		}
+
+		url += '&transport=websocket';
 
 		return url;
 	},
@@ -112,7 +117,7 @@ var data_helper = {
 	get_timestamp: function () {
 		return (new Date()).getTime();
 	},
-	init: function (sessionName) {
+	init_session: function (sessionName) {
 		this.sessionName = sessionName;
 		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
 
@@ -126,7 +131,7 @@ var data_helper = {
 	    	if (event.code != 1000) {
 	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
 	    		console.log('WS clode. re opening');
-	    		this.init(this.sessionName);
+	    		this.init_session(this.sessionName);
 	    	}
 	    }).bind(this);
 
@@ -136,7 +141,7 @@ var data_helper = {
 
 	    	if (this.ws.readyState == 3) { // status CLOSED
 	    		this.ws = undefined;
-	    		this.init(this.sessionName);
+	    		this.init_session(this.sessionName);
 	    	}
 	    }).bind(this);
 

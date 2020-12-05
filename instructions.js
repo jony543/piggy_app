@@ -234,7 +234,7 @@ var settings = Object.assign({}, app_settings);
 //                           PIPELINE:
 // ---------------------------------------------------------------
 (async () => {
-	data_helper.init('instructions');
+	data_helper.init_session('instructions');
 	
 	// get subject data from batch session
 	var subData = await data_helper.get_subject_data(true);
