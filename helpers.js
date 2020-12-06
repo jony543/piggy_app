@@ -31,7 +31,7 @@ var dom_helper = {
 		var original = document.getElementById(id);
 		var clone = original.cloneNode(true); // "deep" clone
 
-		var clone_id = id + (new Date()).getTime();
+		var clone_id = id + data_helper.get_timestamp();
 		clone.id = clone_id;
 
 		original.parentNode.appendChild(clone);
@@ -52,51 +52,140 @@ var dom_helper = {
 	removeElement: function (id) {
 		var element = document.getElementById(id);
 		element.parentNode.removeChild(element);
+	},
+	goTo: function (relativeUrl) {
+		debugger;
+		location.href = relativeUrl + location.search;
 	}
 };
 
 var data_helper = {
-	get_subject_data: function (asArray) {
-		var subjectData = jatos.batchSession.get(jatos.workerId + "_data");
-
-		if (!!asArray) {
-			//arr = []; for (v in subjectData) { arr.push(v); }
-			//return arr;
-			// ** COMMENTED (ABOVE) AND BY RANI AND CHANGED TO THE FOLLOWING: **
-			//initialize data
-			var data = {};
-			if (!!subjectData) {
-				// create one dictionnay for each line of data:
-				arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
-				// populate data variables:
-				app_settings.dataVarList.forEach(key => data[key] = []);
-				// fill dictionnary of arrays:
-				arrayOfObj.forEach(function (lineObject) {
-					for (const key of Object.keys(data)) {
-						data[key].push(lineObject[key]);
+	get_subject_id: function () {
+		return /[&?]subId=([^&]+)/.exec(location.search)[1];
+	},	
+	get_subject_data: function (asArray) { // returns promise
+		return new Promise((function (resolve, reject) { 
+			return ajax_helper.get('/app/api/session/list?subId=' + this.get_subject_id())
+				.then(function (subjectData) {
+					if (!!asArray) { 
+						var data = {};
+						if (!!subjectData) {
+							// create one dictionnay for each line of data:
+							arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
+							// populate data variables:
+							app_settings.dataVarList.forEach(key => data[key] = []);
+							// fill dictionnary of arrays:
+							arrayOfObj.forEach(function (lineObject) {
+								for (const key of Object.keys(data)) {
+									data[key].push(lineObject[key]);
+								}
+							});
+						};
+						resolve(data);
+					} else {
+						resolve((!!subjectData) ? subjectData : {});
 					}
 				});
-			};
-			return data;
-
-		} else {
-			return (!!subjectData) ? subjectData : {};
-		}
+			}));
 	},
-	append_subject_data: function (data) { // returns promise
-		var subjectData = this.get_subject_data(false);
+	getWsUrl: function (sessionName) {
+		var url = 'ws'
+		
+		if (location.protocol.includes('https'))
+			url += 's';		
 
-		if (!!subjectData[jatos.studyResultId]) {
-			var runData = subjectData[jatos.studyResultId];
-			Object.assign(runData, data);
-			subjectData[jatos.studyResultId] = runData;
-		} else {
-			subjectData[jatos.studyResultId] = data;
+		url += '://' + location.hostname;
+
+		if (location.port)
+			url += ":" + location.port;
+
+		url += '/app/session?subId=' +  this.get_subject_id();
+		url += '&sName=' + sessionName;
+
+		if (!!this.sessionId) {
+			url += '&sessionId=' += this.sessionId;
 		}
 
-		return jatos.batchSession.set(jatos.workerId + "_data", subjectData);
+		url += '&transport=websocket';
+
+		return url;
+	},
+	ws: {},
+	sessionName: '',
+	sessionId: '',
+	q: [],
+	get_timestamp: function () {
+		return (new Date()).getTime();
+	},
+	init_session: function (sessionName) {
+		this.sessionName = sessionName;
+		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
+
+		this.ws.onopen = (function (event) {
+			console.log('new session opened');
+			this.try_flush();
+	    }).bind(this);
+
+	    this.ws.onclose = (function (event) {
+	    	// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
+	    	if (event.code != 1000) {
+	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
+	    		console.log('WS clode. re opening');
+	    		this.init_session(this.sessionName);
+	    	}
+	    }).bind(this);
+
+	    this.ws.onerror = (function (event) {
+	    	console.log('WS error!');
+	    	console.log(event);
+
+	    	if (this.ws.readyState == 3) { // status CLOSED
+	    		this.ws = undefined;
+	    		this.init_session(this.sessionName);
+	    	}
+	    }).bind(this);
+
+	    this.ws.onmessage = (function (event) {
+	        var data = JSON.parse(event.data);
+
+	        // if it is the first message in session get the current sessionId
+	        if ('_id' in data) {
+	            this.sessionId = data._id;
+	        }
+
+	        // if it is ack message remove the message from queue
+	        if ('messageId' in data) {
+	        	this.q = this.q.filter(m => m.messageId != data.messageId);
+	        } 
+
+	        if ('broadcast' in data) {
+	        	if (this.on_broadcast) 
+	        		this.on_broadcast(data);
+	        }        
+	    }).bind(this);
+	},
+	on_broadcast: undefined,	
+	append_subject_data: function (data) {
+		// denerate new message id
+		const messageId = 'm' + this.get_timestamp();
+		data['messageId'] = messageId;		
+		this.q.push(data);
+
+		// send all messages that sill in queue together
+		this.try_flush();		
+	},
+	try_flush: function () {
+		if (this.q.length) {
+			if (this.ws.readyState == 1) {
+				const dataToSend = JSON.stringify(
+					Object.assign({ _id: this.sessionId }, ...this.q)
+				);
+				this.ws.send(dataToSend);
+			}
+		}
 	}
 };
+
 
 // ***************************************************************
 //                 Helper functions (by Rani):
@@ -127,15 +216,6 @@ function delay(delay) {
 	return wait(delay);
 }
 
-function syncWait(ms) {
-	var start = Date.now(),
-		now = start;
-	while (now - start < ms) {
-		now = Date.now();
-	}
-}
-
-
 Array.prototype.multiIndexOf = function (el) {
 	var idxs = [];
 	for (var i = this.length - 1; i >= 0; i--) {
@@ -154,6 +234,7 @@ function shuffle(a) {
 	return a;
 }
 
+
 // A function to sort with indices I got from: https://stackoverflow.com/questions/3730510/javascript-sort-array-and-return-an-array-of-indicies-that-indicates-the-positi
 function sortWithIndices(toSort) {
 	for (var i = 0; i < toSort.length; i++) {
@@ -170,18 +251,6 @@ function sortWithIndices(toSort) {
 	return toSort;
 }
 
-function getConfirmation(msg, type) {
-	if (type === "prompt") {
-		confirmationCode = makeid(3);
-		confirmation = '';
-		while (!confirmation || confirmation.toLowerCase() !== confirmationCode) {
-			confirmation = prompt(msg + confirmationCode);
-		}
-	} else if (type === "alert") {
-		alert(msg)
-	}
-}
-
 var ajax_helper = {
 	get: function (url) {
 		return this.request("GET", url);
@@ -189,7 +258,10 @@ var ajax_helper = {
 	request: function (method, url) {
 		return new Promise(function (resolve, reject) {
 			let xhr = new XMLHttpRequest();
+			
 			xhr.open(method, url);
+			xhr.responseType = "json";
+
 			xhr.onload = function () {
 				if (this.status >= 200 && this.status < 300) {
 					resolve(xhr.response);
@@ -200,19 +272,23 @@ var ajax_helper = {
 					});
 				}
 			};
+
 			xhr.onerror = function () {
 				reject({
 					status: this.status,
 					statusText: xhr.statusText
 				});
 			};
+			xhr.ontimeout = function (e) { reject(e); };
+			xhr.onabort = function (e) { reject(e); };
+
 			xhr.send();
 		});
 	}
 };
 
 // Used by app.js and coin_collection.js:
-function finishTrial() {
+function finishTrial(runData) {
 	// show goodbye message:
 	dom_helper.add_css_class('welcome_msg', 'goodByeMessage'); // **
 	dom_helper.add_css_class('welcome_msg_txt', 'goodByeMessageTextSize'); // **
@@ -220,8 +296,12 @@ function finishTrial() {
 	dom_helper.show('welcome_msg'); // **
 
 	// collect end time and save subject data as results:
-	subject_data_worker.postMessage({ endTime: new Date() });
-	terminate_subject_data_worker = true;
+	var dataToSend = { endTime: new Date(), commitSession: true };
+	if (runData.isDemo) {
+		dataToSend.broadcast = 'demo trial ended';
+	}
+	
+	subject_data_worker.postMessage(dataToSend);
 	console.log('Trial Completed')
 }
 
