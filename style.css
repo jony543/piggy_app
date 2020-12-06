@@ -11,9 +11,18 @@ body {
 }
 
 .bgApp {
-  background-image: url('images/context_A.jpg');
   background-color: #666666ff;
   background-size: 100vw 100vh;
+}
+
+.full_bg_image {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -100;
 }
 
 /*#pseudoBackground {
@@ -437,6 +446,7 @@ h1 {
 
 /*                     FOR INSTRUCTIONS                  */
 /* ----------------------------------------------------- */
+
 .bg_instructions {
   background-color: #666666ff;
   background-size: 100vw 100vh;

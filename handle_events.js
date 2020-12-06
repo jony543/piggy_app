@@ -1,4 +1,6 @@
 // This script is aimed to record and handle touch and change in device orientation events
+var container = document.getElementById("main_container");
+var content = container.innerHTML;
 
 // First thing first:
 // ---------------------
@@ -146,8 +148,19 @@ function onUserExit() {
 
 function refreshScreen() {
     if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
-        location.reload();
+        //location.reload();
+        container.innerHTML= content; 
+
+        // an alternative that may be faster but needs more adaptations:
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.src = 'app.js';
+        head.appendChild(script);
+
     } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
-        location = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'install.html' + location.search; // change to main URL upon the next entry
+        location = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'install.html' + location.search; // call to main URL upon the next entry
     }
 }
+
+// MAYBE USE THIS SOMEWHERE (WHEN EXITING) TO STOP THE SCRIPT FROM RUNNING: 
+// throw new Error();

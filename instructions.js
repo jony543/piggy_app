@@ -293,7 +293,17 @@ jatos.loaded().then(function () {
 			{
 				stimulus: '',
 				on_load: function () {
-					document.body.style.backgroundImage = "url('images/instructions/instructions_" + String(instructions_page) + ".jpg')";
+					// present instructions image:
+					if (!document.getElementById('instructionsImage')) {
+						instructionsImageElement = document.createElement('img');
+						instructionsImageElement.setAttribute("id", 'instructionsImage');
+						instructionsImageElement.setAttribute("class", 'full_bg_image');
+						instructionsImageElement.setAttribute("src", 'images/instructions/instructions_' + String(instructions_page) + '.jpg');
+						document.body.appendChild(instructionsImageElement)
+					} else {
+						document.getElementById('instructionsImage').src = 'images/instructions/instructions_' + String(instructions_page) + '.jpg';
+					}
+					// handle buttons:
 					document.getElementById("instructionsButtons").disabled = true;
 					document.getElementById("instructionsButtons").style.opacity = "0.5";
 					setTimeout(function () {
@@ -309,9 +319,9 @@ jatos.loaded().then(function () {
 		timeline: [instructions],
 		loop_function: function (data) {
 			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
-			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if there went through the entire pages of the instructions (and they didn't want to go a page back)
-				document.body.style.backgroundImage = "none"
-				document.body.style.backgroundColor = "white"
+			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if they went over all the pages of the instructions (and they didn't want to go a page back)
+			dom_helper.removeElement('instructionsImage');
+			document.body.style.backgroundColor = "white";
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				return false;
 			} else {
