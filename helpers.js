@@ -116,8 +116,14 @@ var data_helper = {
 	get_timestamp: function () {
 		return (new Date()).getTime();
 	},
-	init_session: function (sessionName) {
+	init_session: function (sessionName, tryRestore) { // use tryRestore = false to force new session
 		this.sessionName = sessionName;
+
+		if (!tryRestore) {
+			this.sessionId = '';
+			this.q = [];
+		}
+
 		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
 
 		this.ws.onopen = (function (event) {
@@ -130,7 +136,7 @@ var data_helper = {
 	    	if (event.code != 1000) {
 	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
 	    		console.log('WS clode. re opening');
-	    		this.init_session(this.sessionName);
+	    		this.init_session(this.sessionName, true);
 	    	}
 	    }).bind(this);
 
@@ -140,7 +146,7 @@ var data_helper = {
 
 	    	if (this.ws.readyState == 3) { // status CLOSED
 	    		this.ws = undefined;
-	    		this.init_session(this.sessionName);
+	    		this.init_session(this.sessionName, true);
 	    	}
 	    }).bind(this);
 
@@ -164,9 +170,9 @@ var data_helper = {
 	        }        
 	    }).bind(this);
 	},
-	on_broadcast: undefined,	
+	on_broadcast: undefined,
 	append_subject_data: function (data) {
-		// denerate new message id
+		// generate new message id
 		const messageId = 'm' + this.get_timestamp();
 		data['messageId'] = messageId;		
 		this.q.push(data);

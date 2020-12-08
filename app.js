@@ -27,11 +27,11 @@
 	data_helper.init_session('app');
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
-		if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
-			uniqueEntryID = 1;
-		} else {
-			uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
-		}
+	if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
+		uniqueEntryID = 1;
+	} else {
+		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
+	}
 
 	subject_data_worker.postMessage({...runData, commitSession: true});
 
