@@ -1,6 +1,3 @@
-// Get time of entry
-var startTime = new Date();
-
 // ****************************************************************
 //                           FUNCTIONS:
 // ---------------------------------------------------------------
@@ -161,7 +158,6 @@ var logic = {
       if (!isCalledFromInstructions && (noDataYet || !instructionCompletion)) {
         var dataToSave = {
           subID: data_helper.get_subject_id(),
-          startInstructionsTime: startTime,
           showInstructions: true,
         };
         return dataToSave;
@@ -297,7 +293,6 @@ var logic = {
       consumptionTest: consumptionTest,
       hideOutcome: toHideOutcome,
       isFirstTime: isFirstTime,
-      startTime: startTime,
       showInstructions: false,
       isDemo: isDemo,
       demoTrialNum: demoTrialNum,
