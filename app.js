@@ -3,30 +3,37 @@
 	//           SET STUFF:
 	// ----------------------------------------------------------------
 
-	await jatos.loaded();
+	var settings = Object.assign({}, app_settings); 	
 
-	var terminate_subject_data_worker = false;
-	subject_data_worker.done = function (x) {
-		// when all messages are processed save the information as a JATOS result
-		if (terminate_subject_data_worker) {
-			var subData = data_helper.get_subject_data(false);
-			var currentRunData = subData[jatos.studyResultId];
-
-			jatos.appendResultData(currentRunData).then(function () {
-				console.log('finished');
+	// get subject data from batch session *** Temp Bandage by Rani
+	var timer = new Date();
+	do {
+		if (new Date() - timer < 5000) { // In case the data is taken before saving was completed from last session it will try for 5 seconds to get the data again and check that it's fine (measured by having a uniqueEntryID).
+			var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+				console.log('error getting subject data');
+				console.log(e);
+			});
+		} else {
+			Object.keys(subData).forEach(function(key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
+			subData[key] = subData[key].slice(0,subData[key].length-1);
 			});
 		}
-	};
-
-	// get custom settings for component and batch
-	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
-
-	// get subject data from batch session
-	var subData = data_helper.get_subject_data(true);
+	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length-1])
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
-	subject_data_worker.postMessage(runData);
+
+	// create new session with server only after logic is called! (important for demo to work)
+	data_helper.init_session('app');
+
+	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
+		if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
+			uniqueEntryID = 1;
+		} else {
+			uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
+		}
+
+	subject_data_worker.postMessage({...runData, commitSession: true});
 
 	// assign animation times according to settings:
 	document.getElementById('cost_indicator_1_').style.animationDuration = String(settings.durations.costAnim / 1000) + 's' // **	
@@ -41,14 +48,7 @@
 
 	// go to instructinos (if relevant)
 	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		if (!!jatos.isLocalhost) {
-			var intructions_url = "instructions.html?" +
-				"batchId=" + jatos.batchId +
-				"&userId=" + jatos.workerId;;
-			location = intructions_url;
-		} else {
-			jatos.goToComponent("instructions");
-		}
+		window.location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
 		return;
 	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
@@ -138,6 +138,10 @@
 	dom_helper.show("upper_half");
 	dom_helper.show("lower_half");
 
+	// For the flow of the demo:
+	if (runData.isDemo) {
+			subject_data_worker.postMessage({ broadcast: 'sequence entering stage presented' });
+	}	
 
 	// wait for 2 clicks to happen
 	await Promise.all([p1, p2]);
@@ -206,9 +210,9 @@
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
 		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
-		run_coin_collection(settings.coinCollectionTask)
+		run_coin_collection(settings.coinCollectionTask, runData)
 	} else {
-		finishTrial()
+		finishTrial(runData)
 	}
 
 })();

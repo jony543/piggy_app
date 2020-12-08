@@ -12,29 +12,36 @@ var check_consent = function (elem) {
 	return false;
 };
 
-function exitAppDemo(appDemoID) {
+async function exitAppDemo(appDemoID) {
 	console.log('Exit THE APP')
 	dom_helper.remove_css_class(appDemoID, 'appOpen');
 	dom_helper.add_css_class(appDemoID, 'appClose');
 	wait(1000).then(() => dom_helper.hide(appDemoID));
-	appClosed = true; // this to indicate that the app is closed
-	firstAppClosedDetection = true;
+
+	// check if demo cycle is finished:
+	if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1)) { // checking that this is the last trial in the demo cycle;
+		dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
+		mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
+		wait(500).then(() => removeSmartphoneApperance());
+		await delay(750)
+		data_helper.on_broadcast = undefined;
+		jsPsych.resumeExperiment();
+	} else {
+	// construct here the demo instructions:
+		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+		dom_helper.removeElement(oldMainDemoTextDuplicateID)
+		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+		dom_helper.show(mainDemoTextDuplicateID)
+	}
 }
 
-function loadAppDemo() {
+async function loadAppDemo() {
 	// check when to present again the button that closes the demo app:
-	var subData = data_helper.get_subject_data(true);
+	subData = await data_helper.get_subject_data(true);
 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
 
-	var demoUrl = "/experiments/publix/" + jatos.studyId + "/start?" +
-		"batchId=" + jatos.batchId +
-		"&personalMultipleWorkerId=" + jatos.workerId;
-	if (!!jatos.isLocalhost) {
-		var demoUrl = "index.html?" +
-			"batchId=" + jatos.batchId +
-			"&userId=" + jatos.workerId;;
-	}
-
+	var demoUrl = "index.html" + location.search;
 
 	if (!document.getElementById("embedded_app")) { //i.e. it's the first time
 		// embed the app for demo purposes:
@@ -45,7 +52,7 @@ function loadAppDemo() {
 		embeddedElement.className = "bigRectangle"
 		document.body.appendChild(embeddedElement)
 	} else {
-		var appDemoID = dom_helper.duplicate('embedded_app');
+		appDemoID = dom_helper.duplicate('embedded_app');
 	}
 
 	dom_helper.remove_css_class(appDemoID, 'appClose');
@@ -53,10 +60,7 @@ function loadAppDemo() {
 	dom_helper.show(appDemoID);
 	dom_helper.hide('demoExitButton')
 
-	appClosed = false; // this to indicate that the app is closed
 	firstAppOpennedDetection = true; // this is to indicate when the button to open the was first pressed (for some relevant checks to rely on)
-	revealExitButton = true;
-	return appDemoID
 }
 
 function createSmartphoneApperance() {
@@ -123,7 +127,7 @@ function createLoadAppButton(elementIdName) {
 	// button of openning the app:
 	loadTheAppElement = document.createElement('button');
 	loadTheAppElement.setAttribute("id", elementIdName);
-	loadTheAppElement.setAttribute("onclick", "appDemoID = loadAppDemo()");
+	loadTheAppElement.setAttribute("onclick", "loadAppDemo()");
 	loadTheAppElement.setAttribute("class", "loadButton");
 	//loadTheAppElement.appendChild(document.createTextNode("Enter the app"));
 	document.body.appendChild(loadTheAppElement);
@@ -142,90 +146,49 @@ function removeSmartphoneApperance(appDemoID) {
 	document.getElementById("demoLoadButton").remove();
 }
 
-function monitorChangesInDemoAndReact(settings) {
+async function monitorChangesInDemoAndReact(broadcastMessage) {
 	console.log('check...')
-	var subData = data_helper.get_subject_data(true);
-
-	// check when to present again the button that closes the demo app:
-	// if (firstAppOpennedDetection) { // first set the stuff to check when embedded app finshed running:
-	// 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
-	// 	firstAppOpennedDetection = false;
-	// }
-	current_n_data_points = !!Object.keys(subData).length ? subData.day.length : 0; // accounting for when there is no data yet
-	if (revealExitButton &&
-		current_n_data_points === target_n_data_points
-		&& !!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
-		revealExitButton = false;
+	subData = await data_helper.get_subject_data(true)
+	
+	// present again the button that closes the demo app:
+	if (!!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
 		wait(2000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
 		});
 	}
 
-	if (!!current_n_data_points) { // if there is data
-
-		// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
-		if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === 0) {  // first demo trial
-			if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
-				document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
-				!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
-			) {  // first detection after app was closed
-				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-				dom_helper.removeElement(oldMainDemoTextDuplicateID)
-				dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['b'])
-				dom_helper.show(mainDemoTextDuplicateID)
-				is_firstDemoScreen_SuportingInstructions_changed_1 = true;
-			}
-			if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
-				!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
-			) {  // first detection after app was closed
-				var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-				mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-				dom_helper.removeElement(oldMainDemoTextDuplicateID)
-				dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['c'])
-				dom_helper.show(mainDemoTextDuplicateID)
-				is_firstDemoScreen_SuportingInstructions_changed_2 = true;
-			}
-		}
-
-		// construct here the demo instructions:
-		if (!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-			appClosed && // app was closed
-			firstAppClosedDetection) {  // first detection after app was closed
+	// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
+		if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
+			document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
+			!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
+		) {  // first detection after app was closed
 			var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 			mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
 			dom_helper.removeElement(oldMainDemoTextDuplicateID)
-			dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+			dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['b'])
 			dom_helper.show(mainDemoTextDuplicateID)
-			console.log(settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
-			firstAppClosedDetection = false;
+			is_firstDemoScreen_SuportingInstructions_changed_1 = true;
 		}
-
-		// check if demo cycle is finished:
-		if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1) && // checking that this is the last trial in the demo cycle;
-			!!subData.endTime[subData.endTime.length - 1] && // Also making sure this trial has ended
-			appClosed) {  // app was closed
-			appClosed = false; // this is made just to prevent entering the loop withought going through demo again when desired by the participant				
-			dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
-			mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
-			wait(500).then(() => removeSmartphoneApperance());
-			syncWait(750)
-			jsPsych.resumeExperiment();
-		} else {
-			setTimeout(monitorChangesInDemoAndReact.bind(null, settings), 300)
+		if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
+			!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
+		) {  // first detection after app was closed
+			var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+			mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+			dom_helper.removeElement(oldMainDemoTextDuplicateID)
+			dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['c'])
+			dom_helper.show(mainDemoTextDuplicateID)
+			is_firstDemoScreen_SuportingInstructions_changed_2 = true;
 		}
-
-	}
 }
 
 // ****************************************************************
 //                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
-var appClosed = true; //indicator for when the embedded app is closed or open during the demo.
-var firstAppClosedDetection = null; // indicator for when change the instruction above the embedded demo app.
+var appDemoID = null;
+var subData = {};
+
 var firstAppOpennedDetection = null;
-var revealExitButton = null;
 var current_n_data_points = null; // used to navigate between embedded demo up states
 var target_n_data_points = null; // used to navigate between embedded demo up states
 var instructions_page = 1;
@@ -237,29 +200,37 @@ var timeline = [];
 // a global var to comunicate with the handle_events.js:
 tutorialCompleted = false;
 
+var settings = Object.assign({}, app_settings);
+
 // ****************************************************************
 //                           PIPELINE:
 // ---------------------------------------------------------------
-jatos.loaded().then(function () {
-	var terminate_subject_data_worker = false;
-	subject_data_worker.done = function (x) {
-		// when all messages are processed save the information as a JATOS result
-		if (terminate_subject_data_worker) {
-			var subData = data_helper.get_subject_data(false);
-			var currentRunData = subData[jatos.studyResultId];
-
-			jatos.appendResultData(currentRunData).then(function () {
-				console.log('finished');
+(async () => {
+	data_helper.init_session('instructions');
+	
+	// get subject data from batch session *** Temp Bandage by Rani
+	var timer = new Date();
+	do {
+		if (new Date() - timer < 5000) { // In case the data is taken before saving was completed from last session it will try for 5 seconds to get the data again and check that it's fine (measured by having a uniqueEntryID).
+			var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+				console.log('error getting subject data');
+				console.log(e);
+			});
+		} else {
+			Object.keys(subData).forEach(function(key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
+			subData[key] = subData[key].slice(0,subData[key].length-1);
 			});
 		}
-	};
+	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length-1])
 
-	// get custom settings for component and batch
-	var settings = Object.assign({}, app_settings, jatos.componentJsonInput, jatos.batchJsonInput);
-	// get subject data from batch session
-	var subData = data_helper.get_subject_data(true);
+	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
+	if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
+		uniqueEntryID = 1;
+	} else {
+		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
+	}
 
-	subject_data_worker.postMessage({ instructionsStartedFlag: true }); // this is used to restart the demo cycle.
+	subject_data_worker.postMessage({ instructionsStartedFlag: true, instructionsStartTime: new Date(), commitSession: true }); // this is used to restart the demo cycle.
 	// intialize test questions stuff:
 	//---------------------------------
 	var question_index = 0;
@@ -345,7 +316,7 @@ jatos.loaded().then(function () {
 			createExitAppButton(elementIdName = 'demoExitButton')
 			createLoadAppButton(elementIdName = 'demoLoadButton')
 			jsPsych.pauseExperiment()
-			monitorChangesInDemoAndReact(settings)
+			data_helper.on_broadcast = monitorChangesInDemoAndReact;
 		},
 	};
 	var continue_or_repeat_demo_cycle = {
@@ -365,7 +336,6 @@ jatos.loaded().then(function () {
 	var big_demo_loop = {
 		timeline: [demo, continue_or_repeat_demo_cycle],
 		loop_function: function (data) {
-			console.log('YYYYY')
 			const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
 			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
 				return false;
@@ -485,32 +455,30 @@ jatos.loaded().then(function () {
 	timeline.push(consentForm);
 	timeline.push(completeTutorialLoop);
 
-	jatos.onLoad(function () {
-		jsPsych.init({
-			timeline: timeline,
-			//display_element: 'jspsych-display-element',
-			on_finish: function () {
-				// saving the data
-				// ---------------------
-				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+	jsPsych.init({
+		timeline: timeline,
+		//display_element: 'jspsych-display-element',
+		on_finish: function () {
+			// saving the data
+			// ---------------------
+			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
-				subject_data_worker.postMessage({ completedInstructions: true });
-				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+			subject_data_worker.postMessage({ completedInstructions: true });
+			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
-				terminate_subject_data_worker = true;
-				tutorialCompleted = true;
-				console.log('Tutrial Completed')
-			},
-			on_close: function () { // in case the user gets out before it finishes.
-				// saving the data
-				// ---------------------
-				var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
+			terminate_subject_data_worker = true;
+			tutorialCompleted = true;
+			console.log('Tutrial Completed')
+		},
+		on_close: function () { // in case the user gets out before it finishes.
+			// saving the data
+			// ---------------------
+			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
-				subject_data_worker.postMessage(instructionDataObject) // save the instructions data
+			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
-				terminate_subject_data_worker = true;
-				console.log('Tutrial Closed')
-			}
-		});
+			terminate_subject_data_worker = true;
+			console.log('Tutrial Closed')
+		}
 	});
-});
+})();

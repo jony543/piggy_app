@@ -127,12 +127,8 @@
             document.getElementById('iframe-element').onload = ''
 
             // load index.html with the relevant info (for the iframe):
-            var userId = /[&?]userId=([^&]+)/.exec(location.search)[1];
-            var studyId = 9;
-            var batchId = /[&?]batchId=([^&]+)/.exec(location.search)[1];
-            var xxx = "index.html?" +
-                "batchId=" + batchId +
-                "&userId=" + userId;
+            var subId = /[&?]subId=([^&]+)/.exec(location.search)[1];                    
+            var xxx = "index.html?" + "subId=" + subId;
             document.getElementById('iframe-element').src = xxx;
 
             // show the app (which run through the iframe element):
