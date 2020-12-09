@@ -59,12 +59,14 @@ var dom_helper = {
 };
 
 var data_helper = {
+	base_address: 'https://experiments.schonberglab.org',
+	ws_base_address: 'wss://experiments.schonberglab.org',
 	get_subject_id: function () {
 		return /[&?]subId=([^&]+)/.exec(location.search)[1];
 	},	
 	get_subject_data: function (asArray) { // returns promise
 		return new Promise((function (resolve, reject) { 
-			return ajax_helper.get('/app/api/session/list?subId=' + data_helper.get_subject_id())
+			return ajax_helper.get(this.base_address + '/app/api/session/list?subId=' + this.get_subject_id())
 				.then(function (subjectData) {
 					if (!!asArray) { 
 						var data = {};
@@ -85,20 +87,25 @@ var data_helper = {
 						resolve((!!subjectData) ? subjectData : {});
 					}
 				});
-			}));
+			}).bind(this));
 	},
 	getWsUrl: function (sessionName) {
-		var url = 'ws'
-		
-		if (location.protocol.includes('https'))
-			url += 's';		
+		var url =''
+		if (this.ws_base_address) {
+			url = this.ws_base_address;
+		} else {
+			var url += 'ws'
+			
+			if (location.protocol.includes('https'))
+				url += 's';		
 
-		url += '://' + location.hostname;
+			url += '://' + location.hostname;
 
-		if (location.port)
-			url += ":" + location.port;
+			if (location.port)
+					url += ":" + location.port;
+		}
 
-		url += '/app/session?subId=' +  this.get_subject_id();
+		url += 'app/session?subId=' +  this.get_subject_id();
 		url += '&sName=' + sessionName;
 
 		if (!!this.sessionId) {
@@ -171,28 +178,52 @@ var data_helper = {
 	    }).bind(this);
 	},
 	on_broadcast: undefined,
-	append_subject_data: function (data) {
-		// generate new message id
-		const messageId = 'm' + this.get_timestamp();
-		data['messageId'] = messageId;		
+	append_subject_data: function (data) {		
 		this.q.push(data);
 
 		// send all messages that sill in queue together
-		this.try_flush();		
+		return this.try_flush();		
 	},
 	try_flush: function () {
 		if (this.q.length) {
-			if (this.ws.readyState == 1) {
+			if (this.ws.readyState == 1 && this.sessionId) {
+				// generate new message id for all messages in q
+				const messageId = 'm' + this.get_timestamp();
+				this.q.forEach(m => m.messageId = messageId)
+
 				const dataToSend = JSON.stringify(
 					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : {uniqueEntryID : uniqueEntryID}) // uniqueEntryID added by Rani **
-				);
+				);				
 				this.ws.send(dataToSend);
+
 				console.log('readySatate = 1; data was saved. Th data:')
 				console.log(dataToSend)
+
+				return true;
 			} else {
              	console.log("waiting for connection...")
+             	return false;
 			}
+		} else {
+			return true; // nothing to send - report success
 		}
+	},
+	flush: function (nRetries) { // use -1 for infinite retries
+		if (!nRetries) // if no value is set then use infinite retries
+			nRetries = -1;
+
+		var retries = 0;
+
+		return new Promise((async function(resolve, reject) {
+			while (!this.try_flush() && this.q.length > 0) {
+				retries += 1;
+				if (nRetries < 0 || retries < nRetries)
+					await delay(300);
+				else
+					return reject();
+			}
+			return resolve();
+		}).bind(this));
 	}
 };
 
@@ -328,6 +359,9 @@ function finishTrial(runData) {
 	}
 	
 	subject_data_worker.postMessage(dataToSend);
+
+	data_helper.flush().then(function() { console.log('All data received at server'); });
+
 	console.log('Trial Completed')
 }
 

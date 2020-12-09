@@ -151,6 +151,9 @@ function refreshScreen() {
         //location.reload();
         container.innerHTML= content; 
 
+        // try resending all messages
+        data_helper.flush().then(function() { console.log('All data received at server'); });
+
         // an alternative that may be faster but needs more adaptations:
         var head = document.getElementsByTagName('head')[0];
         var script = document.createElement('script');
