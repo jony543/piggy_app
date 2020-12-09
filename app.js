@@ -1,7 +1,8 @@
 (async () => {
 	// ****************************************************************
-	//           SET STUFF:
+	//           SET & INITIALIZE STUFF:
 	// ----------------------------------------------------------------
+	var startTime = new Date(); // Get time of entry:
 
 	var settings = Object.assign({}, app_settings); 	
 
@@ -24,7 +25,7 @@
 	var runData = logic.initialize(subData, settings);
 
 	// create new session with server only after logic is called! (important for demo to work)
-	data_helper.init_session('app');
+	data_helper.init_session('app', false);
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
 	if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
@@ -33,7 +34,14 @@
 		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
 	}
 
-	subject_data_worker.postMessage({...runData, commitSession: true});
+	// Save the data and refer to instructions if relevant:
+	if (runData.showInstructions) {
+		subject_data_worker.postMessage({...runData, startInstructionsTime: startTime, commitSession: true});
+		window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
+		return;
+	} else {
+		subject_data_worker.postMessage({...runData, startTime: startTime, commitSession: true});
+	}
 
 	// assign animation times according to settings:
 	document.getElementById('cost_indicator_1_').style.animationDuration = String(settings.durations.costAnim / 1000) + 's' // **	
@@ -46,11 +54,7 @@
 	//           RUN THE APP
 	// ----------------------------------------------------------------
 
-	// go to instructinos (if relevant)
-	if (runData.showInstructions) { // If there is no data yet (hold for both cases where demo is used or not)
-		window.location.href = "instructions.html" + location.search; ///dom_helper.goTo('instructions.html');
-		return;
-	} else if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
+	if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
 		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
 		subject_data_worker.postMessage({ realGameBeginsConfirmationTime: new Date() }) // **

@@ -206,7 +206,7 @@ var settings = Object.assign({}, app_settings);
 //                           PIPELINE:
 // ---------------------------------------------------------------
 (async () => {
-	data_helper.init_session('instructions');
+	data_helper.init_session('instructions', false);
 	
 	// get subject data from batch session *** Temp Bandage by Rani
 	var timer = new Date();
