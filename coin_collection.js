@@ -1,5 +1,4 @@
-async function run_coin_collection(settings, runData) {
-
+async function run_coin_collection(settings, runData, identifier) {
 	// ========================================================
 	// 						FUCNTIONS
 	// ========================================================
@@ -33,11 +32,13 @@ async function run_coin_collection(settings, runData) {
 			}
 		}
 		setTimeout(() => {
+			if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 			dom_helper.add_css_class('inside_cave_img', 'closing')
 			dom_helper.hide('time_left_counter')
 			dom_helper.hide('cave_goddbye_message')
 		}, 1000)
 		setTimeout(() => {
+			if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 			dom_helper.hide('inside_cave_img')
 			finishTrial(runData)
 		}, 2500);
@@ -57,6 +58,8 @@ async function run_coin_collection(settings, runData) {
 	// reveal the cave from inside:
 	dom_helper.show('inside_cave_img', 'openning')
 	await delay(settings.openningAnimTime);
+
+	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
 	// place time left counter text and then get font relevant secs counter sizes (in px):
 	secsLeft = settings.duration
@@ -118,6 +121,10 @@ async function run_coin_collection(settings, runData) {
 
 	// Time Left Counter:
 	var timeCounter = setInterval(() => {
+		if (identifiersToClean.includes(identifier)) { // Unlike all the other places I used this here I also stop the interval.
+			clearInterval(timeCounter) // stop the counter
+			return
+		} // Stop running the function in the app is reloaded (and thus a new instance started)
 		secsLeft--
 		dom_helper.set_text('time_left_counter', secsLeft)
 		if (secsLeft == 0) {

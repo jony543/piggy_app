@@ -2,6 +2,10 @@
 var container = document.getElementById("main_container");
 var content = container.innerHTML;
 
+// Define variables used to prevent two instances of the app running in simultaniously when reloading (communicates with app.js)
+identifiersToClean = [];
+recordIdentifier = '';
+
 // First thing first:
 // ---------------------
 // get custom settings for component and batch
@@ -148,11 +152,14 @@ function onUserExit() {
 
 function refreshScreen() {
     if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
+        // Add the current app instance to the cleaning list before openning a new instance:
+        identifiersToClean.push(recordIdentifier)
+
         //location.reload();
-        container.innerHTML= content; 
+        container.innerHTML = content;
 
         // try resending all messages
-        data_helper.flush().then(function() { console.log('All data received at server'); });
+        data_helper.flush().then(function () { console.log('All data received at server'); });
 
         // an alternative that may be faster but needs more adaptations:
         var head = document.getElementsByTagName('head')[0];

@@ -4,22 +4,27 @@
 	// ----------------------------------------------------------------
 	var startTime = new Date(); // Get time of entry:
 
-	var settings = Object.assign({}, app_settings); 	
+	// Define variables used to prevent two instances of the app running in simultaniously when reloading
+	let identifier = startTime.getTime(); // local within this instance
+	recordIdentifier = identifier; // global to communicate with the handle_events.js file
+	// In the manuscript the following line will stop it from running when needed: 	if (identifiersToClean.includes(identifier)) { return }; // originally I throwed an error instead (and catch) to stop it from running.
+
+	var settings = Object.assign({}, app_settings);
 
 	// get subject data from batch session *** Temp Bandage by Rani
 	var timer = new Date();
 	do {
 		if (new Date() - timer < 5000) { // In case the data is taken before saving was completed from last session it will try for 5 seconds to get the data again and check that it's fine (measured by having a uniqueEntryID).
-			var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+			var subData = await data_helper.get_subject_data(true).catch(function (e) {
 				console.log('error getting subject data');
 				console.log(e);
 			});
 		} else {
-			Object.keys(subData).forEach(function(key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
-			subData[key] = subData[key].slice(0,subData[key].length-1);
+			Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
+				subData[key] = subData[key].slice(0, subData[key].length - 1);
 			});
 		}
-	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length-1])
+	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length - 1])
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
@@ -28,19 +33,19 @@
 	data_helper.init_session('app', false);
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
-	if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
+	if (!subData.uniqueEntryID[subData.uniqueEntryID.length - 1]) {// should be assigned once every entry
 		uniqueEntryID = 1;
 	} else {
-		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
+		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length - 1] + 1;
 	}
 
 	// Save the data and refer to instructions if relevant:
 	if (runData.showInstructions) {
-		subject_data_worker.postMessage({...runData, startInstructionsTime: startTime, commitSession: true});
+		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, commitSession: true });
 		window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
 		return;
 	} else {
-		subject_data_worker.postMessage({...runData, startTime: startTime, commitSession: true});
+		subject_data_worker.postMessage({ ...runData, startTime: startTime, commitSession: true });
 	}
 
 	// assign animation times according to settings:
@@ -135,17 +140,17 @@
 		}
 	});
 
-
 	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
+	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 	dom_helper.hide("spaceship");
 	dom_helper.show("upper_half");
 	dom_helper.show("lower_half");
 
 	// For the flow of the demo:
 	if (runData.isDemo) {
-			subject_data_worker.postMessage({ broadcast: 'sequence entering stage presented' });
-	}	
+		subject_data_worker.postMessage({ broadcast: 'sequence entering stage presented' });
+	}
 
 	// wait for 2 clicks to happen
 	await Promise.all([p1, p2]);
@@ -157,6 +162,8 @@
 	dom_helper.hide("upper_half");
 	dom_helper.hide("lower_half");
 
+	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+
 	dom_helper.append_html('main_container',
 		'<img id="lottery" class="waiting_for_outcome_gif" src="images/lottery.gif"/>');
 	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
@@ -164,6 +171,8 @@
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 	setTimeout(() => dom_helper.removeElement("lottery"), settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
+
+	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
 	if (!runData.hideOutcome) { // presenting the outcome:
 		if (runData.isWin) {
@@ -175,17 +184,17 @@
 		}
 
 		// show outcome:
-		dom_helper.show(outcomeElementID, settings.durations.outcomeAnim); // **
+		dom_helper.show(outcomeElementID); // **
 		dom_helper.add_css_class(outcomeElementID, 'goUpOutcomeImage'); // **
 
 		// add a superimposed text on the outcome:
 		dom_helper.set_text('superimposed_outcome_sum_txt', runData.reward);
-		dom_helper.show('superimposed_outcome_sum', settings.durations.outcomeAnim); // **
+		dom_helper.show('superimposed_outcome_sum'); // **
 		dom_helper.add_css_class('superimposed_outcome_sum', 'goUpOutcomeImage'); // **
 
 		// add text about the outcome below the outcome image:
 		dom_helper.set_text('outcome_text_1_', outcomeText);
-		dom_helper.show("outcome_text_1_", settings.durations.outcomeAnim);
+		dom_helper.show("outcome_text_1_");
 		dom_helper.add_css_class('outcome_text_1_', 'appearSlowlyOutcomeText'); // **
 	}
 
@@ -194,15 +203,20 @@
 
 	// register outcome viewing after 250ms: **
 	wait(settings.durations.minTimeToIndicateOutcomeViewing).then(() => {
+		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 		subject_data_worker.postMessage({ viewedOutcome: true });
 	});
 
 	// show winning/loosing message for 2 seconds
 	await delay(settings.durations.intervalBetweenOutcomeAndNextThing);
-	var manipulationOption = logic.isManipulation(runData, settings);
 
-	// activate manipulation notification test:
-	if (manipulationOption) {
+	//
+	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+	//
+
+	// handle manipulations:
+	var manipulationOption = logic.isManipulation(runData, settings); // Check if and which manipulation
+	if (manipulationOption) { // activate manipulation notification:
 		subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
@@ -211,12 +225,12 @@
 	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
+		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
 		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
-		run_coin_collection(settings.coinCollectionTask, runData)
+		run_coin_collection(settings.coinCollectionTask, runData, identifier);
 	} else {
 		finishTrial(runData)
 	}
-
 })();
