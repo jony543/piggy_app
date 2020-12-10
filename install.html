@@ -86,7 +86,7 @@
 <body id="body-element" class="bgInstallPage">
 
     <!-- App installation guide -->
-    <img id="installation_guide" src="" />
+    <img id="installation_guide"/>
     <div id="deviceDoesNotFit" style="width: 90%;" class="centered error_message hidden">
         <h2>יש להכנס לקישור זה מסמארטפון<br>(אייפון או אנדרואיד).</h2>
     </div>
@@ -105,7 +105,7 @@
     </div>
 
     <!-- iframe to run the app in -->
-    <iframe id="iframe-element" src="/[PLACE_HOLDER]" onload="onMyFrameLoad(this)" class="hidden"
+    <iframe id="iframe-element" class="hidden"
         style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
         Your browser doesn't support iframes
     </iframe>
@@ -120,35 +120,35 @@
         window.matchMedia("(display-mode: standalone)").matches ||
         window.matchMedia("(display-mode: minimal-ui)").matches;
 
-    function onMyFrameLoad() {
-        // if app PWA:
-        if (isInWebAppiOS || isInWebAppChrome) {
-            // first, prevent multiple reloads:
-            document.getElementById('iframe-element').onload = ''
+    // if app PWA:
+    if (isInWebAppiOS || isInWebAppChrome) {
+        // load index.html with the relevant info (for the iframe):
+        var subId = /[&?]subId=([^&]+)/.exec(location.search)[1];
+        var xxx = "index.html?" + "subId=" + subId;
+        document.getElementById('iframe-element').src = xxx;
+        document.getElementById('iframe-element').onload = onMyFrameLoad()
 
-            // load index.html with the relevant info (for the iframe):
-            var subId = /[&?]subId=([^&]+)/.exec(location.search)[1];                    
-            var xxx = "index.html?" + "subId=" + subId;
-            document.getElementById('iframe-element').src = xxx;
+    // if app isn't PWA show specific installation instructions:
+    } else {
+        document.getElementById('app_will_load_soon').classList.add('hidden');
+        document.getElementById('loading_animation').classList.add('hidden');
 
-            // show the app (which run through the iframe element):
-            document.getElementById('iframe-element').classList.remove('hidden');
-            document.getElementById('app_will_load_soon').classList.add('hidden');
-            document.getElementById('loading_animation').classList.add('hidden');
-
-            // if app isn't PWA show specific installation instructions:
+        // Show installation instructions according to the device type:
+        var mobileOS = getMobileOperatingSystem();
+        if (mobileOS === 'iOS' || mobileOS === 'Android') {
+            document.getElementById('installation_guide').setAttribute('src', 'images/instructions/installation_guide_' + mobileOS + '.jpg')
         } else {
-            document.getElementById('app_will_load_soon').classList.add('hidden');
-            document.getElementById('loading_animation').classList.add('hidden');
-
-            // Show installation instructions according to the device type:
-            var mobileOS = getMobileOperatingSystem();
-            if (mobileOS === 'iOS' || mobileOS === 'Android') {
-                document.getElementById('installation_guide').setAttribute('src', 'images/instructions/installation_guide_' + mobileOS + '.jpg')
-            } else {
-                document.getElementById('deviceDoesNotFit').classList.remove('hidden');
-            }
+            document.getElementById('deviceDoesNotFit').classList.remove('hidden');
         }
+    }
+
+    function onMyFrameLoad() {
+        // first, prevent multiple reloads:
+        document.getElementById('iframe-element').onload = ''
+        // show the app (which run through the iframe element):
+        document.getElementById('iframe-element').classList.remove('hidden');
+        document.getElementById('app_will_load_soon').classList.add('hidden');
+        document.getElementById('loading_animation').classList.add('hidden');
     };
 
     // get mobile func OS function:
