@@ -82,7 +82,10 @@
 		var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 		dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
 		dom_helper.show(indicator_id);
-		setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
+		setTimeout(() => {
+			if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+			dom_helper.hide(indicator_id)
+		}, settings.durations.costAnim)
 	}
 
 	//show spacechip landing animation:
@@ -104,7 +107,10 @@
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click1));
 					dom_helper.show(indicator_id);
-					setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
+					setTimeout(() => {
+						if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+						dom_helper.hide(indicator_id)
+					}, settings.durations.costAnim)
 				}
 
 				document.getElementById('ice_lower').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
@@ -129,7 +135,10 @@
 					var indicator_id = dom_helper.duplicate('cost_indicator_1_');
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click2));
 					dom_helper.show(indicator_id);
-					setTimeout(() => dom_helper.hide(indicator_id), settings.durations.costAnim)
+					setTimeout(() => {
+						if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+						dom_helper.hide(indicator_id)
+					}, settings.durations.costAnim)
 				}
 
 				document.getElementById('ice_upper').style.animationDuration = String(settings.durations.surface_disappearance / 1000) + 's' // **
@@ -170,7 +179,10 @@
 
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
-	setTimeout(() => dom_helper.removeElement("lottery"), settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
+	setTimeout(() => {
+		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+		dom_helper.removeElement("lottery")
+	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 

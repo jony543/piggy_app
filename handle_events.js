@@ -1,6 +1,9 @@
 // This script is aimed to record and handle touch and change in device orientation events
 var container = document.getElementById("main_container");
-var content = container.innerHTML;
+
+if (!!container) {
+    var content = container.innerHTML;
+}
 
 // Define variables used to prevent two instances of the app running in simultaniously when reloading (communicates with app.js)
 identifiersToClean = [];
@@ -146,7 +149,7 @@ function onUserExit() {
         screenInitialOrientation: screenInitialOrientation,
         screenOrientationEvents: screenOrientationEvents,
     }
-    subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData }) // **
+    subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData, userExitOrUnloadTime: new Date() }) // **
     console.log('meta data was saved');
 }
 
