@@ -5,6 +5,9 @@
     <title>Get App</title>
     <meta charset="UTF-8">
     <meta name='viewport' content='user-scalable=0'>
+
+    <script src="mapping_key_to_subId.js"></script>
+
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <!-- 
@@ -124,7 +127,7 @@
     if (isInWebAppiOS || isInWebAppChrome) {
         // load index.html with the relevant info (for the iframe):
         var subId = /[&?]subId=([^&]+)/.exec(location.search)[1];
-        var xxx = "index.html?" + "subId=" + subId;
+        var xxx = "index.html?" + "subId=" + String(key2subId_mapping[subId]);
         document.getElementById('iframe-element').src = xxx;
         document.getElementById('iframe-element').onload = onMyFrameLoad()
 
