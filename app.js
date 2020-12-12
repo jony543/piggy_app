@@ -186,6 +186,13 @@
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
+	if (runData.endExperiment) { // a message that the real game begins (after instruction [and demo if relevant])
+		subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
+		await dialog_helper.show(settings.text.endExperiment, img_id = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		subject_data_worker.postMessage({ endExperimentConfirmationTime: new Date() }) // **
+		return;
+	}
+
 	if (!runData.hideOutcome) { // presenting the outcome:
 		if (runData.isWin) {
 			var outcomeText = "מצאת " + runData.reward + " יחידות זהב"

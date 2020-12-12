@@ -5,29 +5,57 @@ function setCounterBalancedStuff(subID, settings) {
   // initiate relevant stimuli:
   let firstDevalDay = [];
   let lastDevalDay = [];
-  // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
-  switch (subID % 4) {
-    case 0:
-      firstDevalDay = settings.optionalDaysForFirstDeval[0];
-      lastDevalDay = settings.optionalDaysForLastDeval[0];
-      break;
-    case 1:
-      firstDevalDay = settings.optionalDaysForFirstDeval[1];
-      lastDevalDay = settings.optionalDaysForLastDeval[0];
-      break;
-    case 2:
-      firstDevalDay = settings.optionalDaysForFirstDeval[0];
-      lastDevalDay = settings.optionalDaysForLastDeval[1];
-      break;
-    case 3:
-      firstDevalDay = settings.optionalDaysForFirstDeval[1];
-      lastDevalDay = settings.optionalDaysForLastDeval[1];
-      break;
-  }
-  firstComparableValDay = settings.optionalDaysForFirstDeval.find(element => element !== firstDevalDay)
-  lastComparableValDay = settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay)
+  let group;
+  let dayToFinishExperiment;
 
-  return [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay];
+  // Determine group:
+  if (subID % 200 >= 100) {
+    group = 'short_training'; // subject numbers 100-199, 300-399, 500-599 etc
+    
+    // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
+    switch (subID % 4) {
+      case 0:
+        firstDevalDay = settings.optionalDaysForFirstDeval[0];
+        lastDevalDay = settings.optionalDaysForLastDeval[0];
+        break;
+      case 1:
+        firstDevalDay = settings.optionalDaysForFirstDeval[1];
+        lastDevalDay = settings.optionalDaysForLastDeval[0];
+        break;
+      case 2:
+        firstDevalDay = settings.optionalDaysForFirstDeval[0];
+        lastDevalDay = settings.optionalDaysForLastDeval[1];
+        break;
+      case 3:
+        firstDevalDay = settings.optionalDaysForFirstDeval[1];
+        lastDevalDay = settings.optionalDaysForLastDeval[1];
+        break;
+    }
+    firstComparableValDay = settings.optionalDaysForFirstDeval.find(element => element !== firstDevalDay);
+    lastComparableValDay = settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+
+    dayToFinishExperiment = settings.dayToFinishExperiment_ShortTraining
+  } else {
+    group = 'long_training'; // subject numbers 200-299, 400-499, 600-699 etc
+
+    // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
+    switch (subID % 2) {
+      case 0:
+        firstDevalDay = null;
+        lastDevalDay = settings.optionalDaysForLastDeval[0];
+        break;
+      case 1:
+        firstDevalDay = null;
+        lastDevalDay = settings.optionalDaysForLastDeval[1];
+        break;
+    }
+    firstComparableValDay = null;
+    lastComparableValDay = settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+
+    dayToFinishExperiment = settings.dayToFinishExperiment_LongTraining
+  }
+
+  return [group, firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay, dayToFinishExperiment];
 }
 
 function getTimeFromLastEntryInSec(timePoint) {
@@ -208,7 +236,7 @@ var logic = {
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
-      [firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay] = setCounterBalancedStuff(data_helper.get_subject_id(), app_settings);
+      [group, firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay, dayToFinishExperiment] = setCounterBalancedStuff(data_helper.get_subject_id(), app_settings);
       var isUnderManipulation = false;
       var whichManipulation = null;
       var activateManipulation = false;
@@ -271,6 +299,10 @@ var logic = {
         // ---------------------------
         var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, dayOfExperiment) : false; // check if reset container
 
+        // End experiment
+        // ---------------------------
+        endExperiment = dayOfExperiment >= dayToFinishExperiment;
+
       } else { // if it is the first entry
         isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
         dayOfExperiment = 1;
@@ -282,6 +314,7 @@ var logic = {
 
     var dataToSave = {
       subID: data_helper.get_subject_id(),
+      group: group,
       day: dayOfExperiment,
       isWin: isWin,
       reward: reward,
@@ -293,6 +326,7 @@ var logic = {
       consumptionTest: consumptionTest,
       hideOutcome: toHideOutcome,
       isFirstTime: isFirstTime,
+      endExperiment: endExperiment,
       showInstructions: false,
       isDemo: isDemo,
       demoTrialNum: demoTrialNum,

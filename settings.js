@@ -8,10 +8,12 @@ window.app_settings = {
 	forceDeval: null, // for debugging purposes
 	// optional stuff for counterbalance:
 	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
-	optionalDaysForLastDeval: [8, 9], // The day not chosen for devaluation will be used as a comparable valued day
+	dayToFinishExperiment_ShortTraining: 5,
+	optionalDaysForLastDeval: [10, 11], // The day not chosen for devaluation will be used as a comparable valued day
+	dayToFinishExperiment_LongTraining: 12,
 	// days to base upon first devluation time:
 	daysToBaseUponFirstDeval: [2],
-	daysToBaseUponLastDeval: [7], //[6, 7],
+	daysToBaseUponLastDeval: [9], //[6, 7],
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	manipulationImageID: function (manipulationType) {
 		if (manipulationType == 'devaluation') {
@@ -93,6 +95,7 @@ window.app_settings = {
 		confirmationCodeTextMessage: '\nכדי לאשר שקראת יש לכתוב את האותיות: ',
 		completeDemo: 'ההדגמה הסתיימה. אם ברצונך לסיים חלק זה ולהתחיל במשחק האמיתי יש לכתוב yes.\n כל דבר אחר. כדי לבצע סיבוב הדגמה נוסף יש ללחוץ על',
 		realGameBegins: 'המשחק האמיתי מתחיל עכשיו.<br>הזהב שתצבור/תצברי מעכשיו שווה כסף אמיתי.<br><br>בהצלחה!',
+		endExperiment: 'המשחק נגמר. תודה רבה שהשתתפת!',
 		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 1 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.'
 	},
 	coinCollectionTask: {
