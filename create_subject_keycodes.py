@@ -15,7 +15,7 @@ def get_random_string(length):
     return result_str
 
 
-def createSubNumDict(ranges=[(101, 200), (201, 300), (901, 1000)], key_code_length=20):
+def createSubNumDict(ranges=[(101, 200), (201, 300), (701, 800), (801, 900)], key_code_length=20):
     sub_key_dict = {}
     for i in ranges:
         for j in range(i[0], i[1]):
@@ -46,4 +46,4 @@ if not os.path.exists('./mapping_key_to_subId.js'):
     copyfile('mapping_key_to_subId.csv', 'backup/mapping_key_to_subId.' + str(time.time()) + '.csv')
 
 else:
-    print('STOPPING! *** The file already exists ***')
+    print('STOPPING! *** The files already exists ***')
