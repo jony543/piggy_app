@@ -1,4 +1,4 @@
-var key_subId_mapping = {
+var key2subId_mapping = {
     "xth0qoJgIg6zzmSadQ8G": 101,
     "YHsKga1ORDiiOI6wEuc8": 102,
     "kOcPN5JG0sh9BD2fdy1D": 103,
