@@ -29,7 +29,7 @@ sub_key_dict = createSubNumDict()
 if not os.path.exists('./mapping_key_to_subId.js'):
     # create the js file:
     with open('mapping_key_to_subId.js', 'w') as f:
-        f.write('var key_subId_mapping = ')
+        f.write('var key2subId_mapping = ')
         json.dump(sub_key_dict, f, indent=4)
     print('The file mapping_key_to_subId.js was saved')
     # backup a copy with a timestamp:
