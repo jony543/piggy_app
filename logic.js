@@ -11,7 +11,7 @@ function setCounterBalancedStuff(subID, settings) {
   // Determine group:
   if (subID % 200 >= 100) {
     group = 'short_training'; // subject numbers 100-199, 300-399, 500-599 etc
-    
+
     // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
     switch (subID % 4) {
       case 0:
@@ -222,17 +222,18 @@ var logic = {
 
     if (isDemo) {
 
-      var dayOfExperiment = null
-      let demoVars = settings.demoCycle[demoTrialNum % Object.keys(settings.demoCycle).length]
+      var dayOfExperiment = null;
+      let demoVars = settings.demoCycle[demoTrialNum % Object.keys(settings.demoCycle).length];
       // assign the variables for the demo:
-      isWin = demoVars.isWin
-      whichManipulation = demoVars.whichManipulation
-      activateManipulation = demoVars.activateManipulation
-      isUnderManipulation = demoVars.isUnderManipulation
-      consumptionTest = demoVars.consumptionTest
-      var toHideOutcome = demoVars.toHideOutcome
-      var resetContainer = demoVars.resetContainer
-
+      isWin = demoVars.isWin;
+      whichManipulation = demoVars.whichManipulation;
+      activateManipulation = demoVars.activateManipulation;
+      isUnderManipulation = demoVars.isUnderManipulation;
+      consumptionTest = demoVars.consumptionTest;
+      var toHideOutcome = demoVars.toHideOutcome;
+      var resetContainer = demoVars.resetContainer;
+      var group = 'irrelevant';
+      var endExperiment = false;
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
@@ -343,8 +344,8 @@ var logic = {
     return null;
   },
   calculateReward: function (subData) {
-    var accumulatedValidReward = subData.reward.filter((x,i)=>!!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation')).reduce((a, b) => a + b, 0);
-    var totalCost = subData.cost.filter((x,i)=>subData.startTime[i]).map((x=>x[0])).concat(subData.cost.filter((x,i)=>subData.press1Time[i]).map((x=>x[1]))).concat(subData.cost.filter((x,i)=>subData.press2Time[i]).map((x=>x[2]))).filter((x)=>!!x).reduce((a, b) => a + b, 0);
+    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation')).reduce((a, b) => a + b, 0);
+    var totalCost = subData.cost.filter((x, i) => subData.startTime[i]).map((x => x[0])).concat(subData.cost.filter((x, i) => subData.press1Time[i]).map((x => x[1]))).concat(subData.cost.filter((x, i) => subData.press2Time[i]).map((x => x[2]))).filter((x) => !!x).reduce((a, b) => a + b, 0);
     return accumulatedValidReward - totalCost
   },
   getCost: function (runData, settings, cost_on) {

@@ -13,18 +13,24 @@
 
 	// get subject data from batch session *** Temp Bandage by Rani
 	var timer = new Date();
-	do {
-		if (new Date() - timer < 5000) { // In case the data is taken before saving was completed from last session it will try for 5 seconds to get the data again and check that it's fine (measured by having a uniqueEntryID).
-			var subData = await data_helper.get_subject_data(true).catch(function (e) {
-				console.log('error getting subject data');
-				console.log(e);
-			});
-		} else {
-			Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
-				subData[key] = subData[key].slice(0, subData[key].length - 1);
-			});
-		}
-	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length - 1])
+	try {
+		do {
+			if (new Date() - timer < 5000) { // In case the data is taken before saving was completed from last session it will try for 5 seconds to get the data again and check that it's fine (measured by having a uniqueEntryID).
+				var subData = await data_helper.get_subject_data(true).catch(function (e) {
+					console.log('error getting subject data');
+					console.log(e);
+				});
+			} else {
+				Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
+					subData[key] = subData[key].slice(0, subData[key].length - 1);
+				});
+			}
+		} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length - 1])
+	} catch (err) {
+		console.log(err)
+		await dialog_helper.show(settings.text.loadingDataError, img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
+		return;
+	}
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);

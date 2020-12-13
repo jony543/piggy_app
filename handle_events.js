@@ -171,7 +171,7 @@ function refreshScreen() {
         head.appendChild(script);
 
     } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
-        location = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'install.html' + location.search; // call to main URL upon the next entry
+        location = window.parent.location.href; // call to main URL upon the next entry
     }
 }
 

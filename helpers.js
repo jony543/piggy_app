@@ -105,7 +105,7 @@ var data_helper = {
 				url += ":" + location.port;
 		}
 
-		url += 'app/session?subId=' + this.get_subject_id();
+		url += '/app/session?subId=' + this.get_subject_id();
 		url += '&sName=' + sessionName;
 
 		if (!!this.sessionId) {
