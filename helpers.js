@@ -63,12 +63,12 @@ var data_helper = {
 	ws_base_address: 'wss://experiments.schonberglab.org',
 	get_subject_id: function () {
 		return /[&?]subId=([^&]+)/.exec(location.search)[1];
-	},	
+	},
 	get_subject_data: function (asArray) { // returns promise
-		return new Promise((function (resolve, reject) { 
+		return new Promise((function (resolve, reject) {
 			return ajax_helper.get(this.base_address + '/app/api/session/list?subId=' + this.get_subject_id())
 				.then(function (subjectData) {
-					if (!!asArray) { 
+					if (!!asArray) {
 						var data = {};
 						if (!!subjectData) {
 							// create one dictionnay for each line of data:
@@ -87,25 +87,25 @@ var data_helper = {
 						resolve((!!subjectData) ? subjectData : {});
 					}
 				});
-			}).bind(this));
+		}).bind(this));
 	},
 	getWsUrl: function (sessionName) {
-		var url =''
+		var url = ''
 		if (this.ws_base_address) {
 			url = this.ws_base_address;
 		} else {
-				url += 'ws'
-			
+			url += 'ws'
+
 			if (location.protocol.includes('https'))
-				url += 's';		
+				url += 's';
 
 			url += '://' + location.hostname;
 
 			if (location.port)
-					url += ":" + location.port;
+				url += ":" + location.port;
 		}
 
-		url += 'app/session?subId=' +  this.get_subject_id();
+		url += 'app/session?subId=' + this.get_subject_id();
 		url += '&sName=' + sessionName;
 
 		if (!!this.sessionId) {
@@ -136,53 +136,53 @@ var data_helper = {
 		this.ws.onopen = (function (event) {
 			console.log('new session opened');
 			this.try_flush();
-	    }).bind(this);
+		}).bind(this);
 
-	    this.ws.onclose = (function (event) {
-	    	// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
-	    	if (event.code != 1000) {
-	    		// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
-	    		console.log('WS clode. re opening');
-	    		this.init_session(this.sessionName, true);
-	    	}
-	    }).bind(this);
+		this.ws.onclose = (function (event) {
+			// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
+			if (event.code != 1000) {
+				// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
+				console.log('WS clode. re opening');
+				this.init_session(this.sessionName, true);
+			}
+		}).bind(this);
 
-	    this.ws.onerror = (function (event) {
-	    	console.log('WS error!');
-	    	console.log(event);
+		this.ws.onerror = (function (event) {
+			console.log('WS error!');
+			console.log(event);
 
-	    	if (this.ws.readyState == 3) { // status CLOSED
-	    		this.ws = undefined;
-	    		this.init_session(this.sessionName, true);
-	    	}
-	    }).bind(this);
+			if (this.ws.readyState == 3) { // status CLOSED
+				this.ws = undefined;
+				this.init_session(this.sessionName, true);
+			}
+		}).bind(this);
 
-	    this.ws.onmessage = (function (event) {
-	        var data = JSON.parse(event.data);
+		this.ws.onmessage = (function (event) {
+			var data = JSON.parse(event.data);
 
-	        // if it is the first message in session get the current sessionId
-	        if ('_id' in data) {
-	            this.sessionId = data._id;
+			// if it is the first message in session get the current sessionId
+			if ('_id' in data) {
+				this.sessionId = data._id;
 				this.try_flush();	// added by Rani to save first uploaded data **
-	        }
+			}
 
-	        // if it is ack message remove the message from queue
-	        if ('messageId' in data) {
-	        	this.q = this.q.filter(m => m.messageId != data.messageId);
-	        } 
+			// if it is ack message remove the message from queue
+			if ('messageId' in data) {
+				this.q = this.q.filter(m => m.messageId != data.messageId);
+			}
 
-	        if ('broadcast' in data) {
-	        	if (this.on_broadcast) 
-	        		this.on_broadcast(data);
-	        }        
-	    }).bind(this);
+			if ('broadcast' in data) {
+				if (this.on_broadcast)
+					this.on_broadcast(data);
+			}
+		}).bind(this);
 	},
 	on_broadcast: undefined,
-	append_subject_data: function (data) {		
+	append_subject_data: function (data) {
 		this.q.push(data);
 
 		// send all messages that sill in queue together
-		return this.try_flush();		
+		return this.try_flush();
 	},
 	try_flush: function () {
 		if (this.q.length) {
@@ -192,8 +192,8 @@ var data_helper = {
 				this.q.forEach(m => m.messageId = messageId)
 
 				const dataToSend = JSON.stringify(
-					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : {uniqueEntryID : uniqueEntryID}) // uniqueEntryID added by Rani **
-				);				
+					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
+				);
 				this.ws.send(dataToSend);
 
 				console.log('readySatate = 1; data was saved. Th data:')
@@ -201,8 +201,8 @@ var data_helper = {
 
 				return true;
 			} else {
-             	console.log("waiting for connection...")
-             	return false;
+				console.log("waiting for connection...")
+				return false;
 			}
 		} else {
 			return true; // nothing to send - report success
@@ -214,7 +214,7 @@ var data_helper = {
 
 		var retries = 0;
 
-		return new Promise((async function(resolve, reject) {
+		return new Promise((async function (resolve, reject) {
 			while (!this.try_flush() && this.q.length > 0) {
 				retries += 1;
 				if (nRetries < 0 || retries < nRetries)
@@ -228,20 +228,20 @@ var data_helper = {
 };
 
 // Make the function wait until the connection is made...
-function waitForSocketConnection(socket, callback){
-    setTimeout(
-        function () {
-            if (socket.readyState === 1) {
-                console.log("Connection is made")
-                if (callback != null){
-                    callback();
-                }
-            } else {
-                console.log("wait for connection...")
-                waitForSocketConnection(socket, callback);
-            }
+function waitForSocketConnection(socket, callback) {
+	setTimeout(
+		function () {
+			if (socket.readyState === 1) {
+				console.log("Connection is made")
+				if (callback != null) {
+					callback();
+				}
+			} else {
+				console.log("wait for connection...")
+				waitForSocketConnection(socket, callback);
+			}
 
-        }, 5); // wait 5 milisecond for the connection...
+		}, 5); // wait 5 milisecond for the connection...
 }
 
 
@@ -315,7 +315,7 @@ var ajax_helper = {
 	request: function (method, url) {
 		return new Promise(function (resolve, reject) {
 			let xhr = new XMLHttpRequest();
-			
+
 			xhr.open(method, url);
 			xhr.responseType = "json";
 
@@ -357,10 +357,10 @@ function finishTrial(runData) {
 	if (runData.isDemo) {
 		dataToSend.broadcast = 'demo trial ended';
 	}
-	
+
 	subject_data_worker.postMessage(dataToSend);
 
-	data_helper.flush().then(function() { console.log('All data received at server'); });
+	data_helper.flush().then(function () { console.log('All data received at server'); });
 
 	console.log('Trial Completed')
 }
@@ -378,8 +378,9 @@ var dialog_helper = {
 	random_code_confirmation: function (msg, img_id, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing) { // returns promise
 		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing, resolveOnlyAfterDelayBeforeClosing);
 	},
-	show: function (msg, img_id, confirmation, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing) { // returns promise
+	show: function (msg, img_id, confirmation, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing, preventFeedBack = false) { // returns promise
 		return new Promise(function (resolve) {
+			debugger
 			if (!!confirmation) {
 				dom_helper.set_text("dialog_confirmation_msg", 'כדי להמשיך יש להקליד ' + "'" + confirmation + "'" + '.');
 				dom_helper.show("dialog_confirmation_msg")
@@ -390,6 +391,9 @@ var dialog_helper = {
 						dom_helper.enable("dialog_ok_button");
 					}
 				}
+			} else if (preventFeedBack) {
+				dom_helper.hide("dialog_response_text");
+				dom_helper.hide("dialog_ok_button")
 			} else {
 				dom_helper.hide("dialog_response_text");
 				dom_helper.enable("dialog_ok_button")
@@ -404,6 +408,8 @@ var dialog_helper = {
 			dom_helper.show('dialog_box');
 
 			subject_data_worker.postMessage({ isDialogOn: true });
+
+			if (preventFeedBack) { resolve() }
 
 			document.getElementById('dialog_ok_button').onclick = function () {
 				document.getElementById('dialog_ok_button').onclick = undefined;

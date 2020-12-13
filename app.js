@@ -185,10 +185,10 @@
 	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
-
+	runData.endExperiment=true
 	if (runData.endExperiment) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
-		await dialog_helper.show(settings.text.endExperiment, img_id = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		await dialog_helper.show(settings.text.endExperiment(subData), img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
 		subject_data_worker.postMessage({ endExperimentConfirmationTime: new Date() }) // **
 		return;
 	}
