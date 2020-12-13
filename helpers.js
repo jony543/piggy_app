@@ -375,12 +375,11 @@ var dialog_helper = {
 		}
 		return result;
 	},
-	random_code_confirmation: function (msg, img_id, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing) { // returns promise
-		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing, resolveOnlyAfterDelayBeforeClosing);
+	random_code_confirmation: function (msg, img_id = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = false) { // returns promise
+		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing, resolveOnlyAfterDelayBeforeClosing, preventFeedBack);
 	},
-	show: function (msg, img_id, confirmation, delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing, preventFeedBack = false) { // returns promise
+	show: function (msg, img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = false) { // returns promise
 		return new Promise(function (resolve) {
-			debugger
 			if (!!confirmation) {
 				dom_helper.set_text("dialog_confirmation_msg", 'כדי להמשיך יש להקליד ' + "'" + confirmation + "'" + '.');
 				dom_helper.show("dialog_confirmation_msg")

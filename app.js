@@ -58,17 +58,15 @@
 	// ****************************************************************
 	//           RUN THE APP
 	// ----------------------------------------------------------------
-
 	if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
-		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image');
 		subject_data_worker.postMessage({ realGameBeginsConfirmationTime: new Date() }) // **
 	}
-
 	// reset the container at the beginning of the day:
-	if (runData.resetContainer) { // activating reseting container when relevant. **
+	else if (runData.resetContainer) { // activating reseting container when relevant. **
 		subject_data_worker.postMessage({ resetContainerAlertTime: new Date() }) // **
-		await dialog_helper.show(settings.text.rewardContainerClearingMessage, img_id = 'warehouse_empty', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false);
+		await dialog_helper.show(settings.text.rewardContainerClearingMessage, img_id = 'warehouse_empty');
 		subject_data_worker.postMessage({ resetContainerConfirmationTime: new Date() }) // **
 	}
 
@@ -185,11 +183,11 @@
 	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
-	runData.endExperiment=true
-	if (runData.endExperiment) { // a message that the real game begins (after instruction [and demo if relevant])
+
+	if (runData.endExperiment) { // a message that game has ended (after the lottery gif for now, so I can assess multiple entries after completion)
 		subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
 		await dialog_helper.show(settings.text.endExperiment(subData), img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
-		subject_data_worker.postMessage({ endExperimentConfirmationTime: new Date() }) // **
+		//subject_data_worker.postMessage({ endExperimentConfirmationTime: new Date() }) // **
 		return;
 	}
 
