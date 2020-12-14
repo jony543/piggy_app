@@ -4,6 +4,14 @@
 	// ----------------------------------------------------------------
 	var startTime = new Date(); // Get time of entry:
 
+	// check if implemented as PWA and handle accordingly:
+	// ********************************************************
+	var isPWA = checkAndHandlePWA()
+	if (!isPWA) {
+		return
+	}
+	// ********************************************************
+
 	// Define variables used to prevent two instances of the app running in simultaniously when reloading
 	let identifier = startTime.getTime(); // local within this instance
 	recordIdentifier = identifier; // global to communicate with the handle_events.js file

@@ -168,7 +168,8 @@ function checkIfResetContainer(subData, dayOfExperiment) {
 // ----------------------------------------------------------------
 var logic = {
   isCalledFromInstructions: function () {
-    return document.referrer.includes(settings.instructionsFileName);
+    //return document.referrer.includes(settings.instructionsFileName); // was relevant when in iframe from the install.js
+    return window.parent.location.href.includes(settings.instructionsFileName)
   },
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry

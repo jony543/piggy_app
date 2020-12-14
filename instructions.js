@@ -27,7 +27,7 @@ async function exitAppDemo(appDemoID) {
 		data_helper.on_broadcast = undefined;
 		jsPsych.resumeExperiment();
 	} else {
-	// construct here the demo instructions:
+		// construct here the demo instructions:
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
 		dom_helper.removeElement(oldMainDemoTextDuplicateID)
@@ -149,7 +149,7 @@ function removeSmartphoneApperance(appDemoID) {
 async function monitorChangesInDemoAndReact(broadcastMessage) {
 	console.log('check...')
 	subData = await data_helper.get_subject_data(true)
-	
+
 	// present again the button that closes the demo app:
 	if (!!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
 		wait(2000).then(() => {
@@ -159,27 +159,27 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 	}
 
 	// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
-		if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
-			document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
-			!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
-		) {  // first detection after app was closed
-			var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-			mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-			dom_helper.removeElement(oldMainDemoTextDuplicateID)
-			dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['b'])
-			dom_helper.show(mainDemoTextDuplicateID)
-			is_firstDemoScreen_SuportingInstructions_changed_1 = true;
-		}
-		if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
-			!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
-		) {  // first detection after app was closed
-			var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
-			mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
-			dom_helper.removeElement(oldMainDemoTextDuplicateID)
-			dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['c'])
-			dom_helper.show(mainDemoTextDuplicateID)
-			is_firstDemoScreen_SuportingInstructions_changed_2 = true;
-		}
+	if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
+		document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
+		!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
+	) {  // first detection after app was closed
+		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+		dom_helper.removeElement(oldMainDemoTextDuplicateID)
+		dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['b'])
+		dom_helper.show(mainDemoTextDuplicateID)
+		is_firstDemoScreen_SuportingInstructions_changed_1 = true;
+	}
+	if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
+		!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
+	) {  // first detection after app was closed
+		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
+		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
+		dom_helper.removeElement(oldMainDemoTextDuplicateID)
+		dom_helper.set_text('mainDemoText', app_settings.demoCycleSupportingText[0]['c'])
+		dom_helper.show(mainDemoTextDuplicateID)
+		is_firstDemoScreen_SuportingInstructions_changed_2 = true;
+	}
 }
 
 // ****************************************************************
@@ -207,27 +207,27 @@ var settings = Object.assign({}, app_settings);
 // ---------------------------------------------------------------
 (async () => {
 	data_helper.init_session('instructions', false);
-	
+
 	// get subject data from batch session *** Temp Bandage by Rani
 	var timer = new Date();
 	do {
 		if (new Date() - timer < 5000) { // In case the data is taken before saving was completed from last session it will try for 5 seconds to get the data again and check that it's fine (measured by having a uniqueEntryID).
-			var subData = await data_helper.get_subject_data(true).catch(function (e) { 
+			var subData = await data_helper.get_subject_data(true).catch(function (e) {
 				console.log('error getting subject data');
 				console.log(e);
 			});
 		} else {
-			Object.keys(subData).forEach(function(key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
-			subData[key] = subData[key].slice(0,subData[key].length-1);
+			Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
+				subData[key] = subData[key].slice(0, subData[key].length - 1);
 			});
 		}
-	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length-1])
+	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length - 1])
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
-	if (!subData.uniqueEntryID[subData.uniqueEntryID.length-1]) {// should be assigned once every entry
+	if (!subData.uniqueEntryID[subData.uniqueEntryID.length - 1]) {// should be assigned once every entry
 		uniqueEntryID = 1;
 	} else {
-		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length-1]+1;
+		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length - 1] + 1;
 	}
 
 	subject_data_worker.postMessage({ instructionsStartedFlag: true, instructionsStartTime: new Date(), commitSession: true }); // this is used to restart the demo cycle.
@@ -291,8 +291,8 @@ var settings = Object.assign({}, app_settings);
 		loop_function: function (data) {
 			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
 			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if they went over all the pages of the instructions (and they didn't want to go a page back)
-			dom_helper.removeElement('instructionsImage');
-			document.body.style.backgroundColor = "white";
+				dom_helper.removeElement('instructionsImage');
+				document.body.style.backgroundColor = "white";
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				return false;
 			} else {
@@ -463,7 +463,7 @@ var settings = Object.assign({}, app_settings);
 			// ---------------------
 			var instructionDataObject = { Instructions_Data: { ...jsPsych.data.get().values() } }// get the data for the instructions after reducing all the check demo (every 400ms "trials") which can create thousand of trials and make problems when uploading the data.
 
-			subject_data_worker.postMessage({ completedInstructions: true });
+			subject_data_worker.postMessage({ completedInstructions: true, commitSession: true });
 			subject_data_worker.postMessage(instructionDataObject) // save the instructions data
 
 			terminate_subject_data_worker = true;

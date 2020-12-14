@@ -149,7 +149,8 @@ function onUserExit() {
         screenInitialOrientation: screenInitialOrientation,
         screenOrientationEvents: screenOrientationEvents,
     }
-    subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData, userExitOrUnloadTime: new Date() }) // **
+    subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData, userExitOrUnloadTime: new Date() }) // ** 
+    data_helper.flush().then(function () { console.log('All data received at server [initiated by user exit]'); }); // **
     console.log('meta data was saved');
 }
 
@@ -162,7 +163,7 @@ function refreshScreen() {
         container.innerHTML = content;
 
         // try resending all messages
-        data_helper.flush().then(function () { console.log('All data received at server'); });
+        data_helper.flush().then(function () { console.log('All data received at server [initiated by pseudo refresh]' ); });
 
         // an alternative that may be faster but needs more adaptations:
         var head = document.getElementsByTagName('head')[0];
@@ -171,7 +172,7 @@ function refreshScreen() {
         head.appendChild(script);
 
     } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
-        location = window.parent.location.href; // call to main URL upon the next entry
+        window.location.href = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'index.html' + window.location.search; // call to main URL upon the next entry
     }
 }
 

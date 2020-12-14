@@ -4,8 +4,10 @@
 <head>
     <title>Space Gold</title>
     <meta charset="UTF-8">
+    <meta name='viewport' content='user-scalable=0'>
     <!--<script src="js/NoSleep.js"></script> #I deactivated it for now-->
 
+    <script src="mapping_key_to_subId.js"></script>
     <script src="helpers.js"></script>
     <script src="settings.js"></script>
     <script src="logic.js"></script>
@@ -13,15 +15,105 @@
 
     <link rel="stylesheet" type="text/css" href="style.css">
 
+    <!-- 
+            this is how to create the icon pack and manifest
+            https://medium.com/@sam20gh/how-to-add-add-to-home-screen-to-your-website-4b07aee02676 
+
+            and this is why it can't be automated on all browsers (IOS for example)
+            https://love2dev.com/pwa/add-to-homescreen-library/
+        -->
+    <!--
+            this is how to check if app is standalone:
+            https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
+         -->
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="manifest" href="icons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="icons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="App">
+
+    <!-- Set splash screen for iphones: -->
+    <!------------------------------------------------------------------>
+    <!-- iPhone 5 and SE (640px x 1136px) V -->
+    <link href="splashscreens/iphone5_and_se_splash.png"
+        media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+        rel="apple-touch-startup-image" />
+    <!-- iPhone 8, 7, 6s, 6 (750px x 1334px) V -->
+    <link href="splashscreens/iphone6_and_6s_and_7_and_8_splash.png"
+        media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+        rel="apple-touch-startup-image" />
+    <!-- ** iPhone 6s Plus, 6 Plus , 7 Plus, 8 Plus (1242x x 2208px) V -->
+    <link href="splashscreens/iphone_6plus_6Splus_7plus_8plus_splash.png"
+        media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
+        rel="apple-touch-startup-image" />
+    <!-- iPhone X, XS, 11 pro (1125px x 2436px) V -->
+    <link href="splashscreens/iphonex_and_xs_and_11_pro_splash.png"
+        media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+        rel="apple-touch-startup-image" />
+    <!-- iPhone XR and iphone 11 (828px x 1792px) V -->
+    <link href="splashscreens/iphonexr_and_11_splash.png"
+        media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+        rel="apple-touch-startup-image" />
+    <!-- iPhone XS max and iphone 11 pro max (1242px x 2688px) V -->
+    <link href="splashscreens/iphonexsmax_and_11_pro_max_splash.png"
+        media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+        rel="apple-touch-startup-image" />
+
+    <!-- iPhone 12 mini (1080px x 2340px V) -->
+    <link href="splashscreens/iphone_12_mini_splash.png"
+        media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3)"
+        rel="apple-touch-startup-image" />
+    <!-- iPhone 12, 12 pro (1170px x 2532px) V -->
+    <link href="splashscreens/iphone_12_and_12_pro_splash.png"
+        media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+        rel="apple-touch-startup-image" />
+    <!-- iPhone 12 pro max (1284px x 2778px) V -->
+    <link href="splashscreens/iphone_12_pro_max_splash.png"
+        media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)"
+        rel="apple-touch-startup-image" />
+    <!------------------------------------------------------------------>
 </head>
 
 <body id="background" class="bgApp">
+
+    <!-- Loading Screen -->
+    <div id="app_will_load_soon" class="centered appIsLoading">
+        <h1>...טוען</h1>
+    </div>
+    <div id="loading_animation">
+        <div class="lds-ellipsis">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- App installation guide -->
+    <img id="installation_guide" />
+    <div id="installationProblem" style="width: 90%; background-color: #666666ff; z-index:999;" class="centered error_message hidden">
+        <h2 id='installationProblemMessage'></h2>
+    </div>
+
     <!-- <img id="pseudoBackground" src="images/cave.jpg" /> -->
-    <div id="main_container" class="container">
+    <div id="main_container" class="container hidden">
         <img id="planet" class="full_bg_image" src="images/context_A.jpg" />
         <img id="spaceship" class="hidden" src="images/spaceship_flying.png" />
         <img id="ice_upper" class="ice" src="images/ice.jpg" />
