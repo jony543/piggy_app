@@ -1,4 +1,4 @@
-(async () => {
+async function runApp() {
 	// ****************************************************************
 	//           SET & INITIALIZE STUFF:
 	// ----------------------------------------------------------------
@@ -55,11 +55,11 @@
 
 	// Save the data and refer to instructions if relevant:
 	if (runData.showInstructions) {
-		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, commitSession: true });
+		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true });
 		window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
 		return;
 	} else {
-		subject_data_worker.postMessage({ ...runData, startTime: startTime, commitSession: true });
+		subject_data_worker.postMessage({ ...runData, startTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true });
 	}
 
 	// assign animation times according to settings:
@@ -72,6 +72,10 @@
 	// ****************************************************************
 	//           RUN THE APP
 	// ----------------------------------------------------------------
+	dom_helper.hide('app_will_load_soon');
+	dom_helper.hide('loading_animation');
+	dom_helper.show('main_container')
+
 	if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
 		await dialog_helper.show(settings.text.realGameBegins, img_id = 'game_begins_image');
@@ -264,4 +268,4 @@
 	} else {
 		finishTrial(runData)
 	}
-})();
+};

@@ -335,12 +335,9 @@ function checkAndHandlePWA() {
 		window.matchMedia("(display-mode: standalone)").matches ||
 		window.matchMedia("(display-mode: minimal-ui)").matches;
 
-	dom_helper.hide('app_will_load_soon');
-	dom_helper.hide('loading_animation');
 	// if app PWA:
 	if (isInWebAppiOS || isInWebAppChrome) {
 		dom_helper.hide('installation_guide')
-		dom_helper.show('main_container')
 		return true
 	} else {
 		// get device type:
@@ -366,6 +363,8 @@ function checkAndHandlePWA() {
 				dom_helper.show('installationProblem');
 			}
 		}
+		dom_helper.hide('app_will_load_soon');
+		dom_helper.hide('loading_animation');
 		return false;
 	}
 }

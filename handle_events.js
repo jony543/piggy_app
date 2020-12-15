@@ -160,16 +160,19 @@ function refreshScreen() {
         identifiersToClean.push(recordIdentifier)
 
         //location.reload();
+        // an alternative to reloading step 1 that may be faster but needs more adaptations:
         container.innerHTML = content;
+        //dom_helper.hide('main_container')
+        dom_helper.show('app_will_load_soon');
+        dom_helper.show('loading_animation');    
 
         // try resending all messages
-        data_helper.flush().then(function () { console.log('All data received at server [initiated by pseudo refresh]' ); });
+        data_helper.flush().then(function () {
+            console.log('All data received at server [initiated by pseudo refresh]'); // **
 
-        // an alternative that may be faster but needs more adaptations:
-        var head = document.getElementsByTagName('head')[0];
-        var script = document.createElement('script');
-        script.src = 'app.js';
-        head.appendChild(script);
+            // an alternative to reloading step 2 that may be faster but needs more adaptations:
+            document.body.onload = runApp();
+        });
 
     } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
         window.location.href = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'index.html' + window.location.search; // call to main URL upon the next entry
