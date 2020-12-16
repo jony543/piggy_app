@@ -68,7 +68,10 @@ async function runApp() {
 	document.getElementById('outcome_no_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('superimposed_outcome_sum').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
-
+	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
+	
+	// get lottery gif/animated png source name to later restart it
+	var lotterySRC = document.getElementById('lottery').src;
 	// ****************************************************************
 	//           RUN THE APP
 	// ----------------------------------------------------------------
@@ -189,15 +192,15 @@ async function runApp() {
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
-	dom_helper.append_html('main_container',
-		'<img id="lottery" class="waiting_for_outcome_gif" src="images/lottery.gif"/>');
-	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
+	// restart the lottery element and show it:
+	document.getElementById('lottery').src = ''; document.getElementById('lottery').src = lotterySRC;
+	dom_helper.show('lottery')
 
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 	setTimeout(() => {
 		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
-		dom_helper.removeElement("lottery")
+		dom_helper.hide('lottery')
 	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
