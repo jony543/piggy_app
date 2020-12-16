@@ -12,6 +12,8 @@ async function runApp() {
 	}
 	// ********************************************************
 
+	dom_helper.show('main_container')
+
 	// Define variables used to prevent two instances of the app running in simultaniously when reloading
 	let identifier = startTime.getTime(); // local within this instance
 	recordIdentifier = identifier; // global to communicate with the handle_events.js file
@@ -77,7 +79,6 @@ async function runApp() {
 	// ----------------------------------------------------------------
 	dom_helper.hide('app_will_load_soon');
 	dom_helper.hide('loading_animation');
-	dom_helper.show('main_container')
 
 	if (runData.isFirstTime) { // a message that the real game begins (after instruction [and demo if relevant])
 		subject_data_worker.postMessage({ realGameBeginsAlertTime: new Date() }) // **
@@ -200,7 +201,7 @@ async function runApp() {
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 	setTimeout(() => {
 		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
-		dom_helper.hide('lottery')
+		document.getElementById('lottery').remove()
 	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
