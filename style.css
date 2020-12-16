@@ -459,6 +459,7 @@ h1 {
   background-color: #666666ff;
   background-size: 100vw 100vh;
   background-repeat:no-repeat;
+  overscroll-behavior: none;
 }
 
 #instructionsButtons {
