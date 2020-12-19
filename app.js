@@ -71,7 +71,7 @@ async function runApp() {
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('superimposed_outcome_sum').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
-	
+
 	// get lottery gif/animated png source name to later restart it
 	var lotterySRC = document.getElementById('lottery').src;
 	// ****************************************************************
@@ -169,6 +169,9 @@ async function runApp() {
 		}
 	});
 
+	// load the lottery animation frames (during the spaceship animation)
+	loadLotteryFrames(settings.lottery_N_frames)
+
 	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
@@ -193,15 +196,13 @@ async function runApp() {
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
-	// restart the lottery element and show it:
-	document.getElementById('lottery').src = ''; document.getElementById('lottery').src = lotterySRC;
-	dom_helper.show('lottery')
+	runLottery(settings.durations.lotteryAnim / settings.lottery_N_frames, settings.lottery_N_frames);
 
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 	setTimeout(() => {
 		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
-		document.getElementById('lottery').remove()
+		//document.getElementById('lottery').remove()
 	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)

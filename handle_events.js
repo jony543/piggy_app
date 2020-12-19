@@ -163,8 +163,9 @@ function refreshScreen() {
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
         container.innerHTML = content;
         //dom_helper.hide('main_container')
+        dom_helper.hide('lottery'); 
         dom_helper.show('app_will_load_soon');
-        dom_helper.show('loading_animation');    
+        dom_helper.show('loading_animation');
 
         // try resending all messages
         data_helper.flush().then(function () {

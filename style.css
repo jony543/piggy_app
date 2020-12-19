@@ -281,7 +281,8 @@ body {
   100% { top: 10vh; opacity:0.0; }
 }
 
-#lottery {
+.waiting_for_outcome_gif {
+  opacity: 0;
   position: absolute;
   width: 75%;
   height: auto;
@@ -289,7 +290,9 @@ body {
   left: 40%;
   transform: translate(-50%, -50%);
   text-align: center;
+}
 
+#lottery {
   animation-name: lottery_entry;
   /*animation-duration: 3.5s;*/
   animation-iteration-count: 1;

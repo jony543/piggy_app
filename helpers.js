@@ -369,6 +369,46 @@ function checkAndHandlePWA() {
 	}
 }
 
+// load the frames in case they are not already there:
+function loadLotteryFrames(totalFrames) {
+	if (!document.getElementById('lottery-1')) {
+		for (var i = 1; i < totalFrames + 1; i++) {
+			console.log(i)
+			var elem = document.createElement('img');
+			elem.setAttribute('id', 'lottery-' + i)
+			elem.setAttribute('class', 'waiting_for_outcome_gif')
+			elem.setAttribute('src', "images/lottery/image" + i + ".png")
+			document.getElementById('lottery').appendChild(elem);
+		}
+	}
+}
+
+// run the lottery animation:
+function runLottery(timePerFrame, totalFrames) {
+	let timeWhenLastUpdate;
+	let timeFromLastUpdate;
+	dom_helper.show('lottery')
+	document.getElementById('lottery-1').style.opacity = 1
+	let frameNumber = 1;
+	function step(beginningTime) {
+		if (!timeWhenLastUpdate) timeWhenLastUpdate = beginningTime;
+		timeFromLastUpdate = beginningTime - timeWhenLastUpdate;
+		if (timeFromLastUpdate > timePerFrame) {
+			if (frameNumber >= totalFrames) {
+				document.getElementById('lottery-' + frameNumber).style.opacity = 0
+				return;
+			} else {
+				frameNumber = frameNumber + 1;
+			}
+			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0
+			document.getElementById('lottery-' + frameNumber).style.opacity = 1
+			timeWhenLastUpdate = beginningTime;
+		}
+		requestAnimationFrame(step);
+	}
+	requestAnimationFrame(step);
+}
+
 var ajax_helper = {
 	get: function (url) {
 		return this.request("GET", url);

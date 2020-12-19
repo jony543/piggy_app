@@ -63,6 +63,7 @@ window.app_settings = {
 		daysToBaseUponHidingTime: [[2], [2], [7], [7]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
+	lottery_N_frames: 35,
 	durations: { //in ms
 		// every trial:
 		entranceMessage: 800,
