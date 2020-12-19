@@ -345,7 +345,7 @@ var logic = {
     return null;
   },
   calculateReward: function (subData) {
-    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation')).reduce((a, b) => a + b, 0);
+    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0)
     var totalCost = subData.cost.filter((x, i) => subData.startTime[i]).map((x => x[0])).concat(subData.cost.filter((x, i) => subData.press1Time[i]).map((x => x[1]))).concat(subData.cost.filter((x, i) => subData.press2Time[i]).map((x => x[2]))).filter((x) => !!x).reduce((a, b) => a + b, 0);
     return accumulatedValidReward - totalCost
   },
