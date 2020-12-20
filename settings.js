@@ -99,7 +99,7 @@ window.app_settings = {
 		endExperiment: function (subData) {
 			return 'המשחק נגמר. תודה רבה שהשתתפת!' + '<br><br>' +
 				'הצלחת להביא לכדור הארץ כ-'
-				+ logic.calculateReward(subData)
+				+ logic.calculateReward(subData, app_settings.coinCollectionTask, dayToFinishExperiment)
 				+ ' יחידות זהב!'
 		},
 		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 1 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.',
@@ -128,6 +128,8 @@ window.app_settings = {
 		counterTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessageTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessage: "להתראות",
+		costPerPress: 1, // for the winnings calculation at the end
+		rewardPerCoinStash: () => app_settings.rewards.rewardConstantSum, // for the winnings calculation at the end
 	},
 	allowInstructions: true, // for debugging purpose.
 	allowDemo: true,
@@ -243,7 +245,7 @@ window.app_settings = {
 	instructions_main_HTML_element: "jspsych-content",
 	App_HTML_title: 'Space Gold',
 	App_main_HTML_element: "main_container",
-	dataVarList: ["serial", "uniqueEntryID", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn"],
+	dataVarList: ["serial", "uniqueEntryID", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }

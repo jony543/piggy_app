@@ -305,11 +305,7 @@ var logic = {
 
           if (new Date() >= timeToManipulate) {
             // check if this is the first time the outcome should be devalued that day
-            if (subData.day[subData.day.length - 1] !== dayOfExperiment || // activate anyway if last entry was yesterday
-              (!subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.isUnderManipulation[subData.isUnderManipulation.length - 1]) || // activate if in the last entry today it was not activated and we are not already under the manipulation (i.e., it was induced before the last entry)
-              //(subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.manipulationConfirmationTime[subData.manipulationConfirmationTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
-              // I replaced in the condition above the manipulationConfirmationTime variable with simply checking the endTime instead (the new line here below). If I'd want to change it back I also need to put it back in the settings in the definition of the variables.
-              (subData.activateManipulation[subData.activateManipulation.length - 1] && !subData.endTime[subData.endTime.length - 1])) { // activate if in the last entry today it was activated but participants didn't confirm [namely there is no manipulationConfirmationTime to previous entry]
+            if (!subData.activateManipulation.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.endTime[i]).length) {// There was no trial with ACTIVATION on this DAY with that ENDED (the user got to the end of the trial)
               activateManipulation = true;
               consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...
@@ -370,10 +366,20 @@ var logic = {
 
     return null;
   },
-  calculateReward: function (subData) {
-    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0)
-    var totalCost = subData.cost.filter((x, i) => subData.startTime[i] && x !== undefined).map((x => x[0])).concat(subData.cost.filter((x, i) => subData.press1Time[i] && x !== undefined).map((x => x[1]))).concat(subData.cost.filter((x, i) => subData.press2Time[i] && x !== undefined).map((x => x[2]))).filter((x) => !!x).reduce((a, b) => a + b, 0);
-    return accumulatedValidReward - totalCost
+  calculateReward: function (subData, coinCollectionTask, dayToFinishExperiment) {
+    // regular cost and reward:
+    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0);
+    var totalCost = subData.cost.filter((x, i) => subData.startTime[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[0]))
+      .concat(subData.cost.filter((x, i) => subData.press1Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[1])))
+      .concat(subData.cost.filter((x, i) => subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[2])))
+      .filter((x) => !!x).reduce((a, b) => a + b, 0);
+    // coins task:
+    var coinsTaskStillValued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
+    var coinsTaskDevalued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
+    const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.coins_task_gold_collected).reduce((total, num) => total + num) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
+    const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
+    
+    return accumulatedValidReward + rewardFromCoinTasks - totalCost - costFromCoinsTasks
   },
   getCost: function (runData, settings, cost_on) {
     return settings.cost.isCost

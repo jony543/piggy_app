@@ -2,11 +2,16 @@ async function run_coin_collection(settings, runData, identifier) {
 	// ========================================================
 	// 						FUCNTIONS
 	// ========================================================
-	function elementClickedFunc() {
+	function elementClickedFunc(event) {
 		caveElements.filter((el) => el.clone_id === this.id)[0].clickTime.push(new Date()); // record the pressing time
 
+		hits_count++;
+		event.clickTime = new Date();
+		hits_events.push(event);
 		subject_data_worker.postMessage({
-			coins_task_caveElements_state: caveElements
+			coins_task_caveElements_state: caveElements,
+			coins_task_hits_count: hits_count,
+			coins_task_hits_events: hits_events,
 		});
 
 		dom_helper.add_css_class(this.id, 'disappearGradually'); // make stimulus desappear gradually
@@ -16,12 +21,24 @@ async function run_coin_collection(settings, runData, identifier) {
 		}
 	}
 
+	function missedClick(event) {
+		misses_count++;
+		event.clickTime = new Date();
+		misses_events.push(event);
+		subject_data_worker.postMessage({
+			coins_task_misses_count: misses_count,
+			coins_task_misses_events: misses_events,
+		});
+	}
+
 	// when finish the task:
 	function endCoinCollectionTask(timeCounter, secsLeft) {
 		clearInterval(timeCounter) // stop the counter
 		subject_data_worker.postMessage({
 			coin_task_finish_status: {
 				finish_time: new Date(),
+				total_gold_collected: caveElements.filter((el) => el.type === 'coin' && !!el.clickTime.length).length,
+				total_presses: hits_count + misses_count,
 			}
 		});
 		dom_helper.set_text('cave_goddbye_message', settings.finishMessage)
@@ -31,6 +48,9 @@ async function run_coin_collection(settings, runData, identifier) {
 				caveElementsArray[i].classList.add('hidden')
 			}
 		}
+		// stop recording misses (click) events
+		document.getElementById('inside_cave_img').onclick = '';
+		document.getElementById('time_left_counter').onclick = '';
 		setTimeout(() => {
 			if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 			dom_helper.add_css_class('inside_cave_img', 'closing')
@@ -47,8 +67,12 @@ async function run_coin_collection(settings, runData, identifier) {
 	// ========================================================
 	// 			INITIALIZE STUFF AND APPLY APPEARANCE
 	// ========================================================
-	// defin main array:
+	// define main array:
 	let caveElements = [];
+	let misses_count = 0;
+	let misses_events = [];
+	let hits_count = 0;
+	let hits_events = [];
 
 	// remove outcome related stuff from the screen:
 	dom_helper.hide('outcome_win')
@@ -118,6 +142,10 @@ async function run_coin_collection(settings, runData, identifier) {
 			dom_helper.show(clone_id)
 		}
 	}
+
+	// record recording misses (click) events
+	document.getElementById('inside_cave_img').onclick = missedClick
+	document.getElementById('time_left_counter').onclick = missedClick
 
 	// Time Left Counter:
 	var timeCounter = setInterval(() => {

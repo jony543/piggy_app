@@ -72,8 +72,6 @@ async function runApp() {
 	document.getElementById('superimposed_outcome_sum').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('lottery').style.animationDuration = String(settings.durations.lotteryAnim / 1000) + 's' // ** // add animation duration
 
-	// get lottery gif/animated png source name to later restart it
-	var lotterySRC = document.getElementById('lottery').src;
 	// ****************************************************************
 	//           RUN THE APP
 	// ----------------------------------------------------------------
