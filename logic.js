@@ -110,15 +110,40 @@ function assignReward(rewardsData) {
 }
 
 // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
-function getManipulationStartingTime(subData, daysToBaseUponManipulation, referenceDayPrecentile) {
+function getManipulationStartingTime(subData, daysToBaseUponManipulation, referenceDayPrecentile, experimentalDayStartingHour = 0) {
+  const adjustingTime = 1000 * 60 * 60 * experimentalDayStartingHour;
+  const twentyFourHours = 1000 * 60 * 60 * 24;
+
   const entryTimes2BaseManipulationIndices = [].concat.apply([], daysToBaseUponManipulation.map(x => subData.day.multiIndexOf(x))); // get relevant indices of the relevant times
-  const entryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // get the relevant times (startTime)
-  const copyOfEntryTimes2BaseManipulation = subData.startTime.slice(Math.min(...entryTimes2BaseManipulationIndices), Math.max(...entryTimes2BaseManipulationIndices) + 1).map(x => new Date(x)); // a copy of the previous var
-  const timeZeroOfTheseDays = entryTimes2BaseManipulation.map((x, ind) => x - copyOfEntryTimes2BaseManipulation[ind].setHours(0, 0, 0, 0)); // using the copy to calculate the in each day (in ms I think) regardless of the data
+  let entryTimes2BaseManipulation = subData.startTime.filter((x, i) => entryTimes2BaseManipulationIndices.includes(i)).map(x => new Date(x)).filter((x) => !isNaN(x)); // get the relevant times (startTime)
+  let copyOfEntryTimes2BaseManipulation = subData.startTime.filter((x, i) => entryTimes2BaseManipulationIndices.includes(i)).map(x => new Date(x)).filter((x) => !isNaN(x)); // a copy of the previous var
+
+  let timeZeroOfTheseDays = entryTimes2BaseManipulation.map((x, ind) => x - copyOfEntryTimes2BaseManipulation[ind].setHours(0, 0, 0, 0)); // using the copy to calculate the in each day (in ms I think) regardless of the data
+  timeZeroOfTheseDays = timeZeroOfTheseDays.map((x) => x <= adjustingTime ? x + twentyFourHours : x); // handle the shift in day starting hour
+
   sortWithIndices(timeZeroOfTheseDays); // sort and add an object of sorted indices
   const sortedEntryTimes2BaseManipulationTime = timeZeroOfTheseDays.sortIndices.map(x => entryTimes2BaseManipulation[x]); // sort the entry times regardless of date...
   const timeToManipulate = sortedEntryTimes2BaseManipulationTime[Math.floor((sortedEntryTimes2BaseManipulationTime.length - 1) * referenceDayPrecentile)]; // get the time from which to devalue/still-valued manipulation (according to the median; if even taking the earlier); * if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
-  timeToManipulate.setFullYear(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()); // change the date to today (without changing the time.
+
+  // Cover all cases of time to manipulate and current time:
+  const hourNow = new Date().getHours();
+  if (timeToManipulate.getHours() < experimentalDayStartingHour) {// time to MANIPULATE is AFTER midnight (within the timeframe of the experimentalDayStartingHour)
+    if (hourNow < experimentalDayStartingHour) { // The time NOW is AFTER midnight
+      timeToManipulate.setFullYear(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()); // change the date to today (without changing the time).
+    }
+    else if (hourNow >= experimentalDayStartingHour) { // The time NOW is BEFORE midnight
+      timeToManipulate.setFullYear(new Date().getFullYear(), new Date().getMonth(), new Date(new Date().getTime() + twentyFourHours).getDate()); // change the date of manipulation to tomorrow (so it won't operate the manipulation/cover).
+    }
+  }
+  else if (timeToManipulate.getHours() >= experimentalDayStartingHour) {// time to MANIPULATE is BEFORE midnight (within the timeframe of the experimentalDayStartingHour)
+    if (hourNow < experimentalDayStartingHour) { // The time NOW is AFTER midnight
+      timeToManipulate.setFullYear(new Date().getFullYear(), new Date().getMonth(), new Date(new Date().getTime() - twentyFourHours).getDate()); // change the date of manipulation to yesturday (so it won't operate the manipulation/cover).
+    }
+    else if (hourNow >= experimentalDayStartingHour) { // The time NOW is BEFORE midnight
+      timeToManipulate.setFullYear(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()); // change the date to today (without changing the time).
+    }
+  }
+
   return timeToManipulate
 }
 
@@ -140,12 +165,12 @@ function InitializeCost(cost_settings) {
   }
 }
 
-function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderManipulation) {
+function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderManipulation, experimentalDayStartingHour = 0) {
   if (hideOutcome.hide) { // If to hide outcomes
     if (isUnderManipulation && hideOutcome.hideOnlyUnderManipulationPeriods) { // If it's manipulation time and hiding is on only during manipulations.
       return true;
     } else if (!hideOutcome.hideOnlyUnderManipulationPeriods && hideOutcome.daysToHideAt.includes(dayOfExperiment)) {
-      const timeToHideOutcome = getManipulationStartingTime(subData, hideOutcome.daysToBaseUponHidingTime[hideOutcome.daysToHideAt.indexOf(dayOfExperiment)], hideOutcome.relativeTimeOfDayToStart) // according to the median time in specified days
+      const timeToHideOutcome = getManipulationStartingTime(subData, hideOutcome.daysToBaseUponHidingTime[hideOutcome.daysToHideAt.indexOf(dayOfExperiment)], hideOutcome.relativeTimeOfDayToStart, experimentalDayStartingHour) // according to the median time in specified days
       if (new Date() >= timeToHideOutcome) {
         return true;
       }
@@ -153,6 +178,7 @@ function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderMani
   }
   return false;
 }
+
 
 function checkIfResetContainer(subData, dayOfExperiment) {
   if (!subData.day.filter((day) => day === dayOfExperiment).length || // if there were no entries today (i.e., it's the first one)
@@ -275,7 +301,7 @@ var logic = {
           }
 
           // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
-          const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation) // according to the median time in specified days
+          const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation, settings.experimentalDayStartingHour) // according to the median time in specified days
 
           if (new Date() >= timeToManipulate) {
             // check if this is the first time the outcome should be devalued that day
@@ -295,7 +321,7 @@ var logic = {
 
         // Hide outcome
         // ---------------------------
-        var toHideOutcome = checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation);
+        var toHideOutcome = checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation, settings.experimentalDayStartingHour);
 
         // Reset container
         // ---------------------------
@@ -346,7 +372,7 @@ var logic = {
   },
   calculateReward: function (subData) {
     var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0)
-    var totalCost = subData.cost.filter((x, i) => subData.startTime[i]).map((x => x[0])).concat(subData.cost.filter((x, i) => subData.press1Time[i]).map((x => x[1]))).concat(subData.cost.filter((x, i) => subData.press2Time[i]).map((x => x[2]))).filter((x) => !!x).reduce((a, b) => a + b, 0);
+    var totalCost = subData.cost.filter((x, i) => subData.startTime[i] && x !== undefined).map((x => x[0])).concat(subData.cost.filter((x, i) => subData.press1Time[i] && x !== undefined).map((x => x[1]))).concat(subData.cost.filter((x, i) => subData.press2Time[i] && x !== undefined).map((x => x[2]))).filter((x) => !!x).reduce((a, b) => a + b, 0);
     return accumulatedValidReward - totalCost
   },
   getCost: function (runData, settings, cost_on) {

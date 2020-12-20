@@ -22,6 +22,15 @@ window.app_settings = {
 			return 'warehouse_half';
 		}
 	},
+	hideOutcome: {
+		hide: true,
+		// option 1:
+		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
+		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
+		daysToHideAt: [3, 4, 10, 11], // [2, 3, 4, 5, 8, 10, 12],
+		daysToBaseUponHidingTime: [[2], [2], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
+	},
 	rewards: {
 		isRatioSchedule: true,
 		winningRate: 3, //per entries if isRatioSchedule is true; per seconds if isRatioSchedule is false, 
@@ -53,15 +62,6 @@ window.app_settings = {
 		// for constant cost:
 		costConstantSum: 1,
 		presentCost: true, // O'Doherty did not use visual feedback for the cost, Gillan did (in their MB-MF with devaluation study)
-	},
-	hideOutcome: {
-		hide: true,
-		// option 1:
-		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
-		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
-		daysToHideAt: [3, 4, 8, 9], // [2, 3, 4, 5, 8, 10, 12],
-		daysToBaseUponHidingTime: [[2], [2], [7], [7]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
-		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
 	lottery_N_frames: 35,
 	durations: { //in ms
