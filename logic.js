@@ -189,6 +189,23 @@ function checkIfResetContainer(subData, dayOfExperiment) {
   }
 }
 
+function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
+  // Check if the experiment is over
+  if (dayOfExperiment >= dayToFinishExperiment) {
+    return true
+  }
+  // Exclusions:
+  // -------------------------------------------
+  // Check if the participant entered EVERY DAY:
+  const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i] && self.indexOf(x) === i).length;
+  const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].map((x) => x + 1).length;
+  if (daysWithEntries !== possibleDaysWithEntries) {
+    return true
+  }
+
+  return false
+}
+
 // ****************************************************************
 //           LOGIC / Run Data (calculate run parameters):
 // ----------------------------------------------------------------
@@ -323,9 +340,9 @@ var logic = {
         // ---------------------------
         var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, dayOfExperiment) : false; // check if reset container
 
-        // End experiment
+        // End experiment & Exclusions
         // ---------------------------
-        endExperiment = dayOfExperiment >= dayToFinishExperiment;
+        var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment);
 
       } else { // if it is the first entry
         isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
@@ -378,7 +395,7 @@ var logic = {
     var coinsTaskDevalued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
     const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.coins_task_gold_collected).reduce((total, num) => total + num) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
     const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
-    
+
     return accumulatedValidReward + rewardFromCoinTasks - totalCost - costFromCoinsTasks
   },
   getCost: function (runData, settings, cost_on) {
