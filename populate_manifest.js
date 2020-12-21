@@ -62,3 +62,5 @@ const stringManifest = JSON.stringify(myDynamicManifest);
 const blob = new Blob([stringManifest], {type: 'application/json'});
 const manifestURL = URL.createObjectURL(blob);
 document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+// The dynamic manifest implementation is based on https://medium.com/@alshakero/how-to-setup-your-web-app-manifest-dynamically-using-javascript-f7fbee899a61
