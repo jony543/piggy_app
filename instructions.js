@@ -34,9 +34,12 @@ async function exitAppDemo(appDemoID) {
 		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
 		dom_helper.show(mainDemoTextDuplicateID)
 	}
+
+	document.getElementById('demoLoadButton').onclick = loadAppDemo;
 }
 
 async function loadAppDemo() {
+	document.getElementById('demoLoadButton').onclick = '';
 	// check when to present again the button that closes the demo app:
 	subData = await data_helper.get_subject_data(true);
 	target_n_data_points = !!Object.keys(subData).length ? subData.day.length + 1 : 1; // accounting for when there is no data yet
