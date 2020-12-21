@@ -15,6 +15,13 @@ body {
  padding:0;
  overflow:hidden;
  z-index:999999;
+
+-webkit-touch-callout: none; /* iOS Safari */
+-webkit-user-select: none; /* Safari */
+-khtml-user-select: none; /* Konqueror HTML */
+-moz-user-select: none; /* Old versions of Firefox */
+-ms-user-select: none; /* Internet Explorer/Edge */
+user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
 .bgApp {
@@ -521,11 +528,12 @@ h1 {
   font-size: 7vw;
   line-height: normal;
   direction: rtl;
-  margin-bottom: 12vh;
+  margin-bottom: 5vh;
 }
 
 #multipleChoiceQuestionsButtons {
   position: relative;
+  background-color: rgb(230, 230, 230);
   width: 90vw;
   border: 0.3vw solid rgb(50, 50, 50);
   color: rgb(50, 50, 50);
