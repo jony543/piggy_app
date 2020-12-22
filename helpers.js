@@ -408,30 +408,23 @@ function loadLotteryFrames(totalFrames) {
 // 	requestAnimationFrame(step);
 // }
 
-function runLottery(timePerFrame, totalFrames) {
-	x= new Date()
+function runLottery(timePerFrame, totalFrames, identifier) {
+	x = new Date()
 	dom_helper.show('lottery')
 	document.getElementById('lottery-1').style.opacity = 1
 	let frameNumber = 1;
-	console.log(frameNumber)
-	console.log(new Date -x)
-	var runAnimation = setInterval(()=> {
+	var runAnimation = setInterval(() => {
 		frameNumber++;
-		if (frameNumber > totalFrames) {
+		if (frameNumber > totalFrames || identifiersToClean.includes(identifier)) { // The second one is for case of pseudo refresh.
 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
-			console.log(new Date -x)
 			clearInterval(runAnimation)
 			return
-		}else {
+		} else {
 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
 			document.getElementById('lottery-' + frameNumber).style.opacity = 1;
-			console.log(new Date -x)
-			console.log(frameNumber)
-
 		}
-	} ,timePerFrame)
+	}, timePerFrame)
 }
-
 
 var ajax_helper = {
 	get: function (url) {

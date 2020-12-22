@@ -197,7 +197,7 @@ async function runApp() {
 
 	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
-	runLottery(settings.durations.lotteryAnim / settings.lottery_N_frames, settings.lottery_N_frames);
+	runLottery(settings.durations.lotteryAnim / settings.lottery_N_frames, settings.lottery_N_frames, identifier);
 
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
