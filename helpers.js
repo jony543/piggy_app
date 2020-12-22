@@ -373,7 +373,6 @@ function checkAndHandlePWA() {
 function loadLotteryFrames(totalFrames) {
 	if (!document.getElementById('lottery-1')) {
 		for (var i = 1; i < totalFrames + 1; i++) {
-			console.log(i)
 			var elem = document.createElement('img');
 			elem.setAttribute('id', 'lottery-' + i)
 			elem.setAttribute('class', 'waiting_for_outcome_gif')
