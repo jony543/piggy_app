@@ -382,31 +382,56 @@ function loadLotteryFrames(totalFrames) {
 	}
 }
 
-// run the lottery animation:
+// // run the lottery animation:
+// function runLottery(timePerFrame, totalFrames) {
+// 	let timeWhenLastUpdate;
+// 	let timeFromLastUpdate;
+// 	dom_helper.show('lottery')
+// 	document.getElementById('lottery-1').style.opacity = 1
+// 	let frameNumber = 1;
+// 	function step(beginningTime) {
+// 		if (!timeWhenLastUpdate) timeWhenLastUpdate = beginningTime;
+// 		timeFromLastUpdate = beginningTime - timeWhenLastUpdate;
+// 		if (timeFromLastUpdate > timePerFrame) {
+// 			if (frameNumber >= totalFrames) {
+// 				document.getElementById('lottery-' + frameNumber).style.opacity = 0
+// 				return;
+// 			} else {
+// 				frameNumber = frameNumber + 1;
+// 			}
+// 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0
+// 			document.getElementById('lottery-' + frameNumber).style.opacity = 1
+// 			timeWhenLastUpdate = beginningTime;
+// 		}
+// 		requestAnimationFrame(step);
+// 	}
+// 	requestAnimationFrame(step);
+// }
+
 function runLottery(timePerFrame, totalFrames) {
-	let timeWhenLastUpdate;
-	let timeFromLastUpdate;
+	x= new Date()
 	dom_helper.show('lottery')
 	document.getElementById('lottery-1').style.opacity = 1
 	let frameNumber = 1;
-	function step(beginningTime) {
-		if (!timeWhenLastUpdate) timeWhenLastUpdate = beginningTime;
-		timeFromLastUpdate = beginningTime - timeWhenLastUpdate;
-		if (timeFromLastUpdate > timePerFrame) {
-			if (frameNumber >= totalFrames) {
-				document.getElementById('lottery-' + frameNumber).style.opacity = 0
-				return;
-			} else {
-				frameNumber = frameNumber + 1;
-			}
-			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0
-			document.getElementById('lottery-' + frameNumber).style.opacity = 1
-			timeWhenLastUpdate = beginningTime;
+	console.log(frameNumber)
+	console.log(new Date -x)
+	var runAnimation = setInterval(()=> {
+		frameNumber++;
+		if (frameNumber > totalFrames) {
+			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
+			console.log(new Date -x)
+			clearInterval(runAnimation)
+			return
+		}else {
+			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
+			document.getElementById('lottery-' + frameNumber).style.opacity = 1;
+			console.log(new Date -x)
+			console.log(frameNumber)
+
 		}
-		requestAnimationFrame(step);
-	}
-	requestAnimationFrame(step);
+	} ,timePerFrame)
 }
+
 
 var ajax_helper = {
 	get: function (url) {
