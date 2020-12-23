@@ -309,66 +309,6 @@ function sortWithIndices(toSort) {
 	return toSort;
 }
 
-// get mobile func OS function:
-function getMobileOperatingSystem() { // taken by Rani from https://stackoverflow.com/questions/21741841/detecting-ios-android-operating-system
-	var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-	// Windows Phone must come first because its UA also contains "Android"
-	if (/windows phone/i.test(userAgent)) {
-		return "Windows Phone";
-	}
-	if (/android/i.test(userAgent)) {
-		return "Android";
-	}
-	// iOS detection from: http://stackoverflow.com/a/9039885/177710
-	if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-		return "iOS";
-	}
-	return "unknown";
-}
-
-// check if implemented as PWA and handle accordingly:
-// ********************************************************
-function checkAndHandlePWA() {
-	var isInWebAppiOS = window.navigator.standalone === true;
-	var isInWebAppChrome =
-		window.matchMedia("(display-mode: fullscreen)").matches ||
-		window.matchMedia("(display-mode: standalone)").matches ||
-		window.matchMedia("(display-mode: minimal-ui)").matches;
-
-	// if app PWA:
-	if (isInWebAppiOS || isInWebAppChrome) {
-		dom_helper.hide('installation_guide')
-		return true
-	} else {
-		// get device type:
-		var mobileOS = getMobileOperatingSystem();
-		// Check that the url is valid:
-		try {
-			var isSubID = data_helper.get_subject_id()
-		} catch {
-			var isSubID = "undefined";
-		}
-		if (isSubID !== "undefined" && (mobileOS === 'iOS' || mobileOS === 'Android')) {
-			// show installation instructions (according to the device type):
-			document.getElementById('installation_guide').setAttribute('src', 'images/instructions/installation_guide_' + mobileOS + '.jpg')
-		} else {
-			// show url is wrong message
-			if (isSubID === "undefined") {
-				dom_helper.set_text('installationProblemMessage', 'הלינק אינו מלא או לא תקין. אנא וודא/י שאת/ה משתמש/ת בלינק המלא שקיבלת.')
-				dom_helper.show('installationProblem');
-			}
-			// Not a compatable device message:
-			else {
-				dom_helper.set_text('installationProblemMessage', 'יש להכנס לקישור זה מסמארטפון<br>(אייפון או אנדרואיד).')
-				dom_helper.show('installationProblem');
-			}
-		}
-		dom_helper.hide('app_will_load_soon');
-		dom_helper.hide('loading_animation');
-		return false;
-	}
-}
-
 // load the frames in case they are not already there:
 function loadLotteryFrames(totalFrames) {
 	if (!document.getElementById('lottery-1')) {

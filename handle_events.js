@@ -156,6 +156,12 @@ function onUserExit() {
 
 function refreshScreen() {
     if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
+
+        if (!isPWA) { // for the case of the installation page
+            location.reload();
+            return
+        }
+
         // Add the current app instance to the cleaning list before openning a new instance:
         identifiersToClean.push(recordIdentifier)
 
@@ -163,7 +169,7 @@ function refreshScreen() {
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
         container.innerHTML = content;
         //dom_helper.hide('main_container')
-        dom_helper.hide('lottery'); 
+        dom_helper.hide('lottery');
         dom_helper.show('app_will_load_soon');
         dom_helper.show('loading_animation');
 

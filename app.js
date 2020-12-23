@@ -6,10 +6,8 @@ async function runApp() {
 
 	// check if implemented as PWA and handle accordingly:
 	// ********************************************************
-	var isPWA = checkAndHandlePWA()
-	if (!isPWA) {
-		return
-	}
+	if (typeof isPWA === 'undefined') {isPWA = await checkAndHandlePWA()};
+	if (!isPWA) {return}
 	// ********************************************************
 
 	dom_helper.show('main_container')
@@ -30,7 +28,7 @@ async function runApp() {
 					console.log('error getting subject data');
 					console.log(e);
 				});
-			} else if (new Date() - timer < 7000){
+			} else if (new Date() - timer < 7000) {
 				Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
 					subData[key] = subData[key].slice(0, subData[key].length - 1);
 				});
