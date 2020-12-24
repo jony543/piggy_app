@@ -59,16 +59,29 @@ var dom_helper = {
 };
 
 var data_helper = {
-	base_address: 'https://experiments.schonberglab.org',
-	ws_base_address: 'wss://experiments.schonberglab.org',
+	base_address: app_settings.server.base_address,
+	ws_base_address: app_settings.server.ws_base_address,
 	get_subject_id: function () {
 		subId = /[&?]subId=([^&]+)/.exec(location.search)[1];
 		return String(key2subId_mapping[subId]);
 	},
 	get_subject_data: function (asArray) { // returns promise
 		return new Promise((function (resolve, reject) {
-			return ajax_helper.get(this.base_address + '/app/api/session/list?subId=' + this.get_subject_id())
-				.then(function (subjectData) {
+			var url = this.base_address + '/app/api/session/list?subId=' + this.get_subject_id();
+			url += '&fields=' + app_settings.dataVarList.concat(['uniqueEntryID']).join(',');
+
+			var localData = JSON.parse(localStorage.getItem(this.get_subject_id() + '_data')) ?? [];
+			if (localData && localData.length > 0) {
+				const lastSessionDate = new Date(Math.max(...localData.map(x => new Date(x.created_at))));
+				url += '&from=' + lastSessionDate.toISOString();
+			}
+
+			return ajax_helper.get(url)
+				.then((function (subjectData) {
+					var allData = localData.concat(subjectData);
+					subjectData = Object.values(allData.toDict('created_at')); // remove double entries
+					localStorage.setItem(this.get_subject_id() + '_data', JSON.stringify(subjectData));
+
 					if (!!asArray) {
 						var data = {};
 						if (!!subjectData) {
@@ -87,7 +100,7 @@ var data_helper = {
 					} else {
 						resolve((!!subjectData) ? subjectData : {});
 					}
-				});
+				}).bind(this));
 		}).bind(this));
 	},
 	getWsUrl: function (sessionName) {
@@ -283,6 +296,13 @@ Array.prototype.multiIndexOf = function (el) {
 		}
 	}
 	return idxs;
+};
+
+Array.prototype.toDict = function (field) {
+	return this.reduce((d, el) => {
+		d[el[field]] = el;
+		return d;
+	}, {})
 };
 
 function shuffle(a) {

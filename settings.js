@@ -3,6 +3,10 @@
 // ---------------------------------------------------------------
 
 window.app_settings = {
+	server: {
+		base_address: 'https://experiments.schonberglab.org',
+		ws_base_address: 'wss://experiments.schonberglab.org',
+	},
 	experimentalDayStartingHour: 5, // Possiblie assignments are 0-23. Assign 0 to simply seperate between days.  Relevant for example to determine the time at day to empty container according to a 24h watch. 
 	pressesRequired: 2,
 	forceDeval: null, // for debugging purposes
