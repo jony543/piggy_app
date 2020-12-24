@@ -19,9 +19,19 @@ def createSubNumDict(ranges=[(101, 200), (201, 300), (701, 800), (801, 900)], ke
     sub_key_dict = {}
     for i in ranges:
         for j in range(i[0], i[1]):
-            sub_key_dict[get_random_string(key_code_length)] = j
-    return sub_key_dict
+            #the logic here below is to prevent the last 3 characters of being the same.
+            get_code = True
+            while get_code:
+                new_key = get_random_string(key_code_length)
+                get_code = False
+                for key in sub_key_dict.keys():
+                    if new_key[-3:].lower() == key[-3:].lower():
+                        get_code = True
+                        break
 
+            sub_key_dict[new_key] = j
+
+    return sub_key_dict
 
 # RUN THE CODE:
 sub_key_dict = createSubNumDict()
@@ -44,6 +54,5 @@ if not os.path.exists('./mapping_key_to_subId.js'):
     print('The file mapping_key_to_subId.csv was saved')
     # backup a copy with a timestamp:
     copyfile('mapping_key_to_subId.csv', 'backup/mapping_key_to_subId.' + str(time.time()) + '.csv')
-
 else:
     print('STOPPING! *** The files already exists ***')
