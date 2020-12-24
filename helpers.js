@@ -59,8 +59,8 @@ var dom_helper = {
 };
 
 var data_helper = {
-	base_address: 'https://experiments.schonberglab.org',
-	ws_base_address: 'wss://experiments.schonberglab.org',
+	base_address: app_settings.server.base_address,
+	ws_base_address: app_settings.server.ws_base_address,
 	get_subject_id: function () {
 		subId = /[&?]subId=([^&]+)/.exec(location.search)[1];
 		return String(key2subId_mapping[subId]);
