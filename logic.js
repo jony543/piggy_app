@@ -393,7 +393,7 @@ var logic = {
     // coins task:
     var coinsTaskStillValued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
     var coinsTaskDevalued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
-    const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.coins_task_gold_collected).reduce((total, num) => total + num) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
+    const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.total_gold_collected).reduce((total, num) => total + num) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
     const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
 
     return accumulatedValidReward + rewardFromCoinTasks - totalCost - costFromCoinsTasks

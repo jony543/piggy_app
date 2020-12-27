@@ -33,9 +33,9 @@ async function exitAppDemo(appDemoID) {
 		dom_helper.removeElement(oldMainDemoTextDuplicateID)
 		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
 		dom_helper.show(mainDemoTextDuplicateID)
+		// alow to load the app again:
+		document.getElementById('demoLoadButton').onclick = loadAppDemo;
 	}
-
-	document.getElementById('demoLoadButton').onclick = loadAppDemo;
 }
 
 async function loadAppDemo() {
@@ -209,8 +209,6 @@ var settings = Object.assign({}, app_settings);
 //                           PIPELINE:
 // ---------------------------------------------------------------
 (async () => {
-	data_helper.init_session('instructions', false);
-
 	// get subject data from batch session *** Temp Bandage by Rani
 	var timer = new Date();
 	do {
@@ -225,6 +223,8 @@ var settings = Object.assign({}, app_settings);
 			});
 		}
 	} while (subData.uniqueEntryID.length > 1 && !subData.uniqueEntryID[subData.uniqueEntryID.length - 1])
+
+	data_helper.init_session('instructions', false);
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
 	if (!subData.uniqueEntryID[subData.uniqueEntryID.length - 1]) {// should be assigned once every entry
