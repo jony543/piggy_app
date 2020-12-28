@@ -69,21 +69,21 @@ function getTimeFromLastEntryInSec(timePoint) {
 
 function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayIfMultipleNonWins) {
   if (isRatioSchedule) { // RI schedule
-    if (winAnywayIfMultipleNonWins && subData.viewedOutcome && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
-      const indicesWithViewingOutcome = subData.viewedOutcome.multiIndexOf(true)
-      const relevantIndicesToCheck = indicesWithViewingOutcome.slice(length - app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
+    if (winAnywayIfMultipleNonWins && subData.endTime && subData.endTime.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
+      const indicesWithEndTime = subData.endTime.map((x) => !!x).multiIndexOf(true)
+      const relevantIndicesToCheck = indicesWithEndTime.slice(length - app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
       if (!relevantIndicesToCheck.filter((x) => subData.isWin[x]).length) { // this checks if there was no win in the relevant times.
         return true
       }
     }
     return Math.random() < winningChancePerUnit;
   } else { // namely a VI schedule
-    if (!!Object.keys(subData).length) { // if there is some data for this subject
-      if (winAnywayIfMultipleNonWins && subData.viewedOutcome && subData.viewedOutcome.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
+    if (!!Object.keys(subData).length) { // if there is some data for this subject *********** THIS NEED TO BE RECHECKED [WAS NOT TESTED] *************
+      if (winAnywayIfMultipleNonWins && subData.endTime && subData.endTime.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
         const ms_per_second = 1000;
         const timeToCheckBack = new Date(new Date() - ms_per_second * app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
         const firstEntryAfterTimeToCheck = subData.outcomeTime.find((x) => new Date(x) > timeToCheckBack)
-        const relevantentries = subData.viewedOutcome.slice(subData.outcomeTime.indexOf(firstEntryAfterTimeToCheck))
+        const relevantentries = subData.isWin.slice(subData.outcomeTime.indexOf(firstEntryAfterTimeToCheck)) // CHECK THIS LINE IN PARTICULAR [WAS NOT TESTED AFTER A CHANGE]
         if (!firstEntryAfterTimeToCheck || !relevantentries.some((x) => !!x)) { // if there was no entry after the time to check or there was no win in every entry since the time to check
           return true
         }
@@ -385,7 +385,7 @@ var logic = {
   },
   calculateReward: function (subData, coinCollectionTask, dayToFinishExperiment) {
     // regular cost and reward:
-    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.viewedOutcome[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0);
+    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.endTime[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0);
     var totalCost = subData.cost.filter((x, i) => subData.startTime[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[0]))
       .concat(subData.cost.filter((x, i) => subData.press1Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[1])))
       .concat(subData.cost.filter((x, i) => subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[2])))

@@ -26,6 +26,22 @@ function getMobileOperatingSystem() { // taken by Rani from https://stackoverflo
     return "unknown";
 }
 
+function getMobileBrowser() { // adapted by Rani from https://stackoverflow.com/questions/62409889/how-to-detect-browser-for-chrome
+    const agent = window.navigator.userAgent.toLowerCase()
+    // check which browser
+    switch (true) {
+        case agent.indexOf("edge") > -1: return "MS Edge (EdgeHtml)";
+        case agent.indexOf("edg") > -1: return "MS Edge Chromium";
+        case agent.indexOf("opr") > -1 && !!window.opr: return "opera";
+        case agent.indexOf("samsung") > -1: return "samsungInternet";
+        case agent.indexOf("chrome") > -1 && !!window.chrome: return "chrome";
+        case agent.indexOf("trident") > -1: return "Internet Explorer";
+        case agent.indexOf("firefox") > -1: return "firefox";
+        case agent.indexOf("safari") > -1: return "safari";
+        default: return "other";
+    }
+};
+
 // check if implemented as PWA and handle accordingly:
 // ********************************************************
 async function checkAndHandlePWA() {
@@ -43,13 +59,15 @@ async function checkAndHandlePWA() {
     } else {
         // get device type:
         var mobileOS = getMobileOperatingSystem();
+        // get device browser:
+        var browser = getMobileBrowser()
         // Check that the url is valid:
         try {
             var isSubID = data_helper.get_subject_id()
         } catch {
             var isSubID = "undefined";
         }
-        if (isSubID !== "undefined" && (mobileOS === 'iOS' || mobileOS === 'Android')) {
+        if (isSubID !== "undefined" && ((mobileOS === 'iOS' && browser === 'safari') || (mobileOS === 'Android' && browser === 'chrome'))) {
             var subData = await data_helper.get_subject_data(true).catch(function (e) {
                 console.log('error getting subject data');
                 console.log(e);
@@ -71,9 +89,11 @@ async function checkAndHandlePWA() {
                 dom_helper.set_text('installationProblemMessage', 'הלינק אינו מלא או לא תקין. אנא וודא/י שאת/ה משתמש/ת בלינק המלא שקיבלת.')
                 dom_helper.show('installationProblem');
             }
-            // Not a compatible device message:
+            // Not a compatible device message or browser:
             else {
-                dom_helper.set_text('installationProblemMessage', 'יש להכנס לקישור זה מסמארטפון<br>(אייפון או אנדרואיד).')
+                dom_helper.set_text('installationProblemMessage', 'יש להכנס לקישור זה<br>\
+                מדפדפן ה-safari ב-אייפון<br>\
+                או מדפדפן ה-chrome ב-אנדרואיד.')
                 dom_helper.show('installationProblem');
             }
         }

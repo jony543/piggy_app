@@ -141,6 +141,9 @@ window.onunload = onUserExit;
 
 // save data when leaving the app:
 function onUserExit() {
+    // Add the current app instance to the cleaning list before openning a new instance:
+    identifiersToClean.push(recordIdentifier)
+
     touchData = {
         screenInfo: screenInfo,
         pressEvents: pressEvents,
@@ -161,9 +164,6 @@ function refreshScreen() {
             location.reload();
             return
         }
-
-        // Add the current app instance to the cleaning list before openning a new instance:
-        identifiersToClean.push(recordIdentifier)
 
         //location.reload();
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
