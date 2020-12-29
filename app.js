@@ -1,4 +1,5 @@
 async function runApp() {
+
 	// ****************************************************************
 	//           SET & INITIALIZE STUFF:
 	// ----------------------------------------------------------------
@@ -6,10 +7,22 @@ async function runApp() {
 
 	// check if implemented as PWA and handle accordingly:
 	// ********************************************************
-	if (typeof isPWA === 'undefined') {isPWA = await checkAndHandlePWA()};
-	if (!isPWA) {return}
+	if (typeof isPWA === 'undefined') { isPWA = await checkAndHandlePWA() };
+	if (!isPWA) { return }
 	// ********************************************************
 
+	// make sure all images were appropriately loaded:
+	// ********************************************************
+	await Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = resolve; }))).then(() => {
+		console.log('images finished loading');
+	});
+	if (!!Array.from(document.images).filter(img => img.id !== "installation_guide" && img.naturalHeight === 0).length) { // check that all images were successfully loaded - detects if there was an error in loading an image
+		console.log('Problem in image loading');
+		alert('היתה בעיה בטעינה. נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש.')
+		return
+	}
+	// ********************************************************
+	
 	dom_helper.show('main_container')
 
 	// Define variables used to prevent two instances of the app running in simultaniously when reloading
@@ -108,7 +121,6 @@ async function runApp() {
 	}
 
 	//show spacechip landing animation:
-	dom_helper.add_css_class('spaceship', 'landing_spaceship'); // this includes the animation
 	dom_helper.show('spaceship');
 
 	// define top & bottom click operations

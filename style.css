@@ -156,12 +156,13 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 
 /* ---------------------------------------------------- */
 
-
-.landing_spaceship {
+#spaceship {
   position: fixed;
   top: 50vh;
   transform: translate(-50%, -50%);
-  
+  width: 50vw;
+  left: 0vw;
+  z-index: 2;
   animation-duration: 0.8s;
   animation-iteration-count: 1;
   animation-direction: normal;
