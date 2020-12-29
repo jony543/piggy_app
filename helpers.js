@@ -238,6 +238,21 @@ var data_helper = {
 			}
 			return resolve();
 		}).bind(this));
+	},
+	wait_for_server: function (max_ms) {
+		return Promise.race([
+			delay(max_ms),
+			new Promise((async function (resolve,reject) {
+				while (this.q.length > 0) {
+					await delay(300);
+				}
+				return resolve('success');
+			}).bind(this))
+		]).then((function (result) {
+			if (result != 'success') {
+				this.try_flush();
+			}
+		}).bind(this));
 	}
 };
 
@@ -438,7 +453,7 @@ function finishTrial(runData) {
 
 	subject_data_worker.postMessage(dataToSend);
 
-	data_helper.flush().then(function () { console.log('All data received at server'); });
+	data_helper.wait_for_server(2000).then(function () { console.log('All data received at server'); });
 
 	console.log('Trial Completed')
 }

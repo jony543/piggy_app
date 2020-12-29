@@ -153,7 +153,7 @@ function onUserExit() {
         screenOrientationEvents: screenOrientationEvents,
     }
     subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData, userExitOrUnloadTime: new Date() }) // ** 
-    data_helper.flush().then(function () { console.log('All data received at server [initiated by user exit]'); }); // **
+    data_helper.wait_for_server(1500).then(function () { console.log('All data received at server [initiated by user exit]'); }); // **
     console.log('meta data was saved');
 }
 
@@ -174,7 +174,7 @@ function refreshScreen() {
         dom_helper.show('loading_animation');
 
         // try resending all messages
-        data_helper.flush().then(function () {
+        data_helper.wait_for_server(500).then(function () {
             console.log('All data received at server [initiated by pseudo refresh]'); // **
 
             // an alternative to reloading step 2 that may be faster but needs more adaptations:
