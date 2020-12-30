@@ -150,7 +150,7 @@ function onUserExit() {
         screenOrientationEvents: screenOrientationEvents,
     }
     subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData, userExitOrUnloadTime: new Date() }) // ** 
-    data_helper.flush().then(function () { console.log('All data received at server [initiated by user exit]'); }); // **
+    data_helper.wait_for_server(1500).then(function () { console.log('All data received at server [initiated by user exit]'); }); // **
     console.log('meta data was saved');
 }
 
@@ -165,12 +165,11 @@ function refreshScreen() {
         }
 
         // try resending all messages
-        data_helper.flush()
+        data_helper.wait_for_server(500)
             .then(function () {
                 console.log('All data received at server [initiated by pseudo refresh]'); // **
 
-                // Make sure that the previous instance stopped or finished and run a new instance:
-                runNewAppInstance();
+                runNewAppInstance(); // Makes sure that the previous instance stopped or finished and run a new instance:
             });
 
     } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
@@ -180,7 +179,7 @@ function refreshScreen() {
 
 function runNewAppInstance() {
     if (typeof appRunning !== 'undefined' && appRunning) {
-        console.log('LOLOLOLOLLLLLLLL')
+        console.log('WAITING for previous instance to stop/complete.')
         setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
     } else {
         //location.reload();
