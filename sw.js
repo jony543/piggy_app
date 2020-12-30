@@ -10,6 +10,7 @@ self.addEventListener('activate', e => {
     console.log('Service Worker: Activated')
     // Remove unwanted caches:
     e.waitUntil(
+        self.clients.claim(),
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cache => {
@@ -23,21 +24,18 @@ self.addEventListener('activate', e => {
     );
 });
 
-// Call Fetch Event
-self.addEventListener('fetch', e => {
+self.addEventListener('fetch', function (event) {
     console.log('Service Worker: Fetching')
-    e.respondWith(
-        fetch(e.request)
-            .then(res => {
-                // Make copy/clone of response
-                const resClone = res.clone();
-                // Open cache
-                caches.open(cacheName).then(cache => {
-                    // Add response to cache
-                    cache.put(e.request, resClone);
+    event.respondWith(
+        caches.open(cacheName).then(function (cache) {
+            return cache.match(event.request).then(function (response) {
+                return response || fetch(event.request).then(function (response) {
+                    if (!event.request.url.includes('api/session/list?subId')) { // check that this is not the call to the data from the server (which I don't want to cache)
+                        cache.put(event.request, response.clone());
+                    }
+                    return response;
                 });
-                return res;
-            })
-            .catch(err => caches.match(e.request).then(res => res))
+            });
+        })
     );
 });

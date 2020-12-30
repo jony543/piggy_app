@@ -197,8 +197,8 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   // Exclusions:
   // -------------------------------------------
   // Check if the participant entered EVERY DAY:
-  const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i] && self.indexOf(x) === i).length;
-  const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].map((x) => x + 1).length;
+  const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i]).filter((v, i, a) => a.indexOf(v) === i).length;
+  const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].length;
   if (daysWithEntries !== possibleDaysWithEntries) {
     return true
   }
@@ -393,8 +393,8 @@ var logic = {
     // coins task:
     var coinsTaskStillValued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
     var coinsTaskDevalued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
-    const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.total_gold_collected).reduce((total, num) => total + num) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
-    const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
+    const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
+    const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num, 0)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
 
     return accumulatedValidReward + rewardFromCoinTasks - totalCost - costFromCoinsTasks
   },

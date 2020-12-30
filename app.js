@@ -1,5 +1,5 @@
 async function runApp() {
-
+	appRunning = true; // used to determine whther a new session can start
 	// ****************************************************************
 	//           SET & INITIALIZE STUFF:
 	// ----------------------------------------------------------------
@@ -22,9 +22,9 @@ async function runApp() {
 		return
 	}
 	// ********************************************************
-	
-	dom_helper.show('main_container')
 
+	dom_helper.show('main_container')
+	
 	// Define variables used to prevent two instances of the app running in simultaniously when reloading
 	let identifier = startTime.getTime(); // local within this instance
 	recordIdentifier = identifier; // global to communicate with the handle_events.js file
@@ -115,7 +115,7 @@ async function runApp() {
 		dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.entrance));
 		dom_helper.show(indicator_id);
 		setTimeout(() => {
-			if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+			if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 			dom_helper.hide(indicator_id)
 		}, settings.durations.costAnim)
 	}
@@ -139,7 +139,7 @@ async function runApp() {
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click1));
 					dom_helper.show(indicator_id);
 					setTimeout(() => {
-						if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+						if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 						dom_helper.hide(indicator_id)
 					}, settings.durations.costAnim)
 				}
@@ -167,7 +167,7 @@ async function runApp() {
 					dom_helper.set_text(indicator_id, "-" + logic.getCost(runData, settings, logic.cost_on.click2));
 					dom_helper.show(indicator_id);
 					setTimeout(() => {
-						if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+						if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 						dom_helper.hide(indicator_id)
 					}, settings.durations.costAnim)
 				}
@@ -185,7 +185,7 @@ async function runApp() {
 
 	// hide entrance graphics and sequence pressing inteface
 	await delay(settings.durations.entranceMessage);
-	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 	dom_helper.hide("spaceship");
 	dom_helper.show("upper_half");
 	dom_helper.show("lower_half");
@@ -196,7 +196,9 @@ async function runApp() {
 	}
 
 	// wait for 2 clicks to happen
+	appRunning = false;
 	await Promise.all([p1, p2]);
+	appRunning = true;
 
 	// hide sequence pressing inteface and show lottery animation
 	document.getElementById('lower_half').onclick = undefined;
@@ -205,18 +207,20 @@ async function runApp() {
 	dom_helper.hide("upper_half");
 	dom_helper.hide("lower_half");
 
-	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
 	runLottery(settings.durations.lotteryAnim / settings.lottery_N_frames, settings.lottery_N_frames, identifier);
+
+	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
 	// wait until gif animation is finished
 	await delay(settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 	setTimeout(() => {
-		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+		if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 		//document.getElementById('lottery').remove()
 	}, settings.durations.lotteryAnim - settings.durations.intervalBetweenLotteryAndOutcomeAnim);
 
-	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
 	if (runData.endExperiment) { // a message that game has ended (after the lottery gif for now, so I can assess multiple entries after completion)
 		subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
@@ -252,17 +256,14 @@ async function runApp() {
 	// get time of outcome presentation: **
 	subject_data_worker.postMessage({ outcomeTime: new Date() });
 
-	// register outcome viewing after 250ms: **
-	wait(settings.durations.minTimeToIndicateOutcomeViewing).then(() => {
-		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
-		subject_data_worker.postMessage({ viewedOutcome: true });
-	});
+	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+
 
 	// show winning/loosing message for 2 seconds
 	await delay(settings.durations.intervalBetweenOutcomeAndNextThing);
 
 	//
-	if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 	//
 
 	// handle manipulations:
@@ -276,7 +277,7 @@ async function runApp() {
 	// activate consumption test:
 	if (runData.consumptionTest) { // If there is no data yet (hold for both cases where demo is used or not)
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
-		if (identifiersToClean.includes(identifier)) { return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+		if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
 		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
 		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **

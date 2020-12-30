@@ -8,6 +8,8 @@ if (!!container) {
 // Define variables used to prevent two instances of the app running in simultaniously when reloading (communicates with app.js)
 identifiersToClean = [];
 recordIdentifier = '';
+// initiate a variable that tracks if an app is running:
+appRunning = false; // used to determine whther a new session can start
 
 // First thing first:
 // ---------------------
@@ -23,8 +25,6 @@ var isCalledFromInstructions = logic.isCalledFromInstructions();
 var screenInfo = {};
 var pressEvents = [];
 var firstTouchDetected = false;
-// // initialize No SCreen Sleep controller
-// var noSleep = new NoSleep();
 
 // detect touch events:
 document.body.addEventListener("touchstart", recordPressData, false);
@@ -34,7 +34,7 @@ document.body.addEventListener("touchcancel", recordPressData, false);
 
 // recording press data and device meta data:
 function recordPressData(event) {
-    if (!firstTouchDetected) { 	// record device meta data (type + screen/viewport data) (only once at each entry):
+    if (!firstTouchDetected) { 	// record device meta data (type + screen/viewport data) (only once at each entry... actually only when the app loads from scratch):
         screenInfo = {
             device_data: navigator.userAgent,
             event_view_window_visualViewport_height: event.view.window.visualViewport.height,
@@ -44,12 +44,9 @@ function recordPressData(event) {
             window_outerHeight: window.outerHeight,
             window_outerWidth: window.outerWidth,
         }
-
-        // // activate no Screen Sleep:
-        // noSleep.enable(); // keep the screen on!
-
         firstTouchDetected = true;
     }
+
     event.touches.pressTime = new Date();
     event.touches.timeStamp = event.timeStamp;
     event.touches.type = event.type;
@@ -124,7 +121,7 @@ function removeOnlyPortraitMessage() {
 }
 
 // ****************************************************************************************
-//  Handle data saving
+//  Handle data saving and running a new instance
 // ----------------------------------------------------------------------------------------
 // detect leaving the page events:
 document.addEventListener("visibilitychange", function () {
@@ -160,11 +157,32 @@ function onUserExit() {
 function refreshScreen() {
     if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
 
+        identifiersToClean.push(recordIdentifier) // in case it didn't got pushed by onUserExit()
+
         if (!isPWA) { // for the case of the installation page
             location.reload();
             return
         }
 
+        // try resending all messages
+        data_helper.flush()
+            .then(function () {
+                console.log('All data received at server [initiated by pseudo refresh]'); // **
+
+                // Make sure that the previous instance stopped or finished and run a new instance:
+                runNewAppInstance();
+            });
+
+    } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
+        window.location.href = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'index.html' + window.location.search; // call to main URL upon the next entry
+    }
+}
+
+function runNewAppInstance() {
+    if (typeof appRunning !== 'undefined' && appRunning) {
+        console.log('LOLOLOLOLLLLLLLL')
+        setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
+    } else {
         //location.reload();
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
         container.innerHTML = content;
@@ -172,19 +190,6 @@ function refreshScreen() {
         dom_helper.hide('lottery');
         dom_helper.show('app_will_load_soon');
         dom_helper.show('loading_animation');
-
-        // try resending all messages
-        data_helper.flush().then(function () {
-            console.log('All data received at server [initiated by pseudo refresh]'); // **
-
-            // an alternative to reloading step 2 that may be faster but needs more adaptations:
-            document.body.onload = runApp();
-        });
-
-    } else if (typeof tutorialCompleted !== 'undefined' && tutorialCompleted) { // For the last of tutorial when the tutorial is completed so the next entry will start the game.
-        window.location.href = location.href.substring(0, location.href.lastIndexOf('/')) + "/" + 'index.html' + window.location.search; // call to main URL upon the next entry
+        document.body.onload = runApp();// an alternative to reloading step 2 that may be faster but needs more adaptations:
     }
 }
-
-// MAYBE USE THIS SOMEWHERE (WHEN EXITING) TO STOP THE SCRIPT FROM RUNNING: 
-// throw new Error();

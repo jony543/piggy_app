@@ -73,7 +73,6 @@ window.app_settings = {
 		entranceMessage: 800,
 		lotteryAnim: 3500,
 		intervalBetweenLotteryAndOutcomeAnim: 2800,
-		minTimeToIndicateOutcomeViewing: 250,
 		// manipulation:
 		outcomeAnim: 2000,
 		intervalBetweenOutcomeAndNextThing: 1000,
@@ -249,7 +248,7 @@ window.app_settings = {
 	instructions_main_HTML_element: "jspsych-content",
 	App_HTML_title: 'Space Gold',
 	App_main_HTML_element: "main_container",
-	dataVarList: ["serial", "uniqueEntryID", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "viewedOutcome", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status"],
+	dataVarList: ["serial", "uniqueEntryID", "subID", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }

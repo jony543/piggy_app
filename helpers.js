@@ -378,6 +378,7 @@ function runLottery(timePerFrame, totalFrames, identifier) {
 		if (frameNumber > totalFrames || identifiersToClean.includes(identifier)) { // The second one is for case of pseudo refresh.
 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
 			clearInterval(runAnimation)
+			if (identifiersToClean.includes(identifier)) {appRunning = false};
 			return
 		} else {
 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
@@ -438,7 +439,7 @@ function finishTrial(runData) {
 
 	subject_data_worker.postMessage(dataToSend);
 
-	data_helper.flush().then(function () { console.log('All data received at server'); });
+	data_helper.flush().then(function () { console.log('All data received at server'); appRunning = false });
 
 	console.log('Trial Completed')
 }
