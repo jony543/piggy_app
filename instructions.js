@@ -87,43 +87,64 @@ function createSmartphoneApperance() {
 	outerRectangle = document.createElement('div');
 	outerRectangle.setAttribute("id", "outerRectangle");
 	outerRectangle.setAttribute("class", "bigRectangle");
+	document.body.appendChild(outerRectangle);
+
 	// inner rectangles:
+	appsLineContainerElement = document.createElement('div');
+	appsLineContainerElement.setAttribute("id", "appsLineContainerElement");
+	appsLineContainerElement.setAttribute("class", "appLine");
 	innerRectangle = document.createElement('div');
 	innerRectangle.setAttribute("id", "innerRectangle");
 	innerRectangle.setAttribute("class", "smallRectangle");
 	// put the inner rectangle in the outer rectangle
-	outerRectangle.appendChild(innerRectangle);
-	document.body.appendChild(outerRectangle);
+	appsLineContainerElement.appendChild(innerRectangle);
+	outerRectangle.appendChild(appsLineContainerElement);
 	// duplicate the small rectangles
-	for (i = 0; i < 13; i++) {
+	for (i = 0; i < 3; i++) { // make 4 icons in a line (add 3)
 		dom_helper.duplicate('innerRectangle');
 	}
-	// add the icon element:
+	for (i = 0; i < 2; i++) { // create 3 lines (add 2)
+		dom_helper.duplicate('appsLineContainerElement');
+	}
+	// create the line with the app
+	lineWithRealAppContainerElement = document.createElement('div');
+	lineWithRealAppContainerElement.setAttribute("id", "lineWithRealAppContainerElement");
+	lineWithRealAppContainerElement.setAttribute("class", "appLine");
+	innerRectangle = document.createElement('div');
+	innerRectangle.setAttribute("id", "innerRectangle2");
+	innerRectangle.setAttribute("class", "smallRectangle");
+	lineWithRealAppContainerElement.appendChild(innerRectangle);
+	outerRectangle.appendChild(lineWithRealAppContainerElement);
+	dom_helper.duplicate('innerRectangle2');
+	// add the icon of the REAL APP element:
 	appIconElement = document.createElement('img');
 	appIconElement.setAttribute("id", "appIcon");
 	appIconElement.setAttribute("class", "appIconSpecifics");
 	appIconElement.setAttribute("src", "icons/android-icon-72x72.png");
-	outerRectangle.appendChild(appIconElement);
+	lineWithRealAppContainerElement.appendChild(appIconElement);
 	// another app:
-	dom_helper.duplicate('innerRectangle');
-	// draw a line:
-	lineElement = document.createElement('hr');
-	outerRectangle.appendChild(lineElement);
-	// add another 5 regular rectangles:
+	dom_helper.duplicate('innerRectangle2');
+	// draw dots:
+	dotContainerElement = document.createElement('div');
+	dotContainerElement.setAttribute("id", "dotContainerElement");
+	dotElement = document.createElement('span');
+	dotElement.setAttribute("id", "homeScreenDots");
+	dotElement.setAttribute("class", "dot");
+	dotContainerElement.appendChild(dotElement);
+	outerRectangle.appendChild(dotContainerElement);
 	for (i = 0; i < 4; i++) {
-		dom_helper.duplicate('innerRectangle');
+		dom_helper.duplicate('homeScreenDots');
 	}
-}
+	// another line of apps
+	dom_helper.duplicate('appsLineContainerElement');
 
-function createExitAppButton(elementIdName) {
 	// button of exit the app:
 	exitAppElement = document.createElement('button');
-	exitAppElement.setAttribute("id", elementIdName);
+	exitAppElement.setAttribute("id", 'demoExitButton');
 	exitAppElement.setAttribute("onclick", "exitAppDemo(appDemoID)");
-	//exitAppElement.appendChild(document.createTextNode("Exit the app"));
 	document.body.appendChild(exitAppElement);
-	dom_helper.add_css_class(elementIdName, 'demoButton');
-	dom_helper.add_css_class(elementIdName, 'disabled');
+	dom_helper.add_css_class('demoExitButton', 'demoButton');
+	dom_helper.add_css_class('demoExitButton', 'disabled');
 }
 
 function createLoadAppButton(elementIdName) {
@@ -185,6 +206,11 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 	}
 }
 
+function cancelRedundantInvisibleButtonPress(event) {
+	if (event.target.id !== "instructionsButtons") {
+		event.preventDefault()
+	}
+}
 // ****************************************************************
 //                     INITIALIZE VARIABLES:
 // ---------------------------------------------------------------
@@ -267,6 +293,9 @@ var settings = Object.assign({}, app_settings);
 			{
 				stimulus: '',
 				on_load: function () {
+					document.body.addEventListener("touchend", cancelRedundantInvisibleButtonPress, false);
+					//document.getElementById("jspsych-html-button-response-button-0").addEventListener("touchend", (e) => {if (e.target === 'jspsych-html-button-response-button-0') {e.preventDefault()}}, false); // added to prevent the bug where unvisible buttons of next/previous are also in the center of the page.
+					//document.getElementById("jspsych-html-button-response-button-1").addEventListener("touchend", (e) => {if (e.target === 'jspsych-html-button-response-button-1') {e.preventDefault()}}, false); // added to prevent the bug where unvisible buttons of next/previous are also in the center of the page.
 					// present instructions image:
 					if (!document.getElementById('instructionsImage')) {
 						instructionsImageElement = document.createElement('img');
@@ -292,6 +321,7 @@ var settings = Object.assign({}, app_settings);
 	var instructionsLoop = {
 		timeline: [instructions],
 		loop_function: function (data) {
+			document.body.removeEventListener("touchend", cancelRedundantInvisibleButtonPress, false);
 			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
 			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if they went over all the pages of the instructions (and they didn't want to go a page back)
 				dom_helper.removeElement('instructionsImage');
@@ -316,7 +346,6 @@ var settings = Object.assign({}, app_settings);
 		func: function () {
 			// Operate the embedded demo:
 			createSmartphoneApperance()
-			createExitAppButton(elementIdName = 'demoExitButton')
 			createLoadAppButton(elementIdName = 'demoLoadButton')
 			jsPsych.pauseExperiment()
 			data_helper.on_broadcast = monitorChangesInDemoAndReact;

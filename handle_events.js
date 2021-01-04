@@ -34,6 +34,8 @@ document.body.addEventListener("touchcancel", recordPressData, false);
 
 // recording press data and device meta data:
 function recordPressData(event) {
+    //console.log(event.target)
+    //console.log(event)
     if (!firstTouchDetected) { 	// record device meta data (type + screen/viewport data) (only once at each entry... actually only when the app loads from scratch):
         screenInfo = {
             device_data: navigator.userAgent,

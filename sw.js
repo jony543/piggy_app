@@ -1,7 +1,8 @@
-const cacheName = 'v1';
+const cacheName = 'v28';
 
 // Call Install Event
 self.addEventListener('install', e => {
+    self.skipWaiting()
     console.log('Serveice Worker: Installed')
 });
 

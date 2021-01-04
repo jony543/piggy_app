@@ -242,7 +242,7 @@ var data_helper = {
 	wait_for_server: function (max_ms) {
 		return Promise.race([
 			delay(max_ms),
-			new Promise((async function (resolve,reject) {
+			new Promise((async function (resolve, reject) {
 				while (this.q.length > 0) {
 					await delay(300);
 				}
@@ -393,7 +393,7 @@ function runLottery(timePerFrame, totalFrames, identifier) {
 		if (frameNumber > totalFrames || identifiersToClean.includes(identifier)) { // The second one is for case of pseudo refresh.
 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
 			clearInterval(runAnimation)
-			if (identifiersToClean.includes(identifier)) {appRunning = false};
+			if (identifiersToClean.includes(identifier)) { appRunning = false };
 			return
 		} else {
 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0;
@@ -473,6 +473,7 @@ var dialog_helper = {
 		return this.show(msg, img_id, this.makeid(3), delayBeforeClosing, resolveOnlyAfterDelayBeforeClosing, preventFeedBack);
 	},
 	show: function (msg, img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = false) { // returns promise
+		appRunning = false;
 		return new Promise(function (resolve) {
 			if (!!confirmation) {
 				dom_helper.set_text("dialog_confirmation_msg", 'כדי להמשיך יש להקליד ' + "'" + confirmation + "'" + '.');
@@ -521,10 +522,12 @@ var dialog_helper = {
 
 					if (resolveOnlyAfterDelayBeforeClosing) { // needed to make consecutive dialog boxes work sometimes
 						resolve();
+						appRunning = true;
 					}
 				}, delayBeforeClosing)
 				if (!resolveOnlyAfterDelayBeforeClosing) { // needed to make consecutive dialog boxes work sometimes
 					resolve();
+					appRunning = true;
 				}
 			}
 		});
@@ -536,7 +539,29 @@ if ('serviceWorker' in navigator) {
 	window.addEventListener('load', () => {
 		navigator.serviceWorker
 			.register('sw.js')
-			.then(reg => console.log('Service Worker: Registered'))
+			.then(reg => {
+				console.log('Service Worker: Registered')
+				reg.addEventListener('updatefound', () => {
+					console.log('UPDATE FOUND')
+					//reg.update()
+					// A wild service worker has appeared in reg.installing!
+					const newWorker = reg.installing;
+
+					newWorker.state;
+					// "installing" - the install event has fired, but not yet complete
+					// "installed"  - install complete
+					// "activating" - the activate event has fired, but not yet complete
+					// "activated"  - fully active
+					// "redundant"  - discarded. Either failed install, or it's been
+					//                replaced by a newer version
+
+					newWorker.addEventListener('statechange', () => {
+						console.log('STATAE CHANGED')
+						console.log(newWorker.state)
+						// newWorker.state has changed
+					});
+				});
+			})
 			.catch(err => console.log(`Service Worker: Error: ${err}`))
 	})
 }

@@ -56,13 +56,11 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 .error_message_screen {
   position: absolute;
   background-color: black;
-  width: 95vw;
-  height: 95vh;
+  width: 100vw;
+  height: 100vh;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 35px;
-  border: 0.8vw solid rgb(50,50,50);
   z-index: 9999;
 }
 
@@ -245,12 +243,12 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 
 .upper.separate {
 	border-bottom-style: solid;
-    border-bottom-width: 2px;
+    border-bottom-width: 1px;
 }
 
 .lower.separate {
 	border-top-style: solid;
-    border-top-width: 2px;
+    border-top-width: 1px;
 }
 
 /* If you want the content centered horizontally and vertically */
@@ -449,7 +447,7 @@ h1 {
 
   border: 0.5vw solid rgb(100, 100, 100);
   background-color: rgba(220, 220, 220, 0.75);
-  border-radius: 30px;
+  border-radius: 15px;
 }
 
 .goodByeMessageTextSize {
@@ -481,18 +479,18 @@ h1 {
   top: 49.5vh;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 25vw;
-  height: 4vh;
-  margin-right: 20vw;
+  width: 28vw;
+  height: 5.5vh;
+  margin-right: 12vw;
   margin-left: auto;
 
   background-color: rgba(200, 200, 200, 0.7);
-  border: 1vw solid rgb(50, 50, 50);
+  border: 0.5vw solid rgb(50, 50, 50);
   color: rgb(50, 50, 50);
   text-align: center;
-  font-size: 4vw;
+  font-size: 4.2vw;
   transition-duration: 0.4s;
-  border-radius: 50px;
+  border-radius: 25px;
   outline: none;
   z-index: 999;
 }
@@ -587,7 +585,7 @@ h1 {
   top: 14vh;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 35px;
+  border-radius: 17.5px;
   border: 0.8vw solid rgb(50,50,50);
 
   animation-duration: 1.5s;
@@ -607,7 +605,7 @@ h1 {
   line-height: normal;
   text-align: center;
   color: black;
-  font-size: 2vh;
+  font-size: 2.08vh;
   direction: rtl;
   
   animation-duration: 1s;
@@ -616,7 +614,7 @@ h1 {
   animation-timing-function: steps(100, end);
   animation-fill-mode: forwards;
   animation-name: appearGradually;
-  animation-delay: 2s;
+  animation-delay: 1s;
   opacity:0;
 }
 @keyframes appearGradually {
@@ -624,9 +622,67 @@ h1 {
   100% {opacity:1.0}
 }
 
+/* draw a smartphone screen */
+.bigRectangle {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vw;
+  height: 70vh;
+  border: 0.5vw solid rgb(100, 100, 100);
+  border-radius: 5vw;
+}
+
+.appLine {
+  text-align:center;
+  margin: 0;
+}
+.smallRectangle {
+  display:inline-block;
+  width: 12vw;
+  height: 6.5vh;
+  margin-left: 1.7vw;
+  margin-right: 1.7vw;
+  margin-top: 1.8vh;
+  margin-bottom: 1.8vh;
+  border: 0.5vw solid transparent;
+  background-color: rgba(200, 200, 200, 0.35);
+  overflow: hidden;
+  border-radius: 7.5px;
+}
+
+.appIconSpecifics {
+  display:inline-block;
+  width: 13vw;
+  height: calc(6.5vh + 1vw);
+  margin-left: 1.7vw;
+  margin-right: 1.7vw;
+  margin-top: 1.8vh;
+  margin-bottom: 1.8vh;
+  overflow: hidden;
+  border-radius: 7.5px;
+}
+
+#dotContainerElement {
+  text-align:center;
+  margin: 0;
+}
+.dot {
+  display: inline-block;
+  height: 1vh;
+  width: 1vh;
+  margin-left: 1vw;
+  margin-right: 1vw;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  background-color: rgba(200, 200, 200, 0.7);
+  border-radius: 50%;
+}
+
 .demoButton {
   position: absolute;
-  top: 93.5%;
+  top: 91.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 20vw;
@@ -649,7 +705,6 @@ h1 {
   animation-fill-mode: forwards;
   animation-name: appearGradually;
 }
-
 .demoButton:active {
   background-color: #555555;
   color: white;
@@ -658,47 +713,12 @@ h1 {
 .loadButton {
   position: absolute;
   background-color: transparent;
-  border-radius: 15px;
+  border-radius: 7.5px;
   outline: none;
   border-width: 0;
 }
-
 .loadButton:active {
   background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* draw a smartphone screen */
-.bigRectangle {
-  position: absolute;
-  top: 62%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70vw;
-  height: 70vh;
-  border: 0.5vw solid rgb(100, 100, 100);
-  border-radius: 5vw;
-}
-
-.smallRectangle {
-  display:inline-block;
-  width: 12vw;
-  height: 6.5vh;
-  margin-left: 3.5vw;
-  margin-top: 4.3vh;
-  border: 0.5vw solid transparent;
-  background-color: rgba(200, 200, 200, 0.35);
-  overflow: hidden;
-  border-radius: 15px;
-}
-
-.appIconSpecifics {
-  display:inline-block;
-  width: 13vw;
-  height: calc(6.5vh + 1vw);
-  margin-left: 3.5vw;
-  margin-top: 5vh;
-  overflow: hidden;
-  border-radius: 15px;
 }
 
 .appClose {
@@ -732,14 +752,6 @@ h1 {
 
 .disabled{
   pointer-events: none;
-}
-
-hr {
-  position: relative;
-  top: 2vh;
-  margin-left: 5vh;
-  margin-right: 5vh;
-  border-top: 2vw dotted rgba(200, 200, 200, 0.7);
 }
 
 #repeatOrContinueButtons {
@@ -796,6 +808,8 @@ hr {
 }
 
 .dialog button {
+  border-width: 1px;
+  background: rgb(200,200,200);
   font-size: 5vw;
   padding: 1.2vh;
   margin-bottom: 2vh;
@@ -855,7 +869,7 @@ hr {
   width: 75vw;
   height: auto;
   margin-bottom: 2vh;
-  border-radius: 30px;
+  border-radius: 4vw;
 }
 
 /* -------------- cave from the outside ------------------ */

@@ -336,13 +336,13 @@ var logic = {
         // ---------------------------
         var toHideOutcome = checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation, settings.experimentalDayStartingHour);
 
-        // Reset container
-        // ---------------------------
-        var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 ? checkIfResetContainer(subData, dayOfExperiment) : false; // check if reset container
-
         // End experiment & Exclusions
         // ---------------------------
         var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment);
+
+        // Reset container
+        // ---------------------------
+        var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 && !endExperiment ? checkIfResetContainer(subData, dayOfExperiment) : false; // check if reset container
 
       } else { // if it is the first entry
         isWin = checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
