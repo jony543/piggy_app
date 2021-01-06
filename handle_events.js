@@ -60,7 +60,7 @@ function recordPressData(event) {
 // ----------------------------------------------------------------------------------------
 // initialize variables:
 var screenOrientationEvents = [];
-var screenInitialOrientation = '';
+var screenInitialOrientation = checkInitialOrientation();
 
 // get current html to determine relevant id for orientation switches
 if (document.title === settings.instructions_HTML_title) {
@@ -70,11 +70,13 @@ if (document.title === settings.instructions_HTML_title) {
 }
 
 // check upon entry if it is on portrait mode:
-if (screen.availHeight < screen.availWidth) {
-    showOnlyPortraitMessage()
-    screenInitialOrientation = 'landscape'
-} else {
-    screenInitialOrientation = 'portrait'
+function checkInitialOrientation(){
+    if (screen.availHeight < screen.availWidth) {
+        showOnlyPortraitMessage()
+        return 'landscape'
+    } else {
+        return 'portrait'
+    }    
 }
 
 window.addEventListener("orientationchange", function (event) {
@@ -125,24 +127,27 @@ function removeOnlyPortraitMessage() {
 // ****************************************************************************************
 //  Handle data saving and running a new instance
 // ----------------------------------------------------------------------------------------
+
 // detect leaving the page events:
 document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
         console.log('screen closed')
-        onUserExit()
+        onUserExit('visibilitychange_screen_closed_event')
     } else {
         console.log('screen openned')
         refreshScreen()
     }
 }, false);
 
-window.onunload = onUserExit;
+window.onunload = onUserExit('unload_event');
 
 // save data when leaving the app:
-function onUserExit() {
+function onUserExit(initiatorInfo) {
     // Add the current app instance to the cleaning list before openning a new instance:
     identifiersToClean.push(recordIdentifier)
-
+    
+    // assign meta data to send:
+    var dataToSend = {};
     touchData = {
         screenInfo: screenInfo,
         pressEvents: pressEvents,
@@ -151,8 +156,14 @@ function onUserExit() {
         screenInitialOrientation: screenInitialOrientation,
         screenOrientationEvents: screenOrientationEvents,
     }
-    subject_data_worker.postMessage({ touchData: touchData, screenOrientationData: screenOrientationData, userExitOrUnloadTime: new Date() }) // ** 
-    data_helper.wait_for_server(1500).then(function () { console.log('All data received at server [initiated by user exit]'); }); // **
+    Object.assign(dataToSend, { screenOrientationData: screenOrientationData }, { touchData: touchData })
+    if (initiatorInfo.includes('unload') || initiatorInfo.includes('visibilitychange')) { Object.assign(dataToSend, { userExitOrUnloadTime: new Date() }) }
+
+    // send meta data:
+    subject_data_worker.postMessage(dataToSend)
+    data_helper.wait_for_server(1500).then(function (x) {
+        console.log('All meta data received at server [initiated by *' + initiatorInfo + '*]');
+    });
     console.log('meta data was saved');
 }
 
@@ -170,6 +181,11 @@ function refreshScreen() {
         data_helper.wait_for_server(500)
             .then(function () {
                 console.log('All data received at server [initiated by pseudo refresh]'); // **
+
+                // reset meta variables:
+                screenOrientationEvents = [];
+                screenInitialOrientation = checkInitialOrientation();
+                pressEvents = [];
 
                 runNewAppInstance(); // Makes sure that the previous instance stopped or finished and run a new instance:
             });

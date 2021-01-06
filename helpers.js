@@ -454,9 +454,10 @@ function finishTrial(runData) {
 
 	subject_data_worker.postMessage(dataToSend);
 
-	data_helper.wait_for_server(2000).then(function () { console.log('All data received at server'); appRunning = false });
+	data_helper.wait_for_server(2000).then(function () { console.log('All data received at server [initiated by the finishTrial function]'); appRunning = false });
 
 	console.log('Trial Completed')
+	onUserExit('trial_completed')
 }
 
 var dialog_helper = {
