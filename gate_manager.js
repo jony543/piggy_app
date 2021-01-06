@@ -108,7 +108,7 @@ function populate_manifest() {
         "name": "Space Gold",
         "short_name": "Space Gold",
         "display": "standalone",
-        "orientation": "portrait",
+//        "orientation": "portrait",
         "background_color": "#666666ff",
         "theme_color": "#000000",
         "icons": [

@@ -1,3 +1,27 @@
+// const events = [
+// 	"pagehide", "pageshow",
+// 	"unload", "load"
+//   ];
+  
+//   const eventLogger = event => {
+// 	switch (event.type) {
+// 	  case "pagehide":
+// 	  case "pageshow":
+// 		let isPersisted = event.persisted ? "persisted" : "not persisted";
+// 		console.log('EventEventEventEventEventEventEventEventEventEvent:', event.type, '-', isPersisted);
+// 		break;
+// 	  default:
+// 		console.log('EventEventEventEventEventEventEventEventEventEvent:', event.type);
+// 		break;
+// 	}
+//   };
+  
+//   events.forEach(eventName =>
+// 	window.addEventListener(eventName, eventLogger)
+//   );
+
+// https://blog.alexmaccaw.com/javascript-wake-event
+
 var dom_helper = {
 	show: function (id) {
 		this.remove_css_class(id, "hidden");

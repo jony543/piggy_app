@@ -1,4 +1,4 @@
-// This script is aimed to record and handle touch and change in device orientation events
+// This script is aimed to record and handle touch and change in device orientation events and to listen and operate app refreshing
 var container = document.getElementById("main_container");
 
 if (!!container) {
