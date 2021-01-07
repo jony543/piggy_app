@@ -50,7 +50,7 @@ if not os.path.exists('./mapping_key_to_subId.js'):
         writer = csv.writer(file)
         writer.writerow(["Sub_ID", "URL", "key_code"])
         for key, val in sub_key_dict.items():
-            writer.writerow([val, 'https://experiments.schonberglab.org/static/rani/Space_Gold_App4/index.html?subId=' + key, key])
+            writer.writerow([val, 'https://experiments.schonberglab.org/static/rani/Space_Gold_App7/index.html?subId=' + key, key])
     print('The file mapping_key_to_subId.csv was saved')
     # backup a copy with a timestamp:
     copyfile('mapping_key_to_subId.csv', 'backup/mapping_key_to_subId.' + str(time.time()) + '.csv')

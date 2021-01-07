@@ -215,13 +215,13 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 
 .upper {
     top: 0;
-    height: 50%;
+    height: 49.8vh;
     z-index: 2;
 }
 
 .lower {
     bottom: 0;
-    height: 50%; 
+    height: 50.2vh; 
     z-index: 3;
 }
 
@@ -243,12 +243,12 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 
 .upper.separate {
 	border-bottom-style: solid;
-    border-bottom-width: 1px;
+    border-bottom-width: 0.2vh;
 }
 
 .lower.separate {
 	border-top-style: solid;
-    border-top-width: 1px;
+    border-top-width: 0.2vh;
 }
 
 /* If you want the content centered horizontally and vertically */
@@ -605,7 +605,7 @@ h1 {
   line-height: normal;
   text-align: center;
   color: black;
-  font-size: 2.08vh;
+  font-size: 3.8vw;
   direction: rtl;
   
   animation-duration: 1s;
