@@ -215,13 +215,13 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 
 .upper {
     top: 0;
-    height: 49.8vh;
+    height: 49.9vh;
     z-index: 2;
 }
 
 .lower {
     bottom: 0;
-    height: 50.2vh; 
+    height: 49.9vh; 
     z-index: 3;
 }
 
@@ -243,12 +243,12 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 
 .upper.separate {
 	border-bottom-style: solid;
-    border-bottom-width: 0.2vh;
+    border-bottom-width: 0.3vh;
 }
 
 .lower.separate {
 	border-top-style: solid;
-    border-top-width: 0.2vh;
+    border-top-width: 0.3vh;
 }
 
 /* If you want the content centered horizontally and vertically */
@@ -339,8 +339,8 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 #superimposed_outcome_sum {
   position: absolute;
   font-size: 6vw;
-  top: 48%; /* Adjust this value to move the positioned div up and down */
-  left: 52.5%;
+  top: 50%; /* Adjust this value to move the positioned div up and down */
+  left: 50%;
   /*background: rgba(0, 0, 0, 0.8);*/
   color: rgb(240, 240, 240);
   text-shadow: -1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey;
@@ -509,6 +509,7 @@ h1 {
 #post_instructions_test_image {
   width: 70vw;
   height: auto;
+  border-radius: 3vw;
 }
 
 #jspsych-instructions-next {

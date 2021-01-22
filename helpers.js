@@ -1,27 +1,3 @@
-// const events = [
-// 	"pagehide", "pageshow",
-// 	"unload", "load"
-//   ];
-  
-//   const eventLogger = event => {
-// 	switch (event.type) {
-// 	  case "pagehide":
-// 	  case "pageshow":
-// 		let isPersisted = event.persisted ? "persisted" : "not persisted";
-// 		console.log('EventEventEventEventEventEventEventEventEventEvent:', event.type, '-', isPersisted);
-// 		break;
-// 	  default:
-// 		console.log('EventEventEventEventEventEventEventEventEventEvent:', event.type);
-// 		break;
-// 	}
-//   };
-  
-//   events.forEach(eventName =>
-// 	window.addEventListener(eventName, eventLogger)
-//   );
-
-// https://blog.alexmaccaw.com/javascript-wake-event
-
 var dom_helper = {
 	show: function (id) {
 		this.remove_css_class(id, "hidden");
@@ -180,7 +156,7 @@ var data_helper = {
 			// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
 			if (event.code != 1000) {
 				// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
-				console.log('WS clode. re opening');
+				console.log('WS is closed. re-opening');
 				this.init_session(this.sessionName, true);
 			}
 		}).bind(this);
@@ -234,7 +210,7 @@ var data_helper = {
 				);
 				this.ws.send(dataToSend);
 
-				console.log('readySatate = 1; data was saved. Th data:')
+				console.log('readySatate = 1; data was saved. The data:')
 				console.log(dataToSend)
 
 				return true;
@@ -380,32 +356,6 @@ function loadLotteryFrames(totalFrames) {
 		}
 	}
 }
-
-// // run the lottery animation:
-// function runLottery(timePerFrame, totalFrames) {
-// 	let timeWhenLastUpdate;
-// 	let timeFromLastUpdate;
-// 	dom_helper.show('lottery')
-// 	document.getElementById('lottery-1').style.opacity = 1
-// 	let frameNumber = 1;
-// 	function step(beginningTime) {
-// 		if (!timeWhenLastUpdate) timeWhenLastUpdate = beginningTime;
-// 		timeFromLastUpdate = beginningTime - timeWhenLastUpdate;
-// 		if (timeFromLastUpdate > timePerFrame) {
-// 			if (frameNumber >= totalFrames) {
-// 				document.getElementById('lottery-' + frameNumber).style.opacity = 0
-// 				return;
-// 			} else {
-// 				frameNumber = frameNumber + 1;
-// 			}
-// 			document.getElementById('lottery-' + (frameNumber - 1)).style.opacity = 0
-// 			document.getElementById('lottery-' + frameNumber).style.opacity = 1
-// 			timeWhenLastUpdate = beginningTime;
-// 		}
-// 		requestAnimationFrame(step);
-// 	}
-// 	requestAnimationFrame(step);
-// }
 
 function runLottery(timePerFrame, totalFrames, identifier) {
 	x = new Date()

@@ -42,14 +42,20 @@ function getMobileBrowser() { // adapted by Rani from https://stackoverflow.com/
     }
 };
 
+function checkIfTablet() { // taken by rani from https://stackoverflow.com/questions/50195475/detect-if-device-is-tablet/53518181
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent);
+    return isTablet
+}
+
 // check if implemented as PWA and handle accordingly:
 // ********************************************************
 async function checkAndHandlePWA() {
     var isInWebAppiOS = window.navigator.standalone === true;
     var isInWebAppChrome =
-        window.matchMedia("(display-mode: fullscreen)").matches ||
-        window.matchMedia("(display-mode: standalone)").matches ||
-        window.matchMedia("(display-mode: minimal-ui)").matches;
+        //window.matchMedia("(display-mode: fullscreen)").matches || ***** UNCOMMENT FOR DEBUGGING PURPOSES ON MAC/PC ******
+        window.matchMedia("(display-mode: standalone)").matches;
+        //window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // if app PWA:
     if (isInWebAppiOS || isInWebAppChrome) {
@@ -61,13 +67,15 @@ async function checkAndHandlePWA() {
         var mobileOS = getMobileOperatingSystem();
         // get device browser:
         var browser = getMobileBrowser()
+        // check if tablet:
+        var isTablet = checkIfTablet()
         // Check that the url is valid:
         try {
             var isSubID = data_helper.get_subject_id()
         } catch {
             var isSubID = "undefined";
         }
-        if (isSubID !== "undefined" && ((mobileOS === 'iOS' && browser === 'safari') || (mobileOS === 'Android' && browser === 'chrome'))) {
+        if (isSubID !== "undefined" && !isTablet && ((mobileOS === 'iOS' && browser === 'safari') || (mobileOS === 'Android' && browser === 'chrome'))) {
             var subData = await data_helper.get_subject_data(true).catch(function (e) {
                 console.log('error getting subject data');
                 console.log(e);
@@ -104,70 +112,8 @@ async function checkAndHandlePWA() {
 }
 
 function populate_manifest() {
-    var myDynamicManifest = {
-        "name": "Space Gold",
-        "short_name": "Space Gold",
-        "display": "standalone",
-//        "orientation": "portrait",
-        "background_color": "#666666ff",
-        "theme_color": "#000000",
-        "icons": [
-            {
-                "src": "android-icon-36x36.png",
-                "sizes": "36x36",
-                "type": "image\/png",
-                "density": "0.75"
-            },
-            {
-                "src": "android-icon-48x48.png",
-                "sizes": "48x48",
-                "type": "image\/png",
-                "density": "1.0"
-            },
-            {
-                "src": "android-icon-72x72.png",
-                "sizes": "72x72",
-                "type": "image\/png",
-                "density": "1.5"
-            },
-            {
-                "src": "android-icon-96x96.png",
-                "sizes": "96x96",
-                "type": "image\/png",
-                "density": "2.0"
-            },
-            {
-                "src": "android-icon-144x144.png",
-                "sizes": "144x144",
-                "type": "image\/png",
-                "density": "3.0"
-            },
-            {
-                "src": "android-icon-192x192.png",
-                "sizes": "192x192",
-                "type": "image\/png",
-                "density": "4.0"
-            },
-            {
-                "src": "android-icon-512x512.png",
-                "sizes": "512x512",
-                "type": "image\/png",
-                "density": "1.0"
-            }
-        ]
-    }
-    // Add the start url
-    myDynamicManifest["start_url"] = location.href;
+    // TO SWITCH TO USE LOCAL MANIFESTS FROMED BY create_subject_keycodes_and_manifests.py SWITCH COMMENTING BETWEEN THE TWO FOLLOWING LINES:
+    //    document.getElementById('manifest-placeholder').setAttribute('href', location.href.substring(0, location.href.lastIndexOf("/") + 1) + 'manifests/manifest_' + /[&?]subId=([^&]+)/.exec(location.search)[1] + '.json');
+    document.getElementById('manifest-placeholder').setAttribute('href', "https://experiments.schonberglab.org/app/manifests/space_gold.json")
 
-    // Add the correct path for the icons
-    const fullPath = location.href.substring(0, location.href.lastIndexOf("/") + 1) + 'icons/';
-    myDynamicManifest.icons.forEach((x) => x.src = fullPath + x.src)
-
-    // Prepare and attach the manifest to the html
-    const stringManifest = JSON.stringify(myDynamicManifest);
-    const blob = new Blob([stringManifest], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(blob);
-    document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
-
-    // The dynamic manifest implementation is based on https://medium.com/@alshakero/how-to-setup-your-web-app-manifest-dynamically-using-javascript-f7fbee899a61
 }

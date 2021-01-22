@@ -6,7 +6,9 @@ import time
 import string
 import random
 
-commonAdress = 'https://experiments.schonberglab.org/static/rani/Space_Gold_App7/index.html?subId='
+mainAdress = 'https://experiments.schonberglab.org/static/rani/Space_Gold_App7/'
+commonStartAdress = mainAdress + 'index.html?subId='
+commonIconsAdress = mainAdress + 'icons/'
 
 # FUNCTIONS:
 
@@ -14,7 +16,6 @@ def get_random_string(length):
     letters = string.ascii_letters + string.digits
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
-
 
 def createSubNumDict(ranges=[(101, 200), (201, 300), (701, 800), (801, 900)], key_code_length=20):
     sub_key_dict = {}
@@ -40,55 +41,57 @@ myDynamicManifest = {
     "short_name": "Space Gold",
     "start_url": "",
     "display": "standalone",
-#       "orientation": "portrait",
+#   "orientation": "portrait",
     "background_color": "#666666ff",
     "theme_color": "#000000",
     "icons": [
         {
             "src": "android-icon-36x36.png",
             "sizes": "36x36",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "0.75"
         },
         {
             "src": "android-icon-48x48.png",
             "sizes": "48x48",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "1.0"
         },
         {
             "src": "android-icon-72x72.png",
             "sizes": "72x72",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "1.5"
         },
         {
              "src": "android-icon-96x96.png",
             "sizes": "96x96",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "2.0"
         },
         {
             "src": "android-icon-144x144.png",
             "sizes": "144x144",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "3.0"
         },
         {
             "src": "android-icon-192x192.png",
             "sizes": "192x192",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "4.0"
         },
         {
             "src": "android-icon-512x512.png",
             "sizes": "512x512",
-            "type": "image\/png",
+            "type": "image/png",
             "density": "1.0"
         }
     ]
 }
-
+# set the icons full path:
+for icon in myDynamicManifest['icons']:
+    icon['src'] = commonIconsAdress + icon['src']
 
 
 # RUN THE CODE:
@@ -108,7 +111,7 @@ if not os.path.exists('./mapping_key_to_subId.js'):
         writer = csv.writer(file)
         writer.writerow(["Sub_ID", "URL", "key_code"])
         for key, val in sub_key_dict.items():
-            writer.writerow([val, commonAdress + key, key])
+            writer.writerow([val, commonStartAdress + key, key])
     print('The file mapping_key_to_subId.csv was saved')
     # backup a copy with a timestamp:
     copyfile('mapping_key_to_subId.csv', 'backup/mapping_key_to_subId.' + str(time.time()) + '.csv')
@@ -117,7 +120,7 @@ if not os.path.exists('./mapping_key_to_subId.js'):
     if not os.path.exists('manifests'):
         os.makedirs('manifests')
     for key, val in sub_key_dict.items():
-        myDynamicManifest["start_url"] = commonAdress + key
+        myDynamicManifest["start_url"] = commonStartAdress + key
         with open('manifests/manifest_' + key + '.json', 'w') as f:
             json.dump(myDynamicManifest, f, indent=4)
     print('The manifest files were saved')

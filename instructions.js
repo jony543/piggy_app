@@ -1,6 +1,41 @@
 // ****************************************************************
 //                           FUNCTIONS:
 // ----------------------------------------------------------------
+// load the frames in case they are not already there:
+async function preloadInstructionImages(totalPages = settings.n_instruction_pages) {
+	// load the instructions pages
+	for (var i = 1; i < totalPages + 1; i++) {
+		var elem = document.createElement('img');
+		elem.setAttribute('id', 'instructionImage-' + i)
+		elem.setAttribute('class', 'full_bg_image hidden')
+		elem.setAttribute('src', "images/instructions/instructions_" + i + ".jpg")
+		document.body.appendChild(elem);
+	}
+	// load the image used in the finish slide
+	elem2 = document.createElement('img');
+	elem2.setAttribute('class', 'hidden')
+	elem2.setAttribute('src', "images/game_title_image.jpg")
+	document.body.appendChild(elem2);
+	// load the icon of the demo app icon element:
+	elem3 = document.createElement('img');
+	elem3.setAttribute("class", "hidden");
+	elem3.setAttribute("src", "icons/android-icon-72x72.png");
+	document.body.appendChild(elem3);
+
+	// make sure all images were appropriately loaded:
+	// ********************************************************
+	jsPsych.pauseExperiment();
+	await Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = resolve; }))).then(() => {
+		console.log('images finished loading');
+		jsPsych.resumeExperiment();
+	});
+	if (!!Array.from(document.images).filter(img => img.id !== "installation_guide" && img.naturalHeight === 0).length) { // check that all images were successfully loaded - detects if there was an error in loading an image
+		console.log('Problem in image loading');
+		alert('היתה בעיה בטעינה. נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש.')
+		return
+	}
+};
+
 var check_consent = function (elem) {
 	if (document.getElementById('consent_checkbox').checked) {
 		return true;
@@ -271,6 +306,13 @@ var settings = Object.assign({}, app_settings);
 	}
 	var question_number = arrayOfQuestionNumbers[question_index]
 
+	// PRE-LOADIMAGES:
+	//------------------------------------------------------
+	var preLoadImages = {
+		type: 'call-function',
+		func: preloadInstructionImages,
+	};
+
 	// SET INFORMED CONSENT:
 	//------------------------------------------------------
 	var consentForm = {
@@ -294,18 +336,7 @@ var settings = Object.assign({}, app_settings);
 				stimulus: '',
 				on_load: function () {
 					document.body.addEventListener("touchend", cancelRedundantInvisibleButtonPress, false);
-					//document.getElementById("jspsych-html-button-response-button-0").addEventListener("touchend", (e) => {if (e.target === 'jspsych-html-button-response-button-0') {e.preventDefault()}}, false); // added to prevent the bug where unvisible buttons of next/previous are also in the center of the page.
-					//document.getElementById("jspsych-html-button-response-button-1").addEventListener("touchend", (e) => {if (e.target === 'jspsych-html-button-response-button-1') {e.preventDefault()}}, false); // added to prevent the bug where unvisible buttons of next/previous are also in the center of the page.
-					// present instructions image:
-					if (!document.getElementById('instructionsImage')) {
-						instructionsImageElement = document.createElement('img');
-						instructionsImageElement.setAttribute("id", 'instructionsImage');
-						instructionsImageElement.setAttribute("class", 'full_bg_image');
-						instructionsImageElement.setAttribute("src", 'images/instructions/instructions_' + String(instructions_page) + '.jpg');
-						document.body.appendChild(instructionsImageElement)
-					} else {
-						document.getElementById('instructionsImage').src = 'images/instructions/instructions_' + String(instructions_page) + '.jpg';
-					}
+					dom_helper.show('instructionImage-' + String(instructions_page))
 					// handle buttons:
 					document.getElementById("instructionsButtons").disabled = true;
 					document.getElementById("instructionsButtons").style.opacity = "0.5";
@@ -313,6 +344,9 @@ var settings = Object.assign({}, app_settings);
 						document.getElementById("instructionsButtons").disabled = false
 						document.getElementById("instructionsButtons").style.opacity = "1";
 					}, 1500);
+				},
+				on_finish: function () {
+					dom_helper.hide('instructionImage-' + String(instructions_page))
 				}
 			}
 		],
@@ -324,7 +358,7 @@ var settings = Object.assign({}, app_settings);
 			document.body.removeEventListener("touchend", cancelRedundantInvisibleButtonPress, false);
 			var goBack = !!Number(jsPsych.data.get().last().select('button_pressed').values[0]); // check if participant pressed to go back (or 'next')
 			if (!(instructions_page % settings.n_instruction_pages) && !goBack) { // check if they went over all the pages of the instructions (and they didn't want to go a page back)
-				dom_helper.removeElement('instructionsImage');
+				//dom_helper.removeElement('instructionsImage');
 				document.body.style.backgroundColor = "white";
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				return false;
@@ -484,6 +518,7 @@ var settings = Object.assign({}, app_settings);
 		}
 	};
 
+	timeline.push(preLoadImages);
 	timeline.push(consentForm);
 	timeline.push(completeTutorialLoop);
 
