@@ -6,7 +6,7 @@ import time
 import string
 import random
 
-mainAdress = 'https://experiments.schonberglab.org/static/rani/Space_Gold_App7/'
+mainAdress = 'https://experiments.schonberglab.org/static/rani/Space_Gold_App/'
 commonStartAdress = mainAdress + 'index.html?subId='
 commonIconsAdress = mainAdress + 'icons/'
 

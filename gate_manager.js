@@ -53,9 +53,9 @@ function checkIfTablet() { // taken by rani from https://stackoverflow.com/quest
 async function checkAndHandlePWA() {
     var isInWebAppiOS = window.navigator.standalone === true;
     var isInWebAppChrome =
-        //window.matchMedia("(display-mode: fullscreen)").matches || ***** UNCOMMENT FOR DEBUGGING PURPOSES ON MAC/PC ******
+    //    window.matchMedia("(display-mode: fullscreen)").matches || //***** UNCOMMENT FOR DEBUGGING PURPOSES ON MAC/PC ******
         window.matchMedia("(display-mode: standalone)").matches;
-        //window.matchMedia("(display-mode: minimal-ui)").matches;
+    //window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // if app PWA:
     if (isInWebAppiOS || isInWebAppChrome) {
@@ -112,8 +112,7 @@ async function checkAndHandlePWA() {
 }
 
 function populate_manifest() {
-    // TO SWITCH TO USE LOCAL MANIFESTS FROMED BY create_subject_keycodes_and_manifests.py SWITCH COMMENTING BETWEEN THE TWO FOLLOWING LINES:
-    //    document.getElementById('manifest-placeholder').setAttribute('href', location.href.substring(0, location.href.lastIndexOf("/") + 1) + 'manifests/manifest_' + /[&?]subId=([^&]+)/.exec(location.search)[1] + '.json');
-    document.getElementById('manifest-placeholder').setAttribute('href', "https://experiments.schonberglab.org/app/manifests/space_gold.json")
-
+    // TO SWITCH BETWEEN USING LOCAL MANIFESTS FORMED BY create_subject_keycodes_and_manifests.py AND THE COMMON ONE IN THE SERVER - SWITCH COMMENTING BETWEEN THE TWO FOLLOWING LINES:
+    document.getElementById('manifest-placeholder').setAttribute('href', location.href.substring(0, location.href.lastIndexOf("/") + 1) + 'manifests/manifest_' + /[&?]subId=([^&]+)/.exec(location.search)[1] + '.json');
+    //document.getElementById('manifest-placeholder').setAttribute('href', "https://experiments.schonberglab.org/app/manifests/space_gold.json")
 }

@@ -32,6 +32,7 @@ self.addEventListener('fetch', function (event) {
             return cache.match(event.request).then(function (response) {
                 return response || fetch(event.request).then(function (response) {
                     if (!event.request.url.includes('api/session/list?subId')) { // check that this is not the call to the data from the server (which I don't want to cache)
+                        //|| !event.request.url.includes('json')) // to prevent the manifest from being cached // ** add this condition if using a common manifest.json method for all subjects (that uses a start_url) 
                         cache.put(event.request, response.clone());
                     }
                     return response;

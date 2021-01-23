@@ -157,9 +157,10 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
 #spaceship {
   position: fixed;
   top: 50vh;
+  left: 0vw;
   transform: translate(-50%, -50%);
   width: 50vw;
-  left: 0vw;
+  height: auto;
   z-index: 2;
   animation-duration: 0.8s;
   animation-iteration-count: 1;

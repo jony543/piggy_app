@@ -21,6 +21,11 @@ async function preloadInstructionImages(totalPages = settings.n_instruction_page
 	elem3.setAttribute("class", "hidden");
 	elem3.setAttribute("src", "icons/android-icon-72x72.png");
 	document.body.appendChild(elem3);
+	// load the spaceship image (preventing a sometimes smaller apperance of it in the embedded demo):
+	elem4 = document.createElement('img');
+	elem4.setAttribute("class", "hidden");
+	elem4.setAttribute("src", "images/spaceship_flying.png");
+	document.body.appendChild(elem4);
 
 	// make sure all images were appropriately loaded:
 	// ********************************************************
