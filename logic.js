@@ -199,7 +199,7 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   // Check if the participant entered EVERY DAY:
   const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i]).filter((v, i, a) => a.indexOf(v) === i).length;
   const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].length;
-  if (daysWithEntries !== possibleDaysWithEntries) {
+  if (daysWithEntries !== possibleDaysWithEntries || String(subjects_exclude_online).includes(data_helper.get_subject_id())) {
     return true
   }
 

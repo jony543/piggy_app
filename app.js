@@ -89,6 +89,10 @@ async function runApp() {
 	// ****************************************************************
 	//           RUN THE APP
 	// ----------------------------------------------------------------
+	if (runData.isDemo) {
+		await delay(500); // to account for time it takes the embedded app to be openned.
+	}
+
 	dom_helper.hide('app_will_load_soon');
 	dom_helper.hide('loading_animation');
 

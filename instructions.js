@@ -216,7 +216,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 
 	// present again the button that closes the demo app:
 	if (!!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
-		wait(2000).then(() => {
+		wait(1000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
 		});

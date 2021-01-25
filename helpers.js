@@ -511,32 +511,35 @@ var dialog_helper = {
 
 // SERVICE WORKER CALLING
 if ('serviceWorker' in navigator) {
-	window.addEventListener('load', () => {
-		navigator.serviceWorker
-			.register('sw.js')
-			.then(reg => {
-				console.log('Service Worker: Registered')
-				reg.addEventListener('updatefound', () => {
-					console.log('UPDATE FOUND')
-					//reg.update()
-					// A wild service worker has appeared in reg.installing!
-					const newWorker = reg.installing;
+	window.addEventListener('load', registerServiceWorker);
+}
 
-					newWorker.state;
-					// "installing" - the install event has fired, but not yet complete
-					// "installed"  - install complete
-					// "activating" - the activate event has fired, but not yet complete
-					// "activated"  - fully active
-					// "redundant"  - discarded. Either failed install, or it's been
-					//                replaced by a newer version
+function registerServiceWorker() {
+	navigator.serviceWorker
+		.register('sw.js')
+		.then(reg => {
+			console.log('Service Worker: Registered')
+			reg.addEventListener('updatefound', () => {
+				console.log('UPDATE FOUND')
+				subject_data_worker.postMessage({ newServiceWorkerDetected: new Date, commitSession: true });
+				//reg.update()
+				// A wild service worker has appeared in reg.installing!
+				const newWorker = reg.installing;
 
-					newWorker.addEventListener('statechange', () => {
-						console.log('STATAE CHANGED')
-						console.log(newWorker.state)
-						// newWorker.state has changed
-					});
+				newWorker.state;
+				// "installing" - the install event has fired, but not yet complete
+				// "installed"  - install complete
+				// "activating" - the activate event has fired, but not yet complete
+				// "activated"  - fully active
+				// "redundant"  - discarded. Either failed install, or it's been
+				//                replaced by a newer version
+
+				newWorker.addEventListener('statechange', () => {
+					console.log('STATE CHANGED')
+					console.log(newWorker.state)
+					// newWorker.state has changed
 				});
-			})
-			.catch(err => console.log(`Service Worker: Error: ${err}`))
-	})
+			});
+		})
+		.catch(err => console.log(`Service Worker: Error: ${err}`))
 }

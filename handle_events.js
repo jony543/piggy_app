@@ -70,13 +70,13 @@ if (document.title === settings.instructions_HTML_title) {
 }
 
 // check upon entry if it is on portrait mode:
-function checkInitialOrientation(){
+function checkInitialOrientation() {
     if (screen.availHeight < screen.availWidth) {
         showOnlyPortraitMessage()
         return 'landscape'
     } else {
         return 'portrait'
-    }    
+    }
 }
 
 window.addEventListener("orientationchange", function (event) {
@@ -145,7 +145,7 @@ window.onunload = onUserExit('unload_event');
 function onUserExit(initiatorInfo) {
     // Add the current app instance to the cleaning list before openning a new instance:
     identifiersToClean.push(recordIdentifier)
-    
+
     // assign meta data to send:
     var dataToSend = {};
     touchData = {
@@ -187,6 +187,7 @@ function refreshScreen() {
                 screenInitialOrientation = checkInitialOrientation();
                 pressEvents = [];
 
+                if ('serviceWorker' in navigator) { registerServiceWorker() }; // SERVICE WORKER CALLING
                 runNewAppInstance(); // Makes sure that the previous instance stopped or finished and run a new instance:
             });
 
