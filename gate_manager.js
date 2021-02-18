@@ -58,7 +58,8 @@ async function checkAndHandlePWA() {
     //window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // if app PWA:
-    if (true) {
+    if (isInWebAppiOS || isInWebAppChrome) {
+    // if (true) { // for debugging purposes
         populate_manifest();
         dom_helper.hide('installation_guide');
         return true
