@@ -320,12 +320,12 @@ var settings = Object.assign({}, app_settings);
 
 	// SET INFORMED CONSENT:
 	//------------------------------------------------------
-	var consentForm = {
-		type: 'external-html',
-		url: "informed_consent.html",
-		cont_btn: "start",
-		check_fn: check_consent
-	};
+	// var consentForm = {
+	// 	type: 'external-html',
+	// 	url: "informed_consent.html",
+	// 	cont_btn: "start",
+	// 	check_fn: check_consent
+	// };
 
 	// SET WRITTEN INSTRUCTIONS:
 	//------------------------------------------------------
@@ -524,7 +524,7 @@ var settings = Object.assign({}, app_settings);
 	};
 
 	timeline.push(preLoadImages);
-	timeline.push(consentForm);
+	// timeline.push(consentForm);
 	timeline.push(completeTutorialLoop);
 
 	jsPsych.init({

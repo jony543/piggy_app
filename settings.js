@@ -11,10 +11,10 @@ window.app_settings = {
 	pressesRequired: 2,
 	forceDeval: null, // for debugging purposes
 	// optional stuff for counterbalance:
-	optionalDaysForFirstDeval: [3, 4], // The day not chosen for devaluation will be used as a comparable valued day
-	dayToFinishExperiment_ShortTraining: 5,
-	optionalDaysForLastDeval: [10, 11], // The day not chosen for devaluation will be used as a comparable valued day
-	dayToFinishExperiment_LongTraining: 12,
+	optionalDaysForFirstDeval: [3, 4, 5], // The day not chosen for devaluation will be used as a comparable valued day
+	dayToFinishExperiment_ShortTraining: 6,
+	optionalDaysForLastDeval: [10, 11, 12], // The day not chosen for devaluation will be used as a comparable valued day
+	dayToFinishExperiment_LongTraining: 13,
 	// days to base upon first devluation time:
 	daysToBaseUponFirstDeval: [2],
 	daysToBaseUponLastDeval: [9], //[6, 7],
@@ -22,7 +22,7 @@ window.app_settings = {
 	manipulationImageID: function (manipulationType) {
 		if (manipulationType == 'devaluation') {
 			return 'warehouse_full';
-		} else if (manipulationType == 'still_valued') { // i.e., 'still_valued'
+		} else if (manipulationType == 'still_valued' || manipulationType == 'still_valued_post_deval') { // i.e., 'still_valued'
 			return 'warehouse_half';
 		}
 	},
@@ -31,8 +31,8 @@ window.app_settings = {
 		// option 1:
 		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
 		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
-		daysToHideAt: [3, 4, 10, 11], // [2, 3, 4, 5, 8, 10, 12],
-		daysToBaseUponHidingTime: [[2], [2], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+		daysToHideAt: [3, 4, 5, 10, 11, 12], // [2, 3, 4, 5, 8, 10, 12],
+		daysToBaseUponHidingTime: [[2], [2], [2], [9], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	},
 	rewards: {
@@ -92,7 +92,7 @@ window.app_settings = {
 		manipulationMessage: function (manipulationType) {
 			if (manipulationType == 'devaluation') {
 				return 'המחסן מלא!<br>לא ניתן לצבור בו עוד זהב עד שחללית המטען תרוקן אותו.';
-			} else if (manipulationType == 'still_valued') { // i.e., 'still_valued'
+			} else if (manipulationType == 'still_valued' || manipulationType == 'still_valued_post_deval') { // i.e., 'still_valued'
 				return 'המחסן מלא למחצה...';
 			}
 		},
@@ -156,7 +156,7 @@ window.app_settings = {
 		2: 'בכניסה הבאה נדגים קבלת דיווח שהמחסן מלא למחצה.',
 		3: 'הפעם נדגים קבלת דיווח שהמחסן מלא.',
 		4: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.',
-		5: 'בכניסה הבאה כוכב הזהב יהיה מכוסה בעננים ולא תוכל/י לראות את התוצאה של חיפוש הזהב<br>(גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר).',
+		5: 'בכניסה הבאה כוכב הזהב יהיה מכוסה בעננים ולgit statusא תוכל/י לראות את התוצאה של חיפוש הזהב<br>(גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר).',
 		6: 'בסיבוב הבא תיתקל/י במערה עתירת זהב.<br>תקבל/י על כך הודעה ולאחריה יהיו לך 5 שניות בתוכה, בהן תוכל/י לאסוף ממה שבמערה.',
 		7: 'לסיום: עד כה הדגמנו מקרים שונים לחוד אך במשחק עצמו הם יכולים להשתלב.<br>בלחיצה הבאה לדוגמא יהיה מעונן וגם תיתקל/י במערה עתירת זהב.',
 	},

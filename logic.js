@@ -13,49 +13,57 @@ function setCounterBalancedStuff(subID, settings) {
     group = 'short_training'; // subject numbers 100-199, 300-399, 500-599 etc
 
     // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
+    // UPDATE: I THE CANCELLED COUNTER-BALANCING (original values are commeneted):
     switch (subID % 4) {
       case 0:
-        firstDevalDay = settings.optionalDaysForFirstDeval[0];
-        lastDevalDay = settings.optionalDaysForLastDeval[0];
+        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //        firstDevalDay = settings.optionalDaysForFirstDeval[0];
+        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        firstDevalDay = settings.optionalDaysForFirstDeval[0];
         break;
       case 1:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1];
-        lastDevalDay = settings.optionalDaysForLastDeval[0];
+        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //        firstDevalDay = settings.optionalDaysForFirstDeval[1];
+        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[0];
         break;
       case 2:
-        firstDevalDay = settings.optionalDaysForFirstDeval[0];
-        lastDevalDay = settings.optionalDaysForLastDeval[1];
+        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //         firstDevalDay = settings.optionalDaysForFirstDeval[0];
+        lastDevalDay = settings.optionalDaysForLastDeval[1]; //         lastDevalDay = settings.optionalDaysForLastDeval[1];
         break;
       case 3:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1];
-        lastDevalDay = settings.optionalDaysForLastDeval[1];
+        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //         firstDevalDay = settings.optionalDaysForFirstDeval[1];
+        lastDevalDay = settings.optionalDaysForLastDeval[1]; //         lastDevalDay = settings.optionalDaysForLastDeval[1];
         break;
     }
-    firstComparableValDay = settings.optionalDaysForFirstDeval.find(element => element !== firstDevalDay);
-    lastComparableValDay = settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+
+    firstComparableValDay = settings.optionalDaysForFirstDeval[0]; //= settings.optionalDaysForFirstDeval.find(element => element !== firstDevalDay);
+    firstComparableValDay_PostDeval = settings.optionalDaysForFirstDeval[2];
+
+    lastComparableValDay = settings.optionalDaysForLastDeval[0]; //= settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+    lastComparableValDay_PostDeval = settings.optionalDaysForLastDeval[2];
 
     dayToFinishExperiment = settings.dayToFinishExperiment_ShortTraining
   } else {
     group = 'long_training'; // subject numbers 200-299, 400-499, 600-699 etc
 
     // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
+    // UPDATE: I THE CANCELLED COUNTER-BALANCING (original values are commeneted):
     switch (subID % 2) {
       case 0:
         firstDevalDay = null;
-        lastDevalDay = settings.optionalDaysForLastDeval[0];
+        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[0];
         break;
       case 1:
         firstDevalDay = null;
-        lastDevalDay = settings.optionalDaysForLastDeval[1];
+        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[1];
         break;
     }
     firstComparableValDay = null;
-    lastComparableValDay = settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+    firstComparableValDay_PostDeval = null;
+    lastComparableValDay = settings.optionalDaysForLastDeval[0]; //= settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+    lastComparableValDay_PostDeval = settings.optionalDaysForLastDeval[2];
 
     dayToFinishExperiment = settings.dayToFinishExperiment_LongTraining
   }
 
-  return [group, firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay, dayToFinishExperiment];
+  return [group, firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay, firstComparableValDay_PostDeval, lastComparableValDay_PostDeval, dayToFinishExperiment];
 }
 
 function getTimeFromLastEntryInSec(timePoint) {
@@ -281,7 +289,7 @@ var logic = {
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
-      [group, firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay, dayToFinishExperiment] = setCounterBalancedStuff(data_helper.get_subject_id(), app_settings);
+      [group, firstDevalDay, lastDevalDay, firstComparableValDay, lastComparableValDay, firstComparableValDay_PostDeval, lastComparableValDay_PostDeval, dayToFinishExperiment] = setCounterBalancedStuff(data_helper.get_subject_id(), app_settings);
       var isUnderManipulation = false;
       var whichManipulation = null;
       var activateManipulation = false;
@@ -297,22 +305,25 @@ var logic = {
         daysFromBeginning = dateDiff(expStartingTime, new Date(), settings.experimentalDayStartingHour); // "new Date()" is getting the current time.
         dayOfExperiment = daysFromBeginning + 1;
         devalueToday = dayOfExperiment === firstDevalDay || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
-        comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment    
-        if (devalueToday || comparableValuedToday) {
-          whichManipulation = ['devaluation', 'still_valued'].filter((item, i) => [devalueToday, comparableValuedToday][i])[0];
+        comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
+        comparableValuedToday_PostDeval = dayOfExperiment === firstComparableValDay_PostDeval || dayOfExperiment === lastComparableValDay_PostDeval ? true : false;
+        if (devalueToday || comparableValuedToday || comparableValuedToday_PostDeval) {
+          whichManipulation = ['devaluation', 'still_valued', 'still_valued_post_deval'].filter((item, i) => [devalueToday, comparableValuedToday, comparableValuedToday_PostDeval][i])[0];
         };
 
         // OPERATE DEVALUATION DAY
         // ---------------------------
-        if (devalueToday || comparableValuedToday) {
+        if (devalueToday || comparableValuedToday || comparableValuedToday_PostDeval) {
           // resolving which days to base devaluation time on:
           switch (dayOfExperiment) {
             case firstDevalDay:
             case firstComparableValDay:
+            case firstComparableValDay_PostDeval:
               daysToBaseUponManipulation = settings.daysToBaseUponFirstDeval;
               break;
             case lastDevalDay:
             case lastComparableValDay:
+            case lastComparableValDay_PostDeval:
               daysToBaseUponManipulation = settings.daysToBaseUponLastDeval;
               break;
           }
