@@ -53,13 +53,13 @@ function checkIfTablet() { // taken by rani from https://stackoverflow.com/quest
 async function checkAndHandlePWA() {
     var isInWebAppiOS = window.navigator.standalone === true;
     var isInWebAppChrome =
-    //    window.matchMedia("(display-mode: fullscreen)").matches || //***** UNCOMMENT FOR DEBUGGING PURPOSES ON MAC/PC ******
+        // window.matchMedia("(display-mode: fullscreen)").matches || //***** UNCOMMENT FOR DEBUGGING PURPOSES ON MAC/PC ******
         window.matchMedia("(display-mode: standalone)").matches;
-    //window.matchMedia("(display-mode: minimal-ui)").matches;
+        //window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // if app PWA:
     if (isInWebAppiOS || isInWebAppChrome) {
-    // if (true) { // for debugging purposes
+        // if (true) { // for debugging purposes
         populate_manifest();
         dom_helper.hide('installation_guide');
         return true
@@ -84,6 +84,16 @@ async function checkAndHandlePWA() {
             if (!!subData.uniqueEntryID.length) {
                 location.replace('./used_link.html')
             } else {
+                // first - delete any older local storage and caches in case of a former use in the application:
+                window.localStorage.clear()
+                console.log('>> local storage data deleted');
+                caches.keys().then(function (keyList) {
+                    return Promise.all(keyList.map(function (key) {
+                        return caches.delete(key);
+                    }));
+                })
+                console.log('>> cache storage deleted');
+
                 //data_helper.init_session('app', false);
                 populate_manifest();
                 // Save a message so this user will be signaled as used.
