@@ -85,8 +85,8 @@ async function checkAndHandlePWA() {
                 location.replace('./used_link.html')
             } else {
                 // first - delete any older local storage and caches in case of a former use in the application:
-                window.localStorage.clear()
-                console.log('>> local storage data deleted');
+                // window.localStorage.clear() // *** cancelled the localStorage Deletion for now because it creates problems (require some more adaptations and not surely necessary)
+                // console.log('>> local storage data deleted');
                 caches.keys().then(function (keyList) {
                     return Promise.all(keyList.map(function (key) {
                         return caches.delete(key);
