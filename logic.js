@@ -396,16 +396,17 @@ var logic = {
   },
   calculateReward: function (subData, coinCollectionTask, dayToFinishExperiment) {
     // regular cost and reward:
-    var accumulatedValidReward = subData.reward.filter((x, i) => !!subData.endTime[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0);
-    var totalCost = subData.cost.filter((x, i) => subData.startTime[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[0]))
-      .concat(subData.cost.filter((x, i) => subData.press1Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[1])))
-      .concat(subData.cost.filter((x, i) => subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[2])))
+    var accumulatedValidReward = subData.reward.filter((x, i) => !subData.isDemo[i] && !!subData.endTime[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0);
+    var totalCost = subData.cost.filter((x, i) => !subData.isDemo[i] && subData.startTime[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[0]))
+      .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press1Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[1])))
+      .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[2])))
       .filter((x) => !!x).reduce((a, b) => a + b, 0);
     // coins task:
     var coinsTaskStillValued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
     var coinsTaskDevalued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
-    const rewardFromCoinTasks = coinsTaskStillValued.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
-    const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num, 0)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
+    var coinsTaskStillValued_PostDeval = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued_post_deval')
+    const rewardFromCoinTasks = (coinsTaskStillValued.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0) + coinsTaskStillValued_PostDeval.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0)) * coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
+    const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) + coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) + coinsTaskStillValued_PostDeval.map((x) => x.total_presses).reduce((total, num) => total + num, 0)) * coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
 
     return accumulatedValidReward + rewardFromCoinTasks - totalCost - costFromCoinsTasks
   },
