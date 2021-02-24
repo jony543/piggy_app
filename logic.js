@@ -210,7 +210,14 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   if (daysWithEntries !== possibleDaysWithEntries || String(subjects_exclude_online).includes(data_helper.get_subject_id())) {
     return true
   }
-
+  // Check if there was a day whree the MANIPULATION WAS NOT ACTIVATED: 
+  const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
+  const daysToCheckManipulationActivated = daysOfManipulation.filter(x=>!!x && x<dayOfExperiment)
+  const manipulationActivationdays = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
+  if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length) {
+      return true
+  }
+    
   return false
 }
 
@@ -311,9 +318,14 @@ var logic = {
           whichManipulation = ['devaluation', 'still_valued', 'still_valued_post_deval'].filter((item, i) => [devalueToday, comparableValuedToday, comparableValuedToday_PostDeval][i])[0];
         };
 
+        // End experiment & Exclusions
+        // ---------------------------
+        var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment);
+
+         
         // OPERATE DEVALUATION DAY
         // ---------------------------
-        if (devalueToday || comparableValuedToday || comparableValuedToday_PostDeval) {
+        if (!endExperiment && (devalueToday || comparableValuedToday || comparableValuedToday_PostDeval)) {
           // resolving which days to base devaluation time on:
           switch (dayOfExperiment) {
             case firstDevalDay:
@@ -345,11 +357,7 @@ var logic = {
 
         // Hide outcome
         // ---------------------------
-        var toHideOutcome = checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation, settings.experimentalDayStartingHour);
-
-        // End experiment & Exclusions
-        // ---------------------------
-        var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment);
+        var toHideOutcome = !endExperiment ? checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation, settings.experimentalDayStartingHour) : false;
 
         // Reset container
         // ---------------------------
