@@ -553,6 +553,13 @@ h1 {
   color: white;
 }
 
+.correctAnswerBlink {
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  animation-name: alternate_appear_disappear;
+}
 
 /*                   EMBEDDED DEMO STUFF                 */
 /* ----------------------------------------------------- */

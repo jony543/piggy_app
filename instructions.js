@@ -266,6 +266,9 @@ var is_firstDemoScreen_SuportingInstructions_changed_1;
 var is_firstDemoScreen_SuportingInstructions_changed_2;
 var testPassed;
 var timeline = [];
+var durationToDisableInstructionsButtons = 1500
+var showAppDemo = true
+var askIfRepeatDemo = true
 // a global var to comunicate with the handle_events.js:
 tutorialCompleted = false;
 
@@ -348,7 +351,7 @@ var settings = Object.assign({}, app_settings);
 					setTimeout(function () {
 						document.getElementById("instructionsButtons").disabled = false
 						document.getElementById("instructionsButtons").style.opacity = "1";
-					}, 1500);
+					}, durationToDisableInstructionsButtons);
 				},
 				on_finish: function () {
 					dom_helper.hide('instructionImage-' + String(instructions_page))
@@ -366,7 +369,12 @@ var settings = Object.assign({}, app_settings);
 				//dom_helper.removeElement('instructionsImage');
 				document.body.style.backgroundColor = "white";
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
+				durationToDisableInstructionsButtons = 0
 				return false;
+			} else if (instructions_page === settings.n_instruction_pages-1 && durationToDisableInstructionsButtons == 0 && !goBack ) { // This is to pass the "Demo is coming" when viewing the instructions again.
+				//dom_helper.removeElement('instructionsImage');
+				document.body.style.backgroundColor = "white";
+				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 			} else {
 				if (goBack && instructions_page > 1) {
 					instructions_page--
@@ -383,11 +391,13 @@ var settings = Object.assign({}, app_settings);
 	var demo = {
 		type: 'call-function',
 		func: function () {
-			// Operate the embedded demo:
-			createSmartphoneApperance()
-			createLoadAppButton(elementIdName = 'demoLoadButton')
-			jsPsych.pauseExperiment()
-			data_helper.on_broadcast = monitorChangesInDemoAndReact;
+			if (showAppDemo) {
+				// Operate the embedded demo:
+				createSmartphoneApperance()
+				createLoadAppButton(elementIdName = 'demoLoadButton')
+				jsPsych.pauseExperiment()
+				data_helper.on_broadcast = monitorChangesInDemoAndReact;
+			}
 		},
 	};
 	var continue_or_repeat_demo_cycle = {
@@ -404,11 +414,52 @@ var settings = Object.assign({}, app_settings);
 			}
 		]
 	};
+	var check_if_to_ask_if_continue_or_repeat_demo_cycle = {
+		timeline: [continue_or_repeat_demo_cycle],
+		conditional_function: function(){
+			if(askIfRepeatDemo){
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	// adding an option to choose if do or not do the demo again when repeatingthe instuctions:
+	var redo_demo = {
+		data: {
+			trialType: 'redo_demo_cycle',
+		},
+		type: 'html-button-response',
+		trial_duration: undefined, // no time limit
+		choices: ['לדלג', 'סיבוב הדגמה'],
+		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
+		timeline: [
+			{
+				stimulus: '<p id="repeatOrContinueText">ההוראות הסתיימו.<br><br>האם ברצונך לבצע סיבוב הדגמה נוסף (של כניסות מדומות לאפליקציה) או לדלג לשאלות?<br><br></p>',
+				on_finish: function (data) {
+					showAppDemo = Number(jsPsych.data.get().last().select('button_pressed').values[0]);
+					askIfRepeatDemo = !!showAppDemo
+				}
+			}
+		]
+	};	
+	var check_if_to_ask_to_redo_demo = {
+		timeline: [redo_demo],
+		conditional_function: function(){
+			if(showAppDemo){
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+	//
 	var big_demo_loop = {
-		timeline: [demo, continue_or_repeat_demo_cycle],
+		timeline: [check_if_to_ask_to_redo_demo, demo, check_if_to_ask_if_continue_or_repeat_demo_cycle],
 		loop_function: function (data) {
 			const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
-			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended	
+			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended
+				showAppDemo = false	
 				return false;
 			} else {
 				// Operate the embedded demo:
@@ -431,7 +482,7 @@ var settings = Object.assign({}, app_settings);
 			{
 				stimulus: '<p id="repeatOrContinueText">כעת נשאל אותך מספר שאלות כדי לוודא שההוראות ברורות.<br><br> \
 				תזכורת: כדי שתוכל/י להתחיל במשחק יש לענות נכונה על כל השאלות.<br>\
-				אם לא עונים על כל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
+				אם לא עונים על הכל נכון פשוט חוזרים על ההוראות וההדגמה.<br><br>\
 				לחצ/י על התחל כדי לעבור לשאלות.<br><br>\
 				</p>',
 			}
@@ -441,18 +492,20 @@ var settings = Object.assign({}, app_settings);
 		data: {
 			trialType: 'test_question',
 		},
-		type: 'html-button-response',
+		type: 'html-button-response-and-feedback_Rani',
 		trial_duration: undefined, // no time limit
 		timeline: [
 			{
 				stimulus: '',
 				choices: '',
+				correct_answer: '',
 				on_start: function () {
 					this.stimulus = '<p id="test_question_text">' + questions[arrayOfQuestionNumbers[question_index]].question + '</p>'
 					this.choices = shuffle([questions[question_number].correct_answer, questions[question_number].distractor_1, questions[question_number].distractor_2, questions[question_number].distractor_3])
 					this.choices.unshift(questions.dont_know_answer)
 					this.button_html = '<button id="multipleChoiceQuestionsButtons">%choice%</button>'
-				},
+					this.correct_answer = questions[question_number].correct_answer
+				},				
 				on_finish: function (data) {
 					data.correct = data.button_pressed == this.choices.indexOf(questions[question_number].correct_answer); // option B
 				}
