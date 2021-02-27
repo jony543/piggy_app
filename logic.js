@@ -405,9 +405,9 @@ var logic = {
   calculateReward: function (subData, coinCollectionTask, dayToFinishExperiment) {
     // regular cost and reward:
     var accumulatedValidReward = subData.reward.filter((x, i) => !subData.isDemo[i] && !!subData.endTime[i] && !(!!subData.isUnderManipulation[i] && subData.manipulationToday[i] === 'devaluation') && x !== undefined).reduce((a, b) => a + b, 0);
-    var totalCost = subData.cost.filter((x, i) => !subData.isDemo[i] && subData.startTime[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[0]))
-      .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press1Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[1])))
-      .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment).map((x => x[2])))
+    var totalCost = subData.cost.filter((x, i) => !subData.isDemo[i] && subData.startTime[i] && x !== undefined && subData.day[i] < dayToFinishExperiment && !subData.endExperiment[i]).map((x => x[0]))
+      .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press1Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment && !subData.endExperiment[i]).map((x => x[1])))
+      .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment && !subData.endExperiment[i]).map((x => x[2])))
       .filter((x) => !!x).reduce((a, b) => a + b, 0);
     // coins task:
     var coinsTaskStillValued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
