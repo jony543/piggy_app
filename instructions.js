@@ -371,7 +371,7 @@ var settings = Object.assign({}, app_settings);
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				durationToDisableInstructionsButtons = 0
 				return false;
-			} else if (instructions_page === settings.n_instruction_pages-1 && durationToDisableInstructionsButtons == 0 && !goBack ) { // This is to pass the "Demo is coming" when viewing the instructions again.
+			} else if (settings.lastInstructionsPageExplainsDemo && instructions_page === settings.n_instruction_pages-1 && durationToDisableInstructionsButtons == 0 && !goBack ) { // This is to pass the "Demo is coming" when viewing the instructions again (durationToDisableInstructionsButtons == 0 is just used to check if it's not the first round).
 				//dom_helper.removeElement('instructionsImage');
 				document.body.style.backgroundColor = "white";
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,

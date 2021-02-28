@@ -162,6 +162,7 @@ window.app_settings = {
 	},
 	instructionsFileName: 'instructions.html',
 	n_instruction_pages: 22,
+	lastInstructionsPageExplainsDemo: true,
 	instructions_test_questions: {
 		toRandomizeQuestions: false,
 		dont_know_answer: 'לא יודע/ת.',
