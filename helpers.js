@@ -423,7 +423,7 @@ function finishTrial(runData) {
 	// collect end time and save subject data as results:
 	var dataToSend = { endTime: new Date(), commitSession: true };
 	if (runData.isDemo) {
-		dataToSend.broadcast = 'demo trial ended';
+		dataToSend.broadcast = 'demo_trial_ended';
 	}
 
 	subject_data_worker.postMessage(dataToSend);

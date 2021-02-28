@@ -211,11 +211,14 @@ function removeSmartphoneApperance(appDemoID) {
 }
 
 async function monitorChangesInDemoAndReact(broadcastMessage) {
+
+	//sequence_entering_stage_presented
+	//demo_trial_ended
 	console.log('check...')
 	subData = await data_helper.get_subject_data(true)
 
 	// present again the button that closes the demo app:
-	if (!!subData.endTime[subData.endTime.length - 1]) { // check again while there is no new data point and while it has no value for endTime
+	if (broadcastMessage.broadcast  == "demo_trial_ended") { // check again while there is no new data point and while it has no value for endTime
 		wait(1000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
@@ -224,9 +227,8 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 
 	// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
 	if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
-		document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
-		!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
-	) {  // first detection after app was closed
+		broadcastMessage.broadcast  == "sequence_entering_stage_presented"
+	) {  // first detection when getting to the sequence pressing screen for the first time
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
 		dom_helper.removeElement(oldMainDemoTextDuplicateID)
@@ -235,7 +237,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 		is_firstDemoScreen_SuportingInstructions_changed_1 = true;
 	}
 	if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
-		!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
+		broadcastMessage.broadcast  == "demo_trial_ended" // check that the trial was completed			
 	) {  // first detection after app was closed
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
@@ -393,10 +395,10 @@ var settings = Object.assign({}, app_settings);
 		func: function () {
 			if (showAppDemo) {
 				// Operate the embedded demo:
+				data_helper.on_broadcast = monitorChangesInDemoAndReact;
 				createSmartphoneApperance()
 				createLoadAppButton(elementIdName = 'demoLoadButton')
 				jsPsych.pauseExperiment()
-				data_helper.on_broadcast = monitorChangesInDemoAndReact;
 			}
 		},
 	};

@@ -196,7 +196,7 @@ async function runApp() {
 
 	// For the flow of the demo:
 	if (runData.isDemo) {
-		subject_data_worker.postMessage({ broadcast: 'sequence entering stage presented' });
+		subject_data_worker.postMessage({ broadcast: 'sequence_entering_stage_presented' });
 	}
 
 	// wait for 2 clicks to happen
