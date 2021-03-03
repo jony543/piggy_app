@@ -105,7 +105,7 @@ window.app_settings = {
 				+ logic.calculateReward(subData, app_settings.coinCollectionTask, dayToFinishExperiment)
 				+ ' יחידות זהב!'
 		},
-		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 1 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.',
+		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 3 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.',
 		loadingDataError: 'יש בעיה!' +
 			'<br><br>' +
 			'א. וודא/י שאת/ה מחובר לאינטרנט.' +
@@ -131,7 +131,7 @@ window.app_settings = {
 		counterTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessageTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessage: "להתראות",
-		costPerPress: 1, // for the winnings calculation at the end
+		costPerPress: 3, // for the winnings calculation at the end
 		rewardPerCoinStash: () => app_settings.rewards.rewardConstantSum, // for the winnings calculation at the end
 	},
 	allowInstructions: true, // for debugging purpose.
@@ -139,12 +139,10 @@ window.app_settings = {
 	demoCycle: {
 		0: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
 		1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		2: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		3: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		4: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: true, consumptionTest: false },
-		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: false },
-		6: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
-		7: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: false, consumptionTest: true },
+		2: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
+		3: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: true, consumptionTest: false },
 	},
 	demoCycleSupportingText: {
 		0: {
@@ -153,12 +151,10 @@ window.app_settings = {
 			c: 'בסיבוב הזה מצאת זהב!<br>מיד לאחר מכן הופיעה הודעת הסיום ("נתראה בפעם הבאה"). כשההודעה מופיעה זה אומר שתוצאת החיפוש נשמרה ואפשר לצאת מהאפליקציה. כדי לצאת מהאפליקציה בהדגמה לחצ/י על כפתור הבית הוירטואלי שמופיע על ציור הסמארטפון.',
 		},
 		1: 'עכשיו תבצע/י מספר כניסות ויציאות מהאפליקציה ונדגים אפשרויות שונות.<br>כעת ניתן להיכנס ולהסיר את הקרח.<br>הפעם לא תמצא/י זהב (רק אבנים חסרות ערך).',
-		2: 'בכניסה הבאה נדגים קבלת דיווח שהמחסן מלא למחצה.',
-		3: 'הפעם נדגים קבלת דיווח שהמחסן מלא.',
-		4: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.',
-		5: 'בכניסה הבאה כוכב הזהב יהיה מכוסה בעננים ולא תוכל/י לראות את התוצאה של חיפוש הזהב<br>(גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר).',
-		6: 'בסיבוב הבא תיתקל/י במערה עתירת זהב.<br>תקבל/י על כך הודעה ולאחריה יהיו לך 5 שניות בתוכה, בהן תוכל/י לאסוף ממה שבמערה.',
-		7: 'לסיום: עד כה הדגמנו מקרים שונים לחוד אך במשחק עצמו הם יכולים להשתלב.<br>בלחיצה הבאה לדוגמא יהיה מעונן וגם תיתקל/י במערה עתירת זהב.',
+		2: 'בסיבוב הבא תיתקל/י במערה עתירת זהב.<br>תקבל/י על כך הודעה ולאחריה יהיו לך 5 שניות בתוכה, בהן תוכל/י לאסוף ממה שבמערה.',
+		3: 'בכניסה הבאה נדגים קבלת דיווח שהמחסן מלא למחצה.',
+		4: 'הפעם נדגים קבלת דיווח שהמחסן מלא.',
+		5: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.<br>בנוסף, יהיה מעונן ולא תוכל/י לראות את התוצאה של חיפוש הזהב.<br>*גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר.',
 	},
 	instructionsFileName: 'instructions.html',
 	n_instruction_pages: 22,
@@ -226,7 +222,7 @@ window.app_settings = {
 			question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהן לפעמים?',
 			correct_answer: 'כל התשובות נכונות (למעט לא יודע/ת).',
 			distractor_1: 'יש לי 5 שניות בלבד לשהות במערה, בהן אוכל לאסוף מהדברים שבה.',
-			distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 1 יחידות זהב.',
+			distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 3 יחידות זהב.',
 			distractor_3: 'שווי גושי הזהב והאבנים זהה לזה לשווי גושי הזהב והאבנים בחיפושי הזהב הרגילים.',
 		},
 		10: {
