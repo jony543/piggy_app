@@ -643,6 +643,32 @@ h1 {
   border-radius: 5vw;
 }
 
+.appInBigRectangle {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vw;
+  height: 62.25%;
+  border: 0.5vw solid rgb(100, 100, 100);
+  border-top-left-radius: 5vw;
+  border-top-right-radius: 5vw;
+}
+
+#simulatedSmartphoneButtonArea {
+    position: absolute;
+    left: 50%;
+    top: 93%;
+    background-color: rgba(150,150,150,0.1);
+    height: 8%;
+    width: 70%;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    border-top: 0.5vw solid rgb(100, 100, 100);
+}
+    
 .appLine {
   text-align:center;
   margin: 0;
@@ -691,14 +717,14 @@ h1 {
 
 .demoButton {
   position: absolute;
-  top: 91.5%;
+  top: 92.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 20vw;
   height: 5vh;
 
   background-color: rgba(200, 200, 200, 0.4);
-  border: 1vw solid #555555;
+  border: 1vw solid rgba(85, 85, 85, 1);
   color: black;
   padding: 16px 32px;
   text-align: center;
@@ -715,7 +741,7 @@ h1 {
   animation-name: appearGradually;
 }
 .demoButton:active {
-  background-color: #555555;
+  background-color: rgba(85, 85, 85, 1);
   color: white;
 }
 

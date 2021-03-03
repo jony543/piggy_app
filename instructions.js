@@ -92,7 +92,7 @@ async function loadAppDemo() {
 		embeddedElement = document.createElement('iframe');
 		embeddedElement.setAttribute("id", appDemoID)
 		embeddedElement.setAttribute("src", demoUrl)
-		embeddedElement.className = "bigRectangle"
+		embeddedElement.className = "appInBigRectangle"
 		document.body.appendChild(embeddedElement)
 	} else {
 		appDemoID = dom_helper.duplicate('embedded_app');
@@ -101,7 +101,9 @@ async function loadAppDemo() {
 	dom_helper.remove_css_class(appDemoID, 'appClose');
 	dom_helper.add_css_class(appDemoID, 'appOpen');
 	dom_helper.show(appDemoID);
-	dom_helper.hide('demoExitButton')
+	//dom_helper.hide('demoExitButton')
+	dom_helper.add_css_class('demoExitButton', 'disabled');
+	document.getElementById('demoExitButton').style.borderColor='rgba(85,85,85,0.2)'
 
 	firstAppOpennedDetection = true; // this is to indicate when the button to open the was first pressed (for some relevant checks to rely on)
 }
@@ -185,6 +187,12 @@ function createSmartphoneApperance() {
 	document.body.appendChild(exitAppElement);
 	dom_helper.add_css_class('demoExitButton', 'demoButton');
 	dom_helper.add_css_class('demoExitButton', 'disabled');
+	//document.getElementById('demoExitButton').style.borderColor='rgba(85,85,85,0.2)'
+
+	// create smartphone button area:
+	buttonAreaElement = document.createElement('div');
+	buttonAreaElement.setAttribute("id", 'simulatedSmartphoneButtonArea');
+	document.body.appendChild(buttonAreaElement);
 }
 
 function createLoadAppButton(elementIdName) {
@@ -208,6 +216,7 @@ function removeSmartphoneApperance(appDemoID) {
 	document.getElementById("outerRectangle").remove();
 	document.getElementById("demoExitButton").remove();
 	document.getElementById("demoLoadButton").remove();
+	document.getElementById("simulatedSmartphoneButtonArea").remove();
 }
 
 async function monitorChangesInDemoAndReact(broadcastMessage) {
@@ -222,6 +231,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 		wait(1000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
+			document.getElementById('demoExitButton').style.borderColor=''
 		});
 	}
 
