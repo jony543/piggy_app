@@ -103,7 +103,12 @@ async function loadAppDemo() {
 	dom_helper.show(appDemoID);
 	//dom_helper.hide('demoExitButton')
 	dom_helper.add_css_class('demoExitButton', 'disabled');
-	document.getElementById('demoExitButton').style.borderColor='rgba(85,85,85,0.2)'
+	document.getElementById('demoExitButton').style.borderColor = 'rgba(85,85,85,0.2)'
+
+	runMonitorChangesInIntervals = setInterval(() => {
+		console.log('INTERVALSCUSH.......')
+		monitorChangesInDemoAndReact({ broadcast: 'running_checks_on_intervals' })
+	}, 1000);
 
 	firstAppOpennedDetection = true; // this is to indicate when the button to open the was first pressed (for some relevant checks to rely on)
 }
@@ -220,24 +225,25 @@ function removeSmartphoneApperance(appDemoID) {
 }
 
 async function monitorChangesInDemoAndReact(broadcastMessage) {
-
-	//sequence_entering_stage_presented
-	//demo_trial_ended
-	console.log('check...')
+	console.log('> monitorChangesInDemoAndReact activated by: ' + broadcastMessage.broadcast)
+	console.log('> check...')
 	subData = await data_helper.get_subject_data(true)
 
 	// present again the button that closes the demo app:
-	if (broadcastMessage.broadcast  == "demo_trial_ended") { // check again while there is no new data point and while it has no value for endTime
+	if (!!subData.endTime[subData.endTime.length - 1] && !demoEndTimeRecorded.includes(subData.endTime[subData.endTime.length - 1])) { // check again while there is no new data point and while it has no value for endTime
+		demoEndTimeRecorded.push(subData.endTime[subData.endTime.length - 1])
+		clearInterval(runMonitorChangesInIntervals) // stop monitoring in intervals
 		wait(1000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
-			document.getElementById('demoExitButton').style.borderColor=''
+			document.getElementById('demoExitButton').style.borderColor = ''
 		});
 	}
 
 	// construct the SPECIAL CASE suporting instructions of the FIRST DEMO INTERACTION WITH THE APP which are long and are changed while the embedded app is running:
 	if (!is_firstDemoScreen_SuportingInstructions_changed_1 &&
-		broadcastMessage.broadcast  == "sequence_entering_stage_presented"
+		document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half") && //sometimes it does not exist yet and than an error is occuring on the next line (so this will prevent it)
+		!document.getElementById(appDemoID).contentWindow.document.getElementById("lower_half").classList.contains('hidden') // check that the sequecne pressing (i.e., the line showing were to press) is presented				
 	) {  // first detection when getting to the sequence pressing screen for the first time
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
@@ -247,7 +253,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 		is_firstDemoScreen_SuportingInstructions_changed_1 = true;
 	}
 	if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
-		broadcastMessage.broadcast  == "demo_trial_ended" // check that the trial was completed			
+		!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
 	) {  // first detection after app was closed
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
@@ -268,6 +274,7 @@ function cancelRedundantInvisibleButtonPress(event) {
 // ---------------------------------------------------------------
 var appDemoID = null;
 var subData = {};
+var demoEndTimeRecorded=[]
 
 var firstAppOpennedDetection = null;
 var current_n_data_points = null; // used to navigate between embedded demo up states
@@ -383,7 +390,7 @@ var settings = Object.assign({}, app_settings);
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
 				durationToDisableInstructionsButtons = 0
 				return false;
-			} else if (settings.lastInstructionsPageExplainsDemo && instructions_page === settings.n_instruction_pages-1 && durationToDisableInstructionsButtons == 0 && !goBack ) { // This is to pass the "Demo is coming" when viewing the instructions again (durationToDisableInstructionsButtons == 0 is just used to check if it's not the first round).
+			} else if (settings.lastInstructionsPageExplainsDemo && instructions_page === settings.n_instruction_pages - 1 && durationToDisableInstructionsButtons == 0 && !goBack) { // This is to pass the "Demo is coming" when viewing the instructions again (durationToDisableInstructionsButtons == 0 is just used to check if it's not the first round).
 				//dom_helper.removeElement('instructionsImage');
 				document.body.style.backgroundColor = "white";
 				instructions_page = 1; // initialize it to the original value in case instructions will be carried out again,
@@ -428,8 +435,8 @@ var settings = Object.assign({}, app_settings);
 	};
 	var check_if_to_ask_if_continue_or_repeat_demo_cycle = {
 		timeline: [continue_or_repeat_demo_cycle],
-		conditional_function: function(){
-			if(askIfRepeatDemo){
+		conditional_function: function () {
+			if (askIfRepeatDemo) {
 				return true;
 			} else {
 				return false;
@@ -454,11 +461,11 @@ var settings = Object.assign({}, app_settings);
 				}
 			}
 		]
-	};	
+	};
 	var check_if_to_ask_to_redo_demo = {
 		timeline: [redo_demo],
-		conditional_function: function(){
-			if(showAppDemo){
+		conditional_function: function () {
+			if (showAppDemo) {
 				return false;
 			} else {
 				return true;
@@ -471,7 +478,7 @@ var settings = Object.assign({}, app_settings);
 		loop_function: function (data) {
 			const subPressedContinue = !Number(jsPsych.data.get().last().select('button_pressed').values[0]);
 			if (subPressedContinue) { // checking that this is the last trial in the demo cycle; Also making sure this trial has ended
-				showAppDemo = false	
+				showAppDemo = false
 				return false;
 			} else {
 				// Operate the embedded demo:
@@ -518,7 +525,7 @@ var settings = Object.assign({}, app_settings);
 					this.choices.unshift(questions.dont_know_answer)
 					this.button_html = '<button id="multipleChoiceQuestionsButtons">%choice%</button>'
 					this.correct_answer = questions[question_number].correct_answer
-				},				
+				},
 				on_finish: function (data) {
 					data.correct = data.button_pressed == this.choices.indexOf(questions[question_number].correct_answer); // option B
 				}
