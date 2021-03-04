@@ -450,7 +450,7 @@ var settings = Object.assign({}, app_settings);
 		},
 		type: 'html-button-response',
 		trial_duration: undefined, // no time limit
-		choices: ['לדלג', 'סיבוב הדגמה'],
+		choices: ['לדלג', 'הדגמה'],
 		button_html: '<button id="repeatOrContinueButtons">%choice%</button>',
 		timeline: [
 			{
