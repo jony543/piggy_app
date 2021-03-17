@@ -5,6 +5,8 @@ async function runApp() {
 	// ----------------------------------------------------------------
 	var startTime = new Date(); // Get time of entry:
 
+	if (document.visibilityState !== 'visible') {return} // Stop if from some reason initiated when app is not visible
+
 	// check if implemented as PWA and handle accordingly:
 	// ********************************************************
 	if (typeof isPWA === 'undefined') { isPWA = await checkAndHandlePWA() };
@@ -71,7 +73,7 @@ async function runApp() {
 
 	// Save the data and refer to instructions if relevant:
 	if (runData.showInstructions) {
-		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true });
+		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, dataLoadingTime: (new Date) - startTime, visibilityStateOnFirstDataSaving: document.visibilityState, commitSession: true });
 		window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
 		return;
 	} else {
@@ -135,7 +137,7 @@ async function runApp() {
 			if (!lowerHalfClicked) {
 				dom_helper.remove_css_class('lower_half', 'blinkable');
 
-				subject_data_worker.postMessage({ press1Time: new Date() });
+				subject_data_worker.postMessage({ press1Time: new Date() , visibilityStatePress1: document.visibilityState});
 
 				// show cost on top right corner if needed [After 1st click]
 				if (!!logic.getCost(runData, settings, logic.cost_on.click1)) {
@@ -163,7 +165,7 @@ async function runApp() {
 			if (lowerHalfClicked) {
 				dom_helper.remove_css_class('upper_half', 'blinkable');
 
-				subject_data_worker.postMessage({ press2Time: new Date() });
+				subject_data_worker.postMessage({ press2Time: new Date(), visibilityStatePress2: document.visibilityState });
 
 				// show cost on top right corner if needed [After 2nd click]
 				if (!!logic.getCost(runData, settings, logic.cost_on.click2)) {

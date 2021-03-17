@@ -421,7 +421,7 @@ function finishTrial(runData) {
 	dom_helper.show('welcome_msg'); // **
 
 	// collect end time and save subject data as results:
-	var dataToSend = { endTime: new Date(), commitSession: true };
+	var dataToSend = { endTime: new Date(), visibilityStateOnEndTime: document.visibilityState, commitSession: true };
 	if (runData.isDemo) {
 		dataToSend.broadcast = 'demo_trial_ended';
 	}

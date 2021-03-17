@@ -806,9 +806,9 @@ h1 {
 
 #repeatOrContinueText {
   position: relative;
-  padding: 6vw;
+  padding: 3vw;
   line-height: normal;
-  font-size: 6vw;
+  font-size: 5.5vw;
   direction: rtl;
 }
 

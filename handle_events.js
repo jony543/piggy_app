@@ -130,16 +130,18 @@ function removeOnlyPortraitMessage() {
 
 // detect leaving the page events:
 document.addEventListener("visibilitychange", function () {
-    if (document.hidden) {
+    if (document.visibilityState === 'hidden') {
         console.log('screen closed')
         onUserExit('visibilitychange_screen_closed_event')
-    } else {
+    } else if (document.visibilityState === 'visible') {
         console.log('screen openned')
         refreshScreen()
     }
 }, false);
 
-window.onunload = onUserExit('unload_event');
+//window.onunload = onUserExit('unload_event');
+window.onpagehide = onUserExit('pagehide_event');
+
 
 // save data when leaving the app:
 function onUserExit(initiatorInfo) {
@@ -157,7 +159,7 @@ function onUserExit(initiatorInfo) {
         screenOrientationEvents: screenOrientationEvents,
     }
     Object.assign(dataToSend, { screenOrientationData: screenOrientationData }, { touchData: touchData })
-    if (initiatorInfo.includes('unload') || initiatorInfo.includes('visibilitychange')) { Object.assign(dataToSend, { userExitOrUnloadTime: new Date() }) }
+    if (initiatorInfo.includes('unload') || initiatorInfo.includes('visibilitychange') || initiatorInfo.includes('pagehide')) { Object.assign(dataToSend, {exitInitiatorEvent: initiatorInfo, userExitOrUnloadTime: new Date(), visibilityStateOnUserExitOrUnloadTime: document.visibilityState}) }
 
     // send meta data:
     subject_data_worker.postMessage(dataToSend)
