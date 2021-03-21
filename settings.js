@@ -34,12 +34,25 @@ window.app_settings = {
 	},
 	hideOutcome: {
 		hide: true,
+		toPersonalizedOutcomeHidingTime: false, // normally the value should be similar to toPersonalizedManpulationTime
 		// option 1:
 		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
-		// option 2: relevant if hideOnlyUnderManipulationPeriods is false;
-		daysToHideAt: [3, 4, 5, 10, 11, 12], // [2, 3, 4, 5, 8, 10, 12],
-		daysToBaseUponHidingTime: [[2], [2], [2], [9], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+		// for options 2 and 3:
+		daysToHideAt: { // detemine according to group name
+			short_training: [3, 4, 5],
+			long_training: [10, 11, 12],
+			long_training_parallel_manipulations: [3, 4, 5, 10, 11, 12],
+		}, // [2, 3, 4, 5, 8, 10, 12],
+		// option 2: relevant if hideOnlyUnderManipulationPeriods is false and toPersonalizedOutcomeHidingTime is true;
+		daysToBaseUponHidingTime:  { // detemine according to group name
+			short_training: [[2], [2], [2]],
+			long_training: [[9], [9], [9]],
+			long_training_parallel_manipulations: [[2], [2], [2], [9], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+		}, // [2, 3, 4, 5, 8, 10, 12],
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
+		// option 3: relevant if hideOnlyUnderManipulationPeriods is false and toPersonalizedOutcomeHidingTime is false
+		entry_to_hideOutcome_in: 3,
+		hour_at_day_to_hideOutcome_anyway: 12,
 	},
 	rewards: {
 		isRatioSchedule: true,
@@ -114,7 +127,7 @@ window.app_settings = {
 				+ logic.calculateReward(subData, app_settings.coinCollectionTask, dayToFinishExperiment)
 				+ ' יחידות זהב!'
 		},
-		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 3 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.',
+		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 10 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.',
 		loadingDataError: 'יש בעיה!' +
 			'<br><br>' +
 			'א. וודא/י שאת/ה מחובר לאינטרנט.' +
@@ -140,18 +153,18 @@ window.app_settings = {
 		counterTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessageTextColor: [0, 0, 255], // can be one value for gray, 3 for RGB, 4 to include alpha
 		finishMessage: "להתראות",
-		costPerPress: 3, // for the winnings calculation at the end
+		costPerPress: 10, // for the winnings calculation at the end
 		rewardPerCoinStash: () => app_settings.rewards.rewardConstantSum, // for the winnings calculation at the end
 	},
 	allowInstructions: true, // for debugging purpose.
 	allowDemo: true,
 	demoCycle: {
 		0: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		// 1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		// 2: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
-		// 3: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		// 4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		// 5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: true, consumptionTest: false },
+		1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		2: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
+		3: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		5: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: true, resetContainer: true, consumptionTest: false },
 	},
 	demoCycleSupportingText: {
 		0: {
@@ -159,14 +172,14 @@ window.app_settings = {
 			b: 'כעת לחצ/י על חציו התחתון של המסך ואז על חלקו העליון כדי להסיר את הקרח ולאפשר את חיפוש הזהב. לאחר מספר שניות של חיפוש תופיע התוצאה.',
 			c: 'בסיבוב הזה מצאת זהב!<br>מיד לאחר מכן הופיעה הודעת הסיום ("נתראה בפעם הבאה"). כשההודעה מופיעה זה אומר שתוצאת החיפוש נשמרה ואפשר לצאת מהאפליקציה. כדי לצאת מהאפליקציה בהדגמה לחצ/י על כפתור הבית הוירטואלי שמופיע על ציור הסמארטפון.',
 		},
-		// 1: 'עכשיו תבצע/י מספר כניסות ויציאות מהאפליקציה ונדגים אפשרויות שונות.<br>כעת ניתן להיכנס ולהסיר את הקרח.<br>הפעם לא תמצא/י זהב (רק אבנים חסרות ערך).',
-		// 2: 'בסיבוב הבא תיתקל/י במערה עתירת זהב.<br>תקבל/י על כך הודעה ולאחריה יהיו לך 5 שניות בתוכה, בהן תוכל/י לאסוף ממה שבמערה.',
-		// 3: 'בכניסה הבאה נדגים קבלת דיווח שהמחסן מלא למחצה.',
-		// 4: 'הפעם נדגים קבלת דיווח שהמחסן מלא.',
-		// 5: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.<br>בנוסף, יהיה מעונן ולא תוכל/י לראות את התוצאה של חיפוש הזהב.<br>*גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר.',
+		1: 'עכשיו תבצע/י מספר כניסות ויציאות מהאפליקציה ונדגים אפשרויות שונות.<br>כעת ניתן להיכנס ולהסיר את הקרח.<br>הפעם לא תמצא/י זהב (רק אבנים חסרות ערך).',
+		2: 'בסיבוב הבא תיתקל/י במערה עתירת זהב.<br>תקבל/י על כך הודעה ולאחריה יהיו לך 5 שניות בתוכה, בהן תוכל/י לאסוף ממה שבמערה.',
+		3: 'בכניסה הבאה נדגים קבלת דיווח שהמחסן מלא למחצה.',
+		4: 'הפעם נדגים קבלת דיווח שהמחסן מלא.',
+		5: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.<br>בנוסף, יהיה מעונן ולא תוכל/י לראות את התוצאה של חיפוש הזהב.<br>*גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר.',
 	},
 	instructionsFileName: 'instructions.html',
-	n_instruction_pages: 22,
+	n_instruction_pages: 23,
 	lastInstructionsPageExplainsDemo: true,
 	instructions_test_questions: {
 		toRandomizeQuestions: false,
@@ -178,69 +191,69 @@ window.app_settings = {
 			distractor_2: 'כן, זה עולה 15 יחידות זהב.',
 			distractor_3: 'כן, העלות משתנה בכל פעם.',
 		},
-		// 2: {
-		// 	question: 'האם הסיכוי למצוא זהב משתנה בזמנים מסויימים?',
-		// 	correct_answer: 'לא, הסיכוי למצוא זהב זהה תמיד.',
-		// 	distractor_1: 'הסיכוי למצוא זהב משתנה כל הזמן.',
-		// 	distractor_2: 'הסיכוי למצוא זהב משתנה כשמעונן ואין אפשרות לראות אם מצאנו זהב.',
-		// 	distractor_3: 'אם לאחרונה מצאנו הרבה זהב הסיכוי למצוא עוד זהב קטן יותר ולהפך.',
-		// },
-		// 3: {
-		// 	question: 'מה קורה אם המחסן מלא?',
-		// 	correct_answer: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
-		// 	distractor_1: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
-		// 	distractor_2: 'זה אומר שהמשחק נגמר.',
-		// 	distractor_3: 'המחסן לא יכול להתמלא אלא רק להתמלא באופן חלקי.',
-		// },
-		// 4: {
-		// 	question: 'מה קורה אם המחסן מלא באופן חלקי?',
-		// 	correct_answer: 'שום דבר, זה רק עדכון. כל עוד המחסן אינו מלא לגמרי ניתן להמשיך לצבור בו זהב.',
-		// 	distractor_1: 'זה לא משהו שאדע עליו מפני שאין דיווחים על כך שהמחסן מלא רק באופן חלקי.',
-		// 	distractor_2: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
-		// 	distractor_3: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
-		// },
-		// 5: {
-		// 	question: 'מה השווי של גושי הזהב שאני יכול/ה למצוא?',
-		// 	correct_answer: '15 יחידות זהב.',
-		// 	distractor_1: 'הסכום משתנה והוא יוצג בכל פעם בהתאם.',
-		// 	distractor_2: '1 יחידות זהב.',
-		// 	distractor_3: 'הסכום משתנה ואין לי אפשרות לדעת אותו.',
-		// },
-		// 6: {
-		// 	question: 'לאחר שנכנסתי לאפליקציה, מתי אוכל לצאת ממנה כך שתוצאת החיפוש תיחשב לי?',
-		// 	correct_answer: 'כאשר תופיע הודעת הסיום (בה כתוב "נתראה בפעם הבאה").',
-		// 	distractor_1: 'מיד לאחר הכניסה.',
-		// 	distractor_2: 'מיד עם הופעתה של תוצאת החיפוש.',
-		// 	distractor_3: 'כשמופיעים עננים.',
-		// },
-		// 7: {
-		// 	question: 'מה קורה כשמעונן על כוכב הלכת ואין לי אפשרות לראות את תוצאות החיפוש?',
-		// 	correct_answer: 'הכל ממשיך בדיוק אותו דבר. אין שינוי מלבד זה שאיני יכול/ה לראות את תוצאת החיפוש.',
-		// 	distractor_1: 'המשחק לא זמין בזמנים אלו ולכן עדיף לנסות מאוחר יותר.',
-		// 	distractor_2: 'אין עלות לכניסה.',
-		// 	distractor_3: 'אין לי אפשרות לצבור את הזהב במחסן.',
-		// },
-		// 8: {
-		// 	question: 'כיצד אוכל להרוויח כסף אמיתי?',
-		// 	correct_answer: 'פשוט להיכנס לאפליקציה כדי לחפש זהב. במידה ומצאתי זהב ויש מקום במחסן, הזהב יילקח לכדור הארץ ויומר לכסף אמיתי. ככל שאצבור יותר זהב ארוויח יותר כסף.',
-		// 	distractor_1: 'אין אפשרות להרוויח כסף אמיתי במשחק.',
-		// 	distractor_2: 'פשוט להיכנס לאפליקציה כדי לחפש אבנים. במידה ומצאתי אבנים ויש מקום במחסן, האבנים יילקחו לכדור הארץ ויומרו לכסף אמיתי.',
-		// 	distractor_3: 'להיכנס לאפליקציה ולהמתין בה זמן רב ככל שניתן לפני שאסגור אותה. ככל שהיא פתוחה יותר זמן ברצף, ארוויח יותר. ',
-		// },
-		// 9: {
-		// 	question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהן לפעמים?',
-		// 	correct_answer: 'כל התשובות נכונות (למעט לא יודע/ת).',
-		// 	distractor_1: 'יש לי 5 שניות בלבד לשהות במערה, בהן אוכל לאסוף מהדברים שבה.',
-		// 	distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 3 יחידות זהב.',
-		// 	distractor_3: 'שווי גושי הזהב והאבנים זהה לזה לשווי גושי הזהב והאבנים בחיפושי הזהב הרגילים.',
-		// },
-		// 10: {
-		// 	question: 'מהו משך המשחק?',
-		// 	correct_answer: 'משך המשחק אינו קבוע מראש. הוא אורך בין ימים אחדים לחודש.',
-		// 	distractor_1: 'יום אחד.',
-		// 	distractor_2: 'שבוע.',
-		// 	distractor_3: 'חודש.',
-		// },
+		2: {
+			question: 'האם הסיכוי למצוא זהב משתנה בזמנים מסויימים?',
+			correct_answer: 'לא, הסיכוי למצוא זהב זהה תמיד.',
+			distractor_1: 'הסיכוי למצוא זהב משתנה כל הזמן.',
+			distractor_2: 'הסיכוי למצוא זהב משתנה כשמעונן ואין אפשרות לראות אם מצאנו זהב.',
+			distractor_3: 'אם לאחרונה מצאנו הרבה זהב הסיכוי למצוא עוד זהב קטן יותר ולהפך.',
+		},
+		3: {
+			question: 'מה קורה אם המחסן מלא?',
+			correct_answer: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
+			distractor_1: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
+			distractor_2: 'זה אומר שהמשחק נגמר.',
+			distractor_3: 'המחסן לא יכול להתמלא אלא רק להתמלא באופן חלקי.',
+		},
+		4: {
+			question: 'מה קורה אם המחסן מלא באופן חלקי?',
+			correct_answer: 'שום דבר, זה רק עדכון. כל עוד המחסן אינו מלא לגמרי ניתן להמשיך לצבור בו זהב.',
+			distractor_1: 'זה לא משהו שאדע עליו מפני שאין דיווחים על כך שהמחסן מלא רק באופן חלקי.',
+			distractor_2: 'אין אפשרות לצבור עוד זהב שיילקח לכדור הארץ ויהפוך לכסף ממשי עבורי עד שירוקנו את המחסן עבורי בתום היממה (ב-5:00 לפנות בוקר).',
+			distractor_3: 'אצטרך לשלוח באופן ישיר ומיידי את הזהב לכדור הארץ.',
+		},
+		5: {
+			question: 'מה השווי של גושי הזהב שאני יכול/ה למצוא?',
+			correct_answer: '15 יחידות זהב.',
+			distractor_1: 'הסכום משתנה והוא יוצג בכל פעם בהתאם.',
+			distractor_2: '1 יחידות זהב.',
+			distractor_3: 'הסכום משתנה ואין לי אפשרות לדעת אותו.',
+		},
+		6: {
+			question: 'לאחר שנכנסתי לאפליקציה, מתי אוכל לצאת ממנה כך שתוצאת החיפוש תיחשב לי?',
+			correct_answer: 'כאשר תופיע הודעת הסיום (בה כתוב "נתראה בפעם הבאה").',
+			distractor_1: 'מיד לאחר הכניסה.',
+			distractor_2: 'מיד עם הופעתה של תוצאת החיפוש.',
+			distractor_3: 'כשמופיעים עננים.',
+		},
+		7: {
+			question: 'מה קורה כשמעונן על כוכב הלכת ואין לי אפשרות לראות את תוצאות החיפוש?',
+			correct_answer: 'הכל ממשיך בדיוק אותו דבר. אין שינוי מלבד זה שאיני יכול/ה לראות את תוצאת החיפוש.',
+			distractor_1: 'המשחק לא זמין בזמנים אלו ולכן עדיף לנסות מאוחר יותר.',
+			distractor_2: 'אין עלות לכניסה.',
+			distractor_3: 'אין לי אפשרות לצבור את הזהב במחסן.',
+		},
+		8: {
+			question: 'כיצד אוכל להרוויח כסף אמיתי?',
+			correct_answer: 'פשוט להיכנס לאפליקציה כדי לחפש זהב. במידה ומצאתי זהב ויש מקום במחסן, הזהב יילקח לכדור הארץ ויומר לכסף אמיתי. ככל שאצבור יותר זהב ארוויח יותר כסף.',
+			distractor_1: 'אין אפשרות להרוויח כסף אמיתי במשחק.',
+			distractor_2: 'פשוט להיכנס לאפליקציה כדי לחפש אבנים. במידה ומצאתי אבנים ויש מקום במחסן, האבנים יילקחו לכדור הארץ ויומרו לכסף אמיתי.',
+			distractor_3: 'להיכנס לאפליקציה ולהמתין בה זמן רב ככל שניתן לפני שאסגור אותה. ככל שהיא פתוחה יותר זמן ברצף, ארוויח יותר. ',
+		},
+		9: {
+			question: 'מה מהבאים לא נכון לגבי מערות עתירות זהב שאני עשוי/ה להיתקל בהן לפעמים?',
+			correct_answer: 'כל התשובות נכונות (למעט לא יודע/ת).',
+			distractor_1: 'יש לי 5 שניות בלבד לשהות במערה, בהן אוכל לאסוף מהדברים שבה.',
+			distractor_2: 'כל נסיון איסוף (לחיצה) בתוך המערה עולה 10 יחידות זהב.',
+			distractor_3: 'שווי גושי הזהב והאבנים זהה לזה לשווי גושי הזהב והאבנים בחיפושי הזהב הרגילים.',
+		},
+		10: {
+			question: 'מהו משך המשחק?',
+			correct_answer: 'משך המשחק אינו קבוע מראש. הוא אורך בין ימים אחדים לחודש.',
+			distractor_1: 'יום אחד.',
+			distractor_2: 'שבוע.',
+			distractor_3: 'חודש.',
+		},
 		// [replace_here_ with_a_number]: {
 		// 	question: '',
 		// 	correct_answer: '',

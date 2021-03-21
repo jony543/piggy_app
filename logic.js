@@ -9,76 +9,37 @@ function setCounterBalancedStuff(subID, settings) {
   let dayToFinishExperiment;
 
   // Determine group:
+  // *UPDATE: I THE CANCELLED COUNTER-BALANCING (original values are commeneted):
   if (subID % 300 > 100 && subID % 300 < 200) {
-    group = 'short_training'; // subject numbers 100-199, 300-399, 500-599 etc
+    group = 'short_training'; // subject numbers 101-199, 401-499, 701-799 etc
 
-    // define stimuli assignment and days of devaluation to counterbalance (there are 8 options):
-    // UPDATE: I THE CANCELLED COUNTER-BALANCING (original values are commeneted):
-    switch (subID % 4) {
-      case 0:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //        firstDevalDay = settings.optionalDaysForFirstDeval[0];
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        firstDevalDay = settings.optionalDaysForFirstDeval[0];
-        break;
-      case 1:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //        firstDevalDay = settings.optionalDaysForFirstDeval[1];
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[0];
-        break;
-      case 2:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //         firstDevalDay = settings.optionalDaysForFirstDeval[0];
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //         lastDevalDay = settings.optionalDaysForLastDeval[1];
-        break;
-      case 3:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1]; //         firstDevalDay = settings.optionalDaysForFirstDeval[1];
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //         lastDevalDay = settings.optionalDaysForLastDeval[1];
-        break;
-    }
-
-    firstComparableValDay = settings.optionalDaysForFirstDeval[0]; //= settings.optionalDaysForFirstDeval.find(element => element !== firstDevalDay);
+    firstDevalDay = settings.optionalDaysForFirstDeval[1];
+    firstComparableValDay = settings.optionalDaysForFirstDeval[0];
     firstComparableValDay_PostDeval = settings.optionalDaysForFirstDeval[2];
-
-    lastComparableValDay = settings.optionalDaysForLastDeval[0]; //= settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+    lastDevalDay = settings.optionalDaysForLastDeval[1];
+    lastComparableValDay = settings.optionalDaysForLastDeval[0];
     lastComparableValDay_PostDeval = settings.optionalDaysForLastDeval[2];
 
     dayToFinishExperiment = settings.dayToFinishExperiment_ShortTraining
   } else if (subID % 300 > 200 && subID % 300 < 300) {
-    group = 'long_training'; // subject numbers 200-299, 400-499, 600-699 etc
+    group = 'long_training'; // subject numbers 201-299, 501-599, 801-899 etc
 
-    // UPDATE: I THE CANCELLED COUNTER-BALANCING (original values are commeneted):
-    switch (subID % 2) {
-      case 0:
-        firstDevalDay = null;
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[0];
-        break;
-      case 1:
-        firstDevalDay = null;
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[1];
-        break;
-    }
+    firstDevalDay = null;
     firstComparableValDay = null;
     firstComparableValDay_PostDeval = null;
-    lastComparableValDay = settings.optionalDaysForLastDeval[0]; //= settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+    lastDevalDay = settings.optionalDaysForLastDeval[1];
+    lastComparableValDay = settings.optionalDaysForLastDeval[0];
     lastComparableValDay_PostDeval = settings.optionalDaysForLastDeval[2];
 
     dayToFinishExperiment = settings.dayToFinishExperiment_LongTraining
   } else if (subID % 300 < 100) {
-    group = 'long_training_parallel_manipulations'; // subject numbers 300-399, 600-699, 900-999 etc.
+    group = 'long_training_parallel_manipulations'; // subject numbers 301-399, 601-699, 901-999 etc.
 
-    // UPDATE: I THE CANCELLED COUNTER-BALANCING (original values are commeneted):
-    switch (subID % 2) {
-      case 0:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1];
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[0];
-        break;
-      case 1:
-        firstDevalDay = settings.optionalDaysForFirstDeval[1];
-        lastDevalDay = settings.optionalDaysForLastDeval[1]; //        lastDevalDay = settings.optionalDaysForLastDeval[1];
-        break;
-    }
-
-    firstComparableValDay = settings.optionalDaysForFirstDeval[0]; //= settings.optionalDaysForFirstDeval.find(element => element !== firstDevalDay);
+    firstDevalDay = settings.optionalDaysForFirstDeval[1]; // in this group it will be translated into another still-valued manipulation
+    firstComparableValDay = settings.optionalDaysForFirstDeval[0];
     firstComparableValDay_PostDeval = settings.optionalDaysForFirstDeval[2];
-
-    lastComparableValDay = settings.optionalDaysForLastDeval[0]; //= settings.optionalDaysForLastDeval.find(element => element !== lastDevalDay);
+    lastDevalDay = settings.optionalDaysForLastDeval[1];
+    lastComparableValDay = settings.optionalDaysForLastDeval[0];
     lastComparableValDay_PostDeval = settings.optionalDaysForLastDeval[2];
 
     dayToFinishExperiment = settings.dayToFinishExperiment_LongTraining
@@ -99,7 +60,8 @@ function getTimeFromLastEntryInSec(timePoint) {
 function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayIfMultipleNonWins, enforceFirstEntryWinSecondEntryNoWin) {
   if (enforceFirstEntryWinSecondEntryNoWin &&
     ((subData.resetContainer[subData.resetContainer.length - 1] && !!subData.endTime[subData.endTime.length - 1]) ||
-    (subData.isFirstTime[subData.isFirstTime.length - 1] && !!subData.endTime[subData.endTime.length - 1]))) { // check first if it's not the second entry today (where a reward must be given):
+    (subData.isFirstTime[subData.isFirstTime.length - 1] && !!subData.endTime[subData.endTime.length - 1])) &&
+    (!subData.isWin[subData.isWin.length - 1])) { // check first if it's the second entry today (where a reward must be given). [* the last line is just for the case of when a manipulation is initiated on the first entry that day and isWin is True.]
     return true
   }
   if (isRatioSchedule) { // RI schedule
@@ -199,20 +161,26 @@ function InitializeCost(cost_settings) {
   }
 }
 
-function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderManipulation, experimentalDayStartingHour = 0) {
+function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderManipulation, experimentalDayStartingHour = 0, group, completeEntriesToday) {
   if (hideOutcome.hide) { // If to hide outcomes
     if (isUnderManipulation && hideOutcome.hideOnlyUnderManipulationPeriods) { // If it's manipulation time and hiding is on only during manipulations.
       return true;
-    } else if (!hideOutcome.hideOnlyUnderManipulationPeriods && hideOutcome.daysToHideAt.includes(dayOfExperiment)) {
-      const timeToHideOutcome = getManipulationStartingTime(subData, hideOutcome.daysToBaseUponHidingTime[hideOutcome.daysToHideAt.indexOf(dayOfExperiment)], hideOutcome.relativeTimeOfDayToStart, experimentalDayStartingHour) // according to the median time in specified days
-      if (new Date() >= timeToHideOutcome) {
-        return true;
+    } else if (!hideOutcome.hideOnlyUnderManipulationPeriods && hideOutcome.daysToHideAt[group].includes(dayOfExperiment)) {
+      if (hideOutcome.toPersonalizedOutcomeHidingTime) { // checking in the context of personalized times    
+        const timeToHideOutcome = getManipulationStartingTime(subData, hideOutcome.daysToBaseUponHidingTime[group][hideOutcome.daysToHideAt[group].indexOf(dayOfExperiment)], hideOutcome.relativeTimeOfDayToStart, experimentalDayStartingHour) // according to the median time in specified days
+        if (new Date() >= timeToHideOutcome) {
+          return true;
+        } 
+      } else { // checking according to pre-determined conditions (based on number of entries and/or time at day)
+        const currentHour = (new Date()).getHours()
+        if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in-1 || currentHour >= hideOutcome.hour_at_day_to_hideOutcome_anyway || currentHour < experimentalDayStartingHour){
+          return true
+        }
       }
     }
   }
   return false;
 }
-
 
 function checkIfResetContainer(subData, dayOfExperiment) {
   if (!subData.day.filter((day) => day === dayOfExperiment).length || // if there were no entries today (i.e., it's the first one)
@@ -359,7 +327,7 @@ var logic = {
         // OPERATE MANIPULATION DAY (DEVALUATION)
         // ---------------------------------------
         if (!endExperiment && (devalueToday || comparableValuedToday || comparableValuedToday_PostDeval || comparableValuedInsteadOfShortDeval)) {
-          var inManipulationTimes = false;
+          var inManipulationPeriod = false;
           if (settings.toPersonalizedManpulationTime) { // resolving in what time of the day to devalue (or induce the alternative still-valued manipulation):
             // resolving which days to base devaluation time on:
             switch (dayOfExperiment) {
@@ -375,12 +343,12 @@ var logic = {
                 break;
             }
             const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation, settings.experimentalDayStartingHour) // according to the median time in specified days
-            if (new Date() >= timeToManipulate) { inManipulationTimes = true }
+            if (new Date() >= timeToManipulate) { inManipulationPeriod = true }
           } else { // namely devaluation is determined globally for all participants according to conditions we pre-determined (e.g., number of entries and/or time of day)
             const currentHour = (new Date()).getHours()
-            if (completeEntriesToday >= settings.entry_to_manipulate_in-1 || (currentHour >= settings.hour_at_day_to_manipulate_anyway) || (currentHour < settings.experimentalDayStartingHour)) { inManipulationTimes = true } // i.e., this is the [pettentialy complete] 5th entry, or if it's after the pre-determined hour of day
+            if (completeEntriesToday >= settings.entry_to_manipulate_in-1 || currentHour >= settings.hour_at_day_to_manipulate_anyway || currentHour < settings.experimentalDayStartingHour) { inManipulationPeriod = true } // i.e., this is the [pettentialy complete] 5th entry, or if it's after the pre-determined hour of day
           }
-          if (inManipulationTimes) {
+          if (inManipulationPeriod) {
             // check if this is the first time the outcome should be devalued that day
             if (!subData.activateManipulation.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.endTime[i]).length) {// There was no trial with ACTIVATION on this DAY that ENDED (the user got to the end of the trial)
               activateManipulation = true;
@@ -394,7 +362,7 @@ var logic = {
 
         // Hide outcome
         // ---------------------------
-        var toHideOutcome = !endExperiment ? checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation, settings.experimentalDayStartingHour) : false;
+        var toHideOutcome = !endExperiment ? checkIfToHideOutcome(subData, settings.hideOutcome, dayOfExperiment, isUnderManipulation, settings.experimentalDayStartingHour, group, completeEntriesToday) : false;
 
       } else { // if it is the first entry
         isWin = settings.rewards.enforceFirstEntryWinSecondEntryNoWin ? false : checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);

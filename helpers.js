@@ -96,6 +96,18 @@ var data_helper = {
 								}
 							});
 						};
+						// Remove exact startTime multiple cases to overcome cases of partial or complete duplicates (may happen rarely). This will leave only last case of identical startTime (along with its data).
+						if (data.startTime.filter(x => !!x).length !== (new Set(data.startTime.filter(x => !!x))).size) {
+							var indicesToRemove = []
+							data.startTime.forEach(function (x, i) {
+								if (!!x && i !== data.startTime.lastIndexOf(x)) {
+									indicesToRemove.push(i)
+								}
+							})
+							if (indicesToRemove) {
+								indicesToRemove.reverse().forEach(indToRemove => Object.keys(data).forEach(key => data[key].splice(indToRemove, 1)))
+							}
+						}
 						resolve(data);
 					} else {
 						resolve((!!subjectData) ? subjectData : {});
@@ -518,7 +530,7 @@ if ('serviceWorker' in navigator) {
 				console.log('Service Worker: Registered')
 				reg.addEventListener('updatefound', () => {
 					console.log('UPDATE FOUND')
-					subject_data_worker.postMessage({newServiceWorkerDetected: new Date, commitSession: true });
+					subject_data_worker.postMessage({ newServiceWorkerDetected: new Date, commitSession: true });
 					//reg.update()
 					// A wild service worker has appeared in reg.installing!
 					const newWorker = reg.installing;
