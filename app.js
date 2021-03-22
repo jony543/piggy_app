@@ -26,7 +26,7 @@ async function runApp() {
 	// ********************************************************
 
 	dom_helper.show('main_container')
-	
+
 	// Define variables used to prevent two instances of the app running in simultaniously when reloading
 	let identifier = startTime.getTime(); // local within this instance
 	recordIdentifier = identifier; // global to communicate with the handle_events.js file
@@ -62,7 +62,8 @@ async function runApp() {
 	var runData = logic.initialize(subData, settings);
 
 	// create new session with server only after logic is called! (important for demo to work)
-	data_helper.init_session('app', false);
+	const sessionPrefix = (!!runData.isDemo) ? 'demo' : 'app';
+	data_helper.init_session(sessionPrefix, false);
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
 	if (!subData.uniqueEntryID[subData.uniqueEntryID.length - 1]) {// should be assigned once every entry
@@ -81,7 +82,7 @@ async function runApp() {
 	}
 
 	// assign animation times according to settings:
-	document.getElementById('cost_indicator_1_').style.animationDuration = String(settings.durations.costAnim / 1000) + 's' // **	
+	document.getElementById('cost_indicator_1_').style.animationDuration = String(settings.durations.costAnim / 1000) + 's' // **
 	document.getElementById('outcome_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('outcome_no_win').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
 	document.getElementById('outcome_text_1_').style.animationDuration = String(settings.durations.outcomeAnim / 1000) + 's' // **
@@ -285,7 +286,7 @@ async function runApp() {
 		if (manipulationOption) { await delay(300) } // create a small interval between dialog boxes if they appear one after the other.
 		if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 		subject_data_worker.postMessage({ foundCaveAlertTime: new Date() }) // **
-		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task 			
+		await dialog_helper.random_code_confirmation(msg = settings.text.dialog_coinCollection, img_id = 'cave', delayBeforeClosing = 2000, resolveOnlyAfterDelayBeforeClosing = false); // ** The coins task will run through the helper ** show message about the going to the coin collection task
 		subject_data_worker.postMessage({ foundCaveConfirmationTime: new Date() }) // **
 		run_coin_collection(settings.coinCollectionTask, runData, identifier);
 	} else {

@@ -157,6 +157,10 @@ var data_helper = {
 			this.q = [];
 		}
 
+		// close current socket before re connecting
+		if (this.ws) {
+			this.ws.close();
+		}
 		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
 
 		this.ws.onopen = (function (event) {

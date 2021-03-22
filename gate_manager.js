@@ -58,8 +58,8 @@ async function checkAndHandlePWA() {
         //window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // if app PWA:
-    if (isInWebAppiOS || isInWebAppChrome) {
-        // if (true) { // for debugging purposes
+    //if (isInWebAppiOS || isInWebAppChrome) {
+    if (true) { // for debugging purposes
         populate_manifest();
         dom_helper.hide('installation_guide');
         return true
@@ -97,7 +97,7 @@ async function checkAndHandlePWA() {
                 //data_helper.init_session('app', false);
                 populate_manifest();
                 // Save a message so this user will be signaled as used.
-                data_helper.init_session('app', false);
+                data_helper.init_session('gate', false);
                 await subject_data_worker.postMessage({ opennedInstallaitonPage: true, commitSession: true });
                 // show installation instructions (according to the device type):
                 document.getElementById('installation_guide').setAttribute('src', 'images/instructions/installation_guide_' + mobileOS + '.jpg')
