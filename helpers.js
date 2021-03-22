@@ -158,7 +158,7 @@ var data_helper = {
 		}
 
 		// close current socket before re connecting
-		if (!!this.ws.close) {
+		if (!!this.ws && !!this.ws.close) {
 			this.ws.close();
 		}
 		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
@@ -172,19 +172,13 @@ var data_helper = {
 			// https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
 			if (event.code != 1000) {
 				// https://stackoverflow.com/questions/13797262/how-to-reconnect-to-websocket-after-close-connection
-				console.log('WS is closed. re-opening');
-				this.init_session(this.sessionName, true);
+				console.log('WS is closed');
 			}
 		}).bind(this);
 
 		this.ws.onerror = (function (event) {
 			console.log('WS error!');
 			console.log(event);
-
-			if (this.ws.readyState == 3) { // status CLOSED
-				this.ws = undefined;
-				this.init_session(this.sessionName, true);
-			}
 		}).bind(this);
 
 		this.ws.onmessage = (function (event) {
@@ -232,6 +226,9 @@ var data_helper = {
 				return true;
 			} else {
 				console.log("waiting for connection...")
+				if (this.ws.readyState == 3) { // status CLOSED
+					this.init_session(this.sessionName, true);
+				}
 				return false;
 			}
 		} else {
