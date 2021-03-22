@@ -158,7 +158,7 @@ var data_helper = {
 		}
 
 		// close current socket before re connecting
-		if (this.ws) {
+		if (!!this.ws.close) {
 			this.ws.close();
 		}
 		this.ws = new WebSocket(this.getWsUrl(sessionName + this.get_timestamp()));
