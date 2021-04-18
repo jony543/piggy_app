@@ -58,6 +58,37 @@ var dom_helper = {
 	}
 };
 
+function prepareSubjectData (subjectData) {
+	var data = {};
+	if (!!subjectData) {
+		// create one dictionnay for each line of data:
+		arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
+		// populate data variables:
+		app_settings.dataVarList.forEach(key => data[key] = []);
+		// fill dictionnary of arrays:
+		arrayOfObj.forEach(function (lineObject) {
+			for (const key of Object.keys(data)) {
+				data[key].push(lineObject[key]);
+			}
+		});
+	};
+
+	// Remove exact startTime multiple cases to overcome cases of partial or complete duplicates (may happen rarely). This will leave only last case of identical startTime (along with its data).
+	if (data.startTime.filter(x => !!x).length !== (new Set(data.startTime.filter(x => !!x))).size) {
+		var indicesToRemove = []
+		data.startTime.forEach(function (x, i) {
+			if (!!x && i !== data.startTime.lastIndexOf(x)) {
+				indicesToRemove.push(i)
+			}
+		})
+		if (indicesToRemove) {
+			indicesToRemove.reverse().forEach(indToRemove => Object.keys(data).forEach(key => data[key].splice(indToRemove, 1)))
+		}
+	}
+
+	return data;
+}
+
 var data_helper = {
 	base_address: app_settings.server.base_address,
 	ws_base_address: app_settings.server.ws_base_address,
@@ -70,49 +101,29 @@ var data_helper = {
 			var url = this.base_address + '/app/api/session/list?subId=' + this.get_subject_id();
 			url += '&fields=' + app_settings.dataVarList.concat(['uniqueEntryID']).join(',');
 
-			var localData = JSON.parse(localStorage.getItem(this.get_subject_id() + '_data')) ?? [];
-			if (localData && localData.length > 0) {
-				const lastSessionDate = new Date(Math.max(...localData.map(x => new Date(x.created_at))));
-				url += '&from=' + lastSessionDate.toISOString();
-			}
+			var localData = offline_data_manager.get();
 
-			return ajax_helper.get(url)
-				.then((function (subjectData) {
-					var allData = localData.concat(subjectData);
-					subjectData = Object.values(allData.toDict('created_at')); // remove double entries
-					localStorage.setItem(this.get_subject_id() + '_data', JSON.stringify(subjectData));
+			if (offline_data_manager.isAvailable()) {
+				return resolve(prepareSubjectData(localData));
+			} else {
+				if (localData.length > 0) {
+					const lastSessionDate = new Date(Math.max(...localData.map(x => new Date(x.created_at))));
+					url += '&from=' + lastSessionDate.toISOString();
+				}
 
-					if (!!asArray) {
-						var data = {};
-						if (!!subjectData) {
-							// create one dictionnay for each line of data:
-							arrayOfObj = Object.entries(subjectData).map((e) => Object.assign(({ 'serial': e[0] }), e[1]));
-							// populate data variables:
-							app_settings.dataVarList.forEach(key => data[key] = []);
-							// fill dictionnary of arrays:
-							arrayOfObj.forEach(function (lineObject) {
-								for (const key of Object.keys(data)) {
-									data[key].push(lineObject[key]);
-								}
-							});
-						};
-						// Remove exact startTime multiple cases to overcome cases of partial or complete duplicates (may happen rarely). This will leave only last case of identical startTime (along with its data).
-						if (data.startTime.filter(x => !!x).length !== (new Set(data.startTime.filter(x => !!x))).size) {
-							var indicesToRemove = []
-							data.startTime.forEach(function (x, i) {
-								if (!!x && i !== data.startTime.lastIndexOf(x)) {
-									indicesToRemove.push(i)
-								}
-							})
-							if (indicesToRemove) {
-								indicesToRemove.reverse().forEach(indToRemove => Object.keys(data).forEach(key => data[key].splice(indToRemove, 1)))
-							}
+				return ajax_helper.get(url)
+					.then((function (subjectData) {
+						var allData = localData.concat(subjectData);
+						subjectData = Object.values(allData.toDict('created_at')); // remove double entries
+						offline_data_manager.set(subjectData);
+
+						if (!!asArray) {
+							resolve(prepareSubjectData(subjectData));
+						} else {
+							resolve((!!subjectData) ? subjectData : {});
 						}
-						resolve(data);
-					} else {
-						resolve((!!subjectData) ? subjectData : {});
-					}
-				}).bind(this));
+					}).bind(this));
+			}
 		}).bind(this));
 	},
 	getWsUrl: function (sessionName) {
@@ -155,6 +166,8 @@ var data_helper = {
 		if (!tryRestore) {
 			this.sessionId = '';
 			this.q = [];
+
+			offline_data_manager.clearStaged();
 		}
 
 		// close current socket before re connecting
@@ -193,6 +206,9 @@ var data_helper = {
 			// if it is ack message remove the message from queue
 			if ('messageId' in data) {
 				this.q = this.q.filter(m => m.messageId != data.messageId);
+
+				// when message received in backend, save to local storage
+				offline_data_manager.commit(data.messageId);
 			}
 
 			if ('broadcast' in data) {
@@ -215,10 +231,14 @@ var data_helper = {
 				const messageId = 'm' + this.get_timestamp();
 				this.q.forEach(m => m.messageId = messageId)
 
-				const dataToSend = JSON.stringify(
+				const dataToSend =
 					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
-				);
-				this.ws.send(dataToSend);
+
+				// save sent message to temp storage before receipt confirmation arrives
+				offline_data_manager.stage(dataToSend.messageId, dataToSend);
+
+				// send to backend
+				this.ws.send(JSON.stringify(dataToSend));
 
 				console.log('readySatate = 1; data was saved. The data:')
 				console.log(dataToSend)
@@ -268,6 +288,73 @@ var data_helper = {
 		}).bind(this));
 	}
 };
+
+var offline_data_manager = {
+	get: function () {
+		return local_storage_helper.get('data') ?? [];
+	},
+	stage: function (messageId, data) {
+		local_storage_helper.set('msg_' + messageId, data);
+	},
+	commit: function (messageId) {
+		const data = local_storage_helper.get('msg_' + messageId);
+		const result = this.append(data, '_id');
+		local_storage_helper.remove('msg_' + messageId);
+		return result;
+	},
+	clearStaged: function () {
+		local_storage_helper.keys().forEach( k => {
+			if (k.startsWith('msg_'))
+				local_storage_helper.remove(k);
+		});
+	},
+	append: function (item, key) {
+		if (!item)
+			return;
+
+		var localData = this.get();
+		if (localData && localData.length > 0) {
+			var element = (!!item[key]) ? localData.find(i => i[key] == item[key]) : undefined;
+			if (!!element) {
+				Object.assign(element, item);
+			} else {
+				localData.push(item);
+			}
+		}
+
+		this.set(localData);
+		return localData;
+	},
+	set: function (data) {
+		local_storage_helper.set('data', data);
+	},
+	isAvailable: function () {
+		return !!local_storage_helper.get('data');
+	}
+}
+
+var local_storage_helper = {
+	set: function (id, data) {
+		return localStorage.setItem(data_helper.get_subject_id() + '_' + id, JSON.stringify(data));
+	},
+	get: function (id) {
+		const val = localStorage.getItem(data_helper.get_subject_id() + '_' + id);
+		return val ? JSON.parse(val) : val;
+	},
+	keys: function () {
+		var keys = [];
+		const subIdString = data_helper.get_subject_id() + '_';
+
+		for (var i = 0; i < localStorage.length; i++) {
+			if (localStorage.key(i).includes(subIdString))
+				keys.push(localStorage.key(i).replace(subIdString, ''));
+		}
+		return keys;
+	},
+	remove: function (id) {
+		return localStorage.removeItem(data_helper.get_subject_id() + '_' + id);
+	}
+}
 
 // Make the function wait until the connection is made...
 function waitForSocketConnection(socket, callback) {
