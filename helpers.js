@@ -101,11 +101,11 @@ var data_helper = {
 			var url = this.base_address + '/app/api/session/list?subId=' + this.get_subject_id();
 			url += '&fields=' + app_settings.dataVarList.concat(['uniqueEntryID']).join(',');
 
-			var localData = offline_data_manager.get();
-
 			if (offline_data_manager.isAvailable()) {
-				return resolve(prepareSubjectData(localData));
+				return resolve(prepareSubjectData(offline_data_manager.get()));
 			} else {
+				var localData = offline_data_manager.get();
+
 				if (localData.length > 0) {
 					const lastSessionDate = new Date(Math.max(...localData.map(x => new Date(x.created_at))));
 					url += '&from=' + lastSessionDate.toISOString();
@@ -167,7 +167,8 @@ var data_helper = {
 			this.sessionId = '';
 			this.q = [];
 
-			offline_data_manager.clearStaged();
+			// uncomment this line if using staging and commit mechanism
+			// offline_data_manager.clearStaged();
 		}
 
 		// close current socket before re connecting
@@ -206,9 +207,6 @@ var data_helper = {
 			// if it is ack message remove the message from queue
 			if ('messageId' in data) {
 				this.q = this.q.filter(m => m.messageId != data.messageId);
-
-				// when message received in backend, save to local storage
-				offline_data_manager.commit(data.messageId);
 			}
 
 			if ('broadcast' in data) {
@@ -234,8 +232,8 @@ var data_helper = {
 				const dataToSend =
 					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
 
-				// save sent message to temp storage before receipt confirmation arrives
-				offline_data_manager.stage(dataToSend.messageId, dataToSend);
+				// append message to local storage
+				offline_data_manager.append(dataToSend);
 
 				// send to backend
 				this.ws.send(JSON.stringify(dataToSend));
