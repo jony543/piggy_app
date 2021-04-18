@@ -164,6 +164,11 @@ var data_helper = {
 		this.sessionName = sessionName;
 
 		if (!tryRestore) {
+			if (this.q.length < 0) {
+				console.error(this.q.length + ' message were not when starting new session. Data may be lost.')
+				console.log(this.q);
+			}
+
 			this.sessionId = '';
 			this.q = [];
 
