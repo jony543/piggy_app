@@ -238,7 +238,7 @@ var data_helper = {
 					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
 
 				// append message to local storage
-				offline_data_manager.append(dataToSend);
+				offline_data_manager.append(dataToSend, '_id'); ////NEW
 
 				// send to backend
 				this.ws.send(JSON.stringify(dataToSend));
@@ -332,7 +332,7 @@ var offline_data_manager = {
 		local_storage_helper.set('data', data);
 	},
 	isAvailable: function () {
-		return !!local_storage_helper.get('data');
+		return !!local_storage_helper.get('data') && !!local_storage_helper.get('data').length; ////NEW
 	}
 }
 
