@@ -208,7 +208,8 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
   const daysToCheckManipulationActivated = daysOfManipulation.filter(x=>!!x && x<dayOfExperiment)
   const manipulationActivationdays = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
-  if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length) {
+  const manipulationActivationdays2 = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x,i,s)=>s.indexOf(x) === i) // the last part just takes the unique values
+  if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) {
       return true
   }
     
