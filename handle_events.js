@@ -16,7 +16,7 @@ appRunning = false; // used to determine whther a new session can start
 // get custom settings for component and batch
 var settings = Object.assign({}, app_settings);
 // check if triggered from within instructions:
-var isCalledFromInstructions = logic.isCalledFromInstructions();
+// var isCalledFromInstructions = logic.isCalledFromInstructions(); // This was relevant when instructions were not in an iframe.
 
 // ****************************************************************************************
 //  Listen to touch events and record the data and to page leaving events to save the data:
@@ -63,11 +63,11 @@ var screenOrientationEvents = [];
 var screenInitialOrientation = checkInitialOrientation();
 
 // get current html to determine relevant id for orientation switches
-if (document.title === settings.instructions_HTML_title) {
-    var element_ID_to_Hide = settings.instructions_main_HTML_element;
-} else if (document.title === settings.App_HTML_title && !isCalledFromInstructions) {
-    var element_ID_to_Hide = settings.App_main_HTML_element;
-}
+// if (document.title === settings.instructions_HTML_title) {
+//     var element_ID_to_Hide = settings.instructions_main_HTML_element;
+// } else if (document.title === settings.App_HTML_title && !isCalledFromInstructions) {
+var element_ID_to_Hide = settings.App_main_HTML_element; // The commented parts around were relevant when instructions where not in an iframe
+// }
 
 // check upon entry if it is on portrait mode:
 function checkInitialOrientation(){
@@ -147,7 +147,7 @@ window.onpagehide = onUserExit('pagehide_event');
 function onUserExit(initiatorInfo) {
     // Add the current app instance to the cleaning list before openning a new instance:
     identifiersToClean.push(recordIdentifier)
-    
+
     // assign meta data to send:
     var dataToSend = {};
     touchData = {
@@ -170,7 +170,7 @@ function onUserExit(initiatorInfo) {
 }
 
 function refreshScreen() {
-    if (document.title === settings.App_HTML_title && !isCalledFromInstructions) { // reload on every entry if it's the main App (and not the instructions)
+    if (document.title === settings.App_HTML_title && !logic.isCalledFromInstructions()) { // reload on every entry if it's the main App (and not the instructions)
 
         identifiersToClean.push(recordIdentifier) // in case it didn't got pushed by onUserExit()
 

@@ -75,7 +75,20 @@ async function runApp() {
 	// Save the data and refer to instructions if relevant:
 	if (runData.showInstructions) {
 		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, dataLoadingTime: (new Date) - startTime, visibilityStateOnFirstDataSaving: document.visibilityState, commitSession: true });
-		window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
+		//window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
+
+
+		appRunning = false
+		// create instructions iframe:
+		var instructionsUrl = "instructions.html" + location.search;
+		instructionsElement = document.createElement('iframe');
+		instructionsElement.setAttribute("id", 'instructions_iframe')
+		instructionsElement.setAttribute("src", instructionsUrl)
+		document.body.appendChild(instructionsElement)
+
+
+
+
 		return;
 	} else {
 		subject_data_worker.postMessage({ ...runData, startTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true });

@@ -78,6 +78,31 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
   height: 100%;
   z-index: 999;
 }
+
+#instructions_iframe {
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  width:100%;
+  height:100%;
+  border:none;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  z-index:999999;
+ 
+  touch-action: none;
+ 
+ -webkit-touch-callout: none; /* iOS Safari */
+ -webkit-user-select: none; /* Safari */
+ -khtml-user-select: none; /* Konqueror HTML */
+ -moz-user-select: none; /* Old versions of Firefox */
+ -ms-user-select: none; /* Internet Explorer/Edge */
+ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+ 
 /*                     APP LOADING                      */
 /* ---------------------------------------------------- */
 
