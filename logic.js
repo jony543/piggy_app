@@ -223,7 +223,7 @@ var logic = {
   isCalledFromInstructions: function () {
     //return document.referrer.includes(settings.instructionsFileName); // was relevant when in iframe from the install.js
     //return window.parent.location.href.includes(settings.instructionsFileName) // this was relevant when it instructions were not redirected to
-    return !!document.getElementById('instructions_iframe')
+    return !!document.getElementById('instructions_iframe') || document.referrer.includes(settings.instructionsFileName)
   },
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
