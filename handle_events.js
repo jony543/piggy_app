@@ -62,13 +62,6 @@ function recordPressData(event) {
 var screenOrientationEvents = [];
 var screenInitialOrientation = checkInitialOrientation();
 
-// get current html to determine relevant id for orientation switches
-// if (document.title === settings.instructions_HTML_title) {
-//     var element_ID_to_Hide = settings.instructions_main_HTML_element;
-// } else if (document.title === settings.App_HTML_title && !isCalledFromInstructions) {
-var element_ID_to_Hide = settings.App_main_HTML_element; // The commented parts around were relevant when instructions where not in an iframe
-// }
-
 // check upon entry if it is on portrait mode:
 function checkInitialOrientation(){
     if (screen.availHeight < screen.availWidth) {
@@ -94,6 +87,15 @@ window.addEventListener("orientationchange", function (event) {
     });
 });
 function showOnlyPortraitMessage() {
+    // get current html to determine relevant id for orientation switches
+    if (logic.isCalledFromInstructions()) {
+        var element_ID_to_Hide = settings.instructions_main_HTML_element;
+    } else if (document.location.href.includes(settings.instructionsFileName)){ // if it is called from inside the iframe don't run it (unecessary)
+        return
+    } else if (!logic.isCalledFromInstructions()) {
+        var element_ID_to_Hide = settings.App_main_HTML_element; // The commented parts around were relevant when instructions where not in an iframe
+    }
+    // hide screen and show message:
     dom_helper.hide(element_ID_to_Hide)
     document.body.style.backgroundImage = 'none'
     if (!document.getElementById("support_only_portrait_msg")) { // if the message element has not been formed already
@@ -119,6 +121,15 @@ function showOnlyPortraitMessage() {
     }
 }
 function removeOnlyPortraitMessage() {
+    // get current html to determine relevant id for orientation switches
+    if (logic.isCalledFromInstructions()) {
+        var element_ID_to_Hide = settings.instructions_main_HTML_element;
+    } else if (document.location.href.includes(settings.instructionsFileName)){ // if it is called from inside the iframe don't run it (unecessary)
+        return
+    } else if (!logic.isCalledFromInstructions()) {
+        var element_ID_to_Hide = settings.App_main_HTML_element; // The commented parts around were relevant when instructions where not in an iframe
+    }
+    // remove message and show screen:
     dom_helper.show(element_ID_to_Hide)
     document.body.style.backgroundImage = ''
     dom_helper.hide('support_only_portrait_box')
