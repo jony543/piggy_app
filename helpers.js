@@ -554,3 +554,14 @@ if ('serviceWorker' in navigator) {
 			.catch(err => console.log(`Service Worker: Error: ${err}`))
 	})
 }
+
+function clearCacheAndReload() {
+	caches.keys().then(cacheNames => {
+		return Promise.all(
+			cacheNames.map(cache => {
+				console.log('Service Worker: Clearing Old Cache');
+				return caches.delete(cache);
+			})
+		);
+	}).then(window.location.reload())
+}

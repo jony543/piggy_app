@@ -160,7 +160,7 @@ window.app_settings = {
 	allowDemo: true,
 	demoCycle: {
 		0: { isWin: true, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
-		1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
+		// 1: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
 		// 2: { isWin: false, whichManipulation: null, activateManipulation: false, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: true },
 		// 3: { isWin: true, whichManipulation: 'still_valued', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
 		// 4: { isWin: true, whichManipulation: 'devaluation', activateManipulation: true, isUnderManipulation: false, toHideOutcome: false, resetContainer: false, consumptionTest: false },
@@ -179,7 +179,7 @@ window.app_settings = {
 		5: 'בתחילת הסיבוב הבא תקבל/י דיווח שחללית המטען (זו שמרוקנת את המחסן על כוכב הזהב כל 24 שעות) רוקנה את המחסן.<br>בנוסף, יהיה מעונן ולא תוכל/י לראות את התוצאה של חיפוש הזהב.<br>*גם כאן יש לחכות להודעת הסיום כדי שתוצאת החיפוש תישמר.',
 	},
 	instructionsFileName: 'instructions.html',
-	n_instruction_pages: 2,
+	n_instruction_pages: 1,
 	lastInstructionsPageExplainsDemo: true,
 	instructions_test_questions: {
 		toRandomizeQuestions: false,
