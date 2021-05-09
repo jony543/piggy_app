@@ -227,12 +227,12 @@ function removeSmartphoneApperance(appDemoID) {
 async function monitorChangesInDemoAndReact(broadcastMessage) {
 	console.log('> monitorChangesInDemoAndReact activated by: ' + broadcastMessage.broadcast)
 	console.log('> check...')
-	subData = await data_helper.get_subject_data(true)
 
 	// present again the button that closes the demo app:
-	if (!!subData.endTime[subData.endTime.length - 1] && !demoEndTimeRecorded.includes(subData.endTime[subData.endTime.length - 1])) { // check again while there is no new data point and while it has no value for endTime
-		demoEndTimeRecorded.push(subData.endTime[subData.endTime.length - 1])
+	if (document.getElementById(appDemoID).contentWindow.document.getElementById("welcome_msg") &&
+		!document.getElementById(appDemoID).contentWindow.document.getElementById("welcome_msg").classList.contains('hidden')) {
 		clearInterval(runMonitorChangesInIntervals) // stop monitoring in intervals
+		subData = await data_helper.get_subject_data(true)
 		wait(1000).then(() => {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
@@ -253,7 +253,8 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 		is_firstDemoScreen_SuportingInstructions_changed_1 = true;
 	}
 	if (!is_firstDemoScreen_SuportingInstructions_changed_2 &&
-		!!subData.endTime[subData.endTime.length - 1] // check that the trial was completed			
+		document.getElementById(appDemoID).contentWindow.document.getElementById("welcome_msg") &&
+		!document.getElementById(appDemoID).contentWindow.document.getElementById("welcome_msg").classList.contains('hidden') // check that the trial was completed			
 	) {  // first detection after app was closed
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
@@ -274,7 +275,6 @@ function cancelRedundantInvisibleButtonPress(event) {
 // ---------------------------------------------------------------
 var appDemoID = null;
 var subData = {};
-var demoEndTimeRecorded=[]
 
 var firstAppOpennedDetection = null;
 var current_n_data_points = null; // used to navigate between embedded demo up states
