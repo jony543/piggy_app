@@ -7,7 +7,10 @@ if (!!container) {
 
 // Define variables used to prevent two instances of the app running in simultaniously when reloading (communicates with app.js)
 identifiersToClean = [];
+//if (typeof recordIdentifier === 'undefined') {
 recordIdentifier = '';
+//};
+
 // initiate a variable that tracks if an app is running:
 appRunning = false; // used to determine whther a new session can start
 
@@ -221,6 +224,15 @@ function runNewAppInstance() {
         dom_helper.hide('lottery');
         dom_helper.show('app_will_load_soon');
         dom_helper.show('loading_animation');
+        // a mechanism to check that the new instance of the app starts running (and if not then reload):
+        previousRunIdentifier = recordIdentifier
+        setTimeout(() => {
+            if (previousRunIdentifier === recordIdentifier) {
+                console.log('new app instance is did not start running... RELOADING page')
+                location.reload()
+            }
+        }, 2000);
+        // run the app
         document.body.onload = runApp();// an alternative to reloading step 2 that may be faster but needs more adaptations:
     }
 }

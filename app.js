@@ -1,5 +1,6 @@
 async function runApp() {
 	appRunning = true; // used to determine whther a new session can start
+	clearTimeout(checkIfAppStartedRunning) // Stop checking (through the index.html that app started running on the first time)
 	// ****************************************************************
 	//           SET & INITIALIZE STUFF:
 	// ----------------------------------------------------------------
@@ -43,6 +44,10 @@ async function runApp() {
 	var settings = Object.assign({}, app_settings);
 
 	// get subject data from batch session *** Temp Bandage by Rani
+	var checkLoading = setTimeout(() => {
+		console.log('data not loading... RELOADING page')
+		location.reload()
+	}, 10000)
 	var timer = new Date();
 	try {
 		do {
@@ -52,9 +57,15 @@ async function runApp() {
 					console.log(e);
 				});
 			} else if (new Date() - timer < 7000) {
-				Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
-					subData[key] = subData[key].slice(0, subData[key].length - 1);
-				});
+				try {
+					Object.keys(subData).forEach(function (key) { // After 5 seconds in case there still no good data from what supposedly was the last run, it is probabale that a problem occured or that no data had the chance to be normally saved and the last "trial/s" will be removed.
+						subData[key] = subData[key].slice(0, subData[key].length - 1);
+					});
+				} catch (err) {
+					console.log(err)
+					location.reload()
+					return
+				}
 			} else {
 				location.reload()
 				return
@@ -65,7 +76,8 @@ async function runApp() {
 		await dialog_helper.show(settings.text.loadingDataError, img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
 		return;
 	}
-
+	clearTimeout(checkLoading)
+	
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
 

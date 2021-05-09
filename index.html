@@ -91,10 +91,17 @@
         media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)"
         rel="apple-touch-startup-image" />
     <!------------------------------------------------------------------>
+    <script>
+        // check app loading after the page is loaded
+        checkIfAppStartedRunning = setTimeout(()=>{
+                console.log('app not loading... RELOADING page')
+                location.reload()
+        }, 7000)
+    </script>
+    <script src="app.js"></script>
 </head>
 
 <body id="background" class="bgApp" onload="runApp()">
-
     <!-- Loading Screen -->
     <div id="app_will_load_soon" class="centered appIsLoading">
         <h1>...טוען</h1>
@@ -158,7 +165,6 @@
 </body>
 
 <script src="handle_events.js"></script>
-<script src="app.js"></script>
 <script src="coin_collection.js"></script>
 
 </html>
