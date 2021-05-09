@@ -110,7 +110,6 @@ var data_helper = {
 					const lastSessionDate = new Date(Math.max(...localData.map(x => new Date(x.created_at))));
 					url += '&from=' + lastSessionDate.toISOString();
 				}
-
 				return ajax_helper.get(url)
 					.then((function (subjectData) {
 						var allData = localData.concat(subjectData);
@@ -332,6 +331,7 @@ var offline_data_manager = {
 				this.append(m, '_id')
 			else
 				this.append(m, 'localSessionId')
+
 		});
 	},
 	append: function (item, key) {
@@ -357,7 +357,7 @@ var offline_data_manager = {
 		local_storage_helper.set('data', data);
 	},
 	isAvailable: function () {
-		return !!local_storage_helper.get('data');
+		return !!local_storage_helper.get('data') && !!local_storage_helper.get('data').length; ////NEW
 	}
 }
 
@@ -668,4 +668,15 @@ if ('serviceWorker' in navigator) {
 			})
 			.catch(err => console.log(`Service Worker: Error: ${err}`))
 	})
+}
+
+function clearCacheAndReload() {
+	caches.keys().then(cacheNames => {
+		return Promise.all(
+			cacheNames.map(cache => {
+				console.log('Service Worker: Clearing Old Cache');
+				return caches.delete(cache);
+			})
+		);
+	}).then(window.location.reload())
 }

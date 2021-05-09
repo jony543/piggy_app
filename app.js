@@ -5,7 +5,7 @@ async function runApp() {
 	// ----------------------------------------------------------------
 	var startTime = new Date(); // Get time of entry:
 
-	if (document.visibilityState !== 'visible') {return} // Stop if from some reason initiated when app is not visible
+	if (document.visibilityState !== 'visible') { return } // Stop if from some reason initiated when app is not visible
 
 	// check if implemented as PWA and handle accordingly:
 	// ********************************************************
@@ -19,9 +19,17 @@ async function runApp() {
 		console.log('images finished loading');
 	});
 	if (!!Array.from(document.images).filter(img => img.id !== "installation_guide" && img.naturalHeight === 0).length) { // check that all images were successfully loaded - detects if there was an error in loading an image
+		// subject_data_worker.postMessage({ ...runData, crucialProblem: 'images_not_loaded', problematicTrialStartTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true }); // maybe use this to save a log of a problem but then I need to adjuct the data loading
 		console.log('Problem in image loading');
-		alert('היתה בעיה בטעינה. נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש.')
-		return
+		alert('היתה בעיה בטעינה. לאחר שתאשר/י האפליקציה תרענן את עצמה. אם זה לא נפתר תוך כמה נסיונות נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש לפחות פעמיים. אם זה לא עדיין לא נפתר נא לפנות לנסיינ/ית בפל: 050-5556733.')
+		// reload page after unregistering service worker and 
+		navigator.serviceWorker.getRegistration().then(function (reg) {
+			if (reg) {
+				reg.unregister().then(function () { clearCacheAndReload() });
+			} else {
+				clearCacheAndReload()
+			}
+		});
 	}
 	// ********************************************************
 
@@ -75,7 +83,14 @@ async function runApp() {
 	// Save the data and refer to instructions if relevant:
 	if (runData.showInstructions) {
 		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, dataLoadingTime: (new Date) - startTime, visibilityStateOnFirstDataSaving: document.visibilityState, commitSession: true });
-		window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
+		//window.location.href = "instructions.html" + location.search; 	// go to instructinos (if relevant) ///dom_helper.goTo('instructions.html');
+		appRunning = false
+		// create instructions iframe:
+		var instructionsUrl = "instructions.html" + location.search;
+		instructionsElement = document.createElement('iframe');
+		instructionsElement.setAttribute("id", 'instructions_iframe')
+		instructionsElement.setAttribute("src", instructionsUrl)
+		document.body.appendChild(instructionsElement)
 		return;
 	} else {
 		subject_data_worker.postMessage({ ...runData, startTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true });
@@ -138,7 +153,7 @@ async function runApp() {
 			if (!lowerHalfClicked) {
 				dom_helper.remove_css_class('lower_half', 'blinkable');
 
-				subject_data_worker.postMessage({ press1Time: new Date() , visibilityStatePress1: document.visibilityState});
+				subject_data_worker.postMessage({ press1Time: new Date(), visibilityStatePress1: document.visibilityState });
 
 				// show cost on top right corner if needed [After 1st click]
 				if (!!logic.getCost(runData, settings, logic.cost_on.click1)) {

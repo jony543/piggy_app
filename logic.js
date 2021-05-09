@@ -208,7 +208,8 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
   const daysToCheckManipulationActivated = daysOfManipulation.filter(x=>!!x && x<dayOfExperiment)
   const manipulationActivationdays = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
-  if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length) {
+  const manipulationActivationdays2 = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x,i,s)=>s.indexOf(x) === i) // the last part just takes the unique values
+  if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) {
       return true
   }
     
@@ -221,7 +222,8 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
 var logic = {
   isCalledFromInstructions: function () {
     //return document.referrer.includes(settings.instructionsFileName); // was relevant when in iframe from the install.js
-    return window.parent.location.href.includes(settings.instructionsFileName)
+    //return window.parent.location.href.includes(settings.instructionsFileName) // this was relevant when it instructions were not redirected to
+    return !!document.getElementById('instructions_iframe') || document.referrer.includes(settings.instructionsFileName)
   },
   initialize: function (subData, settings) {
     const noDataYet = !Object.keys(subData).length; // check if this is the first entry
