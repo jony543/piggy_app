@@ -156,12 +156,14 @@ var data_helper = {
 	ws: {},
 	sessionName: '',
 	sessionId: '',
+	localSessionId: '',
 	q: [],
 	get_timestamp: function () {
 		return (new Date()).getTime();
 	},
 	init_session: function (sessionName, tryRestore) { // use tryRestore = false to force new session
 		this.sessionName = sessionName;
+		this.localSessionId = 'session' + this.get_timestamp();
 
 		if (!tryRestore) {
 			this.sessionId = '';
@@ -178,7 +180,6 @@ var data_helper = {
 
 		this.ws.onopen = (function (event) {
 			console.log('new session opened');
-			this.try_flush();
 		}).bind(this);
 
 		this.ws.onclose = (function (event) {
@@ -225,18 +226,18 @@ var data_helper = {
 		return this.try_flush();
 	},
 	try_flush: function () {
-		if (this.q.length) {
+		if (!!this.ws.readyState && this.q.length) { // try flush only after session is initialized
+			// generate new message id for all messages in q
+			const messageId = 'm' + this.get_timestamp();
+			this.q.forEach(m => m.messageId = messageId)
+
+			const dataToSend =
+				Object.assign({ _id: this.sessionId, localSessionId: this.localSessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
+
+			// save sent message to temp storage before receipt confirmation arrives
+			offline_data_manager.stage(dataToSend.messageId, dataToSend);
+
 			if (this.ws.readyState == 1 && this.sessionId) {
-				// generate new message id for all messages in q
-				const messageId = 'm' + this.get_timestamp();
-				this.q.forEach(m => m.messageId = messageId)
-
-				const dataToSend =
-					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
-
-				// save sent message to temp storage before receipt confirmation arrives
-				offline_data_manager.stage(dataToSend.messageId, dataToSend);
-
 				// send to backend
 				this.ws.send(JSON.stringify(dataToSend));
 
@@ -303,9 +304,34 @@ var offline_data_manager = {
 		return result;
 	},
 	clearStaged: function () {
+		var staged = [];
+
 		local_storage_helper.keys().forEach( k => {
-			if (k.startsWith('msg_'))
+			if (k.startsWith('msg_')) {
+				staged.push(local_storage_helper.get(k));
 				local_storage_helper.remove(k);
+			}
+		});
+
+		var stagedByIds = staged.reduce(function (byIds, msg) {
+        byIds[msg.localSessionId] = byIds[msg.localSessionId] || [];
+        byIds[msg.localSessionId].push(msg);
+        return byIds;
+    }, {});
+
+		var newMissedMsgs = Object.values(stagedByIds).map(g => Object.assign({}, ...g));
+
+		var missed = local_storage_helper.get('missed');
+		missed = missed || [];
+		missed.push(...newMissedMsgs);
+
+		local_storage_helper.set('missed', missed);
+
+		newMissedMsgs.forEach(m => {
+			if (!!m._id)
+				this.append(m, '_id')
+			else
+				this.append(m, 'localSessionId')
 		});
 	},
 	append: function (item, key) {
@@ -320,6 +346,8 @@ var offline_data_manager = {
 			} else {
 				localData.push(item);
 			}
+		} else {
+			localData.push(item);
 		}
 
 		this.set(localData);
