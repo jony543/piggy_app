@@ -183,11 +183,12 @@ function onUserExit(initiatorInfo) {
     console.log('meta data was saved');
 }
 
-function refreshScreen() {
+async function refreshScreen() {
     if (document.title === settings.App_HTML_title && !logic.isCalledFromInstructions()) { // reload on every entry if it's the main App (and not the instructions)
 
         identifiersToClean.push(recordIdentifier) // in case it didn't got pushed by onUserExit()
 
+        if (typeof isPWA === 'undefined') { isPWA = await checkAndHandlePWA() };
         if (!isPWA) { // for the case of the installation page
             location.reload();
             return

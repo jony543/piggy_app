@@ -101,16 +101,15 @@ var data_helper = {
 			var url = this.base_address + '/app/api/session/list?subId=' + this.get_subject_id();
 			url += '&fields=' + app_settings.dataVarList.concat(['uniqueEntryID']).join(',');
 
-			if (offline_data_manager.isAvailable()) {
-				return resolve(prepareSubjectData(offline_data_manager.get()));
-			} else {
-				var localData = offline_data_manager.get();
+			var localData = offline_data_manager.get();
 
+			if (offline_data_manager.isAvailable()) {
+				return resolve(prepareSubjectData(localData));
+			} else {
 				if (localData.length > 0) {
 					const lastSessionDate = new Date(Math.max(...localData.map(x => new Date(x.created_at))));
 					url += '&from=' + lastSessionDate.toISOString();
 				}
-
 				return ajax_helper.get(url)
 					.then((function (subjectData) {
 						var allData = localData.concat(subjectData);
@@ -156,6 +155,7 @@ var data_helper = {
 	ws: {},
 	sessionName: '',
 	sessionId: '',
+	localSessionId: '',
 	q: [],
 	get_timestamp: function () {
 		return (new Date()).getTime();
@@ -164,16 +164,11 @@ var data_helper = {
 		this.sessionName = sessionName;
 
 		if (!tryRestore) {
-			if (this.q.length < 0) {
-				console.error(this.q.length + ' message were not when starting new session. Data may be lost.')
-				console.log(this.q);
-			}
-
 			this.sessionId = '';
 			this.q = [];
-
-			// uncomment this line if using staging and commit mechanism
-			// offline_data_manager.clearStaged();
+			this.localSessionId = 'session' + this.get_timestamp();
+			
+			offline_data_manager.clearStaged();
 		}
 
 		// close current socket before re connecting
@@ -184,7 +179,6 @@ var data_helper = {
 
 		this.ws.onopen = (function (event) {
 			console.log('new session opened');
-			this.try_flush();
 		}).bind(this);
 
 		this.ws.onclose = (function (event) {
@@ -212,6 +206,9 @@ var data_helper = {
 			// if it is ack message remove the message from queue
 			if ('messageId' in data) {
 				this.q = this.q.filter(m => m.messageId != data.messageId);
+
+				// when message received in backend, save to local storage
+				offline_data_manager.commit(data.messageId);
 			}
 
 			if ('broadcast' in data) {
@@ -228,18 +225,18 @@ var data_helper = {
 		return this.try_flush();
 	},
 	try_flush: function () {
-		if (this.q.length) {
+		if (!!this.ws.readyState && this.q.length) { // try flush only after session is initialized
+			// generate new message id for all messages in q
+			const messageId = 'm' + this.get_timestamp();
+			this.q.forEach(m => m.messageId = messageId)
+
+			const dataToSend =
+				Object.assign({ _id: this.sessionId, localSessionId: this.localSessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
+
+			// save sent message to temp storage before receipt confirmation arrives
+			offline_data_manager.stage(dataToSend.messageId, dataToSend);
+
 			if (this.ws.readyState == 1 && this.sessionId) {
-				// generate new message id for all messages in q
-				const messageId = 'm' + this.get_timestamp();
-				this.q.forEach(m => m.messageId = messageId)
-
-				const dataToSend =
-					Object.assign({ _id: this.sessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
-
-				// append message to local storage
-				offline_data_manager.append(dataToSend, '_id'); ////NEW
-
 				// send to backend
 				this.ws.send(JSON.stringify(dataToSend));
 
@@ -306,9 +303,35 @@ var offline_data_manager = {
 		return result;
 	},
 	clearStaged: function () {
+		var staged = [];
+
 		local_storage_helper.keys().forEach( k => {
-			if (k.startsWith('msg_'))
+			if (k.startsWith('msg_')) {
+				staged.push(local_storage_helper.get(k));
 				local_storage_helper.remove(k);
+			}
+		});
+
+		var stagedByIds = staged.reduce(function (byIds, msg) {
+        byIds[msg.localSessionId] = byIds[msg.localSessionId] || [];
+        byIds[msg.localSessionId].push(msg);
+        return byIds;
+    }, {});
+
+		var newMissedMsgs = Object.values(stagedByIds).map(g => Object.assign({}, ...g));
+
+		var missed = local_storage_helper.get('missed');
+		missed = missed || [];
+		missed.push(...newMissedMsgs);
+
+		local_storage_helper.set('missed', missed);
+
+		newMissedMsgs.forEach(m => {
+			if (!!m._id)
+				this.append(m, '_id')
+			else
+				this.append(m, 'localSessionId')
+
 		});
 	},
 	append: function (item, key) {
@@ -323,6 +346,8 @@ var offline_data_manager = {
 			} else {
 				localData.push(item);
 			}
+		} else {
+			localData.push(item);
 		}
 
 		this.set(localData);
