@@ -162,12 +162,12 @@ var data_helper = {
 	},
 	init_session: function (sessionName, tryRestore) { // use tryRestore = false to force new session
 		this.sessionName = sessionName;
-		this.localSessionId = 'session' + this.get_timestamp();
 
 		if (!tryRestore) {
 			this.sessionId = '';
 			this.q = [];
-
+			this.localSessionId = 'session' + this.get_timestamp();
+			
 			offline_data_manager.clearStaged();
 		}
 
