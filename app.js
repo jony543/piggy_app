@@ -42,6 +42,11 @@ async function runApp() {
 
 	var settings = Object.assign({}, app_settings);
 
+	// create new session with server only after logic is called! (important for demo to work)
+	//const sessionPrefix = (!!runData.isDemo) ? 'demo' : 'app';
+	const sessionPrefix = 'app';
+	data_helper.init_session(sessionPrefix, false);
+	
 	// get subject data from batch session *** Temp Bandage by Rani
 	var timer = new Date();
 	try {
@@ -68,10 +73,6 @@ async function runApp() {
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
-
-	// create new session with server only after logic is called! (important for demo to work)
-	const sessionPrefix = (!!runData.isDemo) ? 'demo' : 'app';
-	data_helper.init_session(sessionPrefix, false);
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
 	if (!subData.uniqueEntryID[subData.uniqueEntryID.length - 1]) {// should be assigned once every entry
