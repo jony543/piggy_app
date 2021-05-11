@@ -47,7 +47,7 @@ async function runApp() {
 	//const sessionPrefix = (!!runData.isDemo) ? 'demo' : 'app';
 	const sessionPrefix = 'app';
 	data_helper.init_session(sessionPrefix, false);
-	
+
 	// get subject data from batch session *** Temp Bandage by Rani
 	var checkLoading = setTimeout(() => {
 		console.log('data not loading... RELOADING page')
@@ -82,7 +82,7 @@ async function runApp() {
 		return;
 	}
 	clearTimeout(checkLoading)
-	
+
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
 
@@ -258,9 +258,18 @@ async function runApp() {
 	if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 
 	if (runData.endExperiment) { // a message that game has ended (after the lottery gif for now, so I can assess multiple entries after completion)
-		subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
-		await dialog_helper.show(settings.text.endExperiment(subData), img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
-		//subject_data_worker.postMessage({ endExperimentConfirmationTime: new Date() }) // **
+		// get data again to verify it was updated on the server on this run
+		var updatedSubData = await data_helper.get_subject_data(true).catch(function (e) {
+			console.log('error getting subject data');
+			console.log(e);
+		});
+		if (new Date(updatedSubData.startTime[updatedSubData.startTime.length - 1]).getTime() === startTime.getTime()) { // making sure the data was sent to the server by comparing the start times.
+			subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
+			await dialog_helper.show(settings.text.endExperiment(subData), img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
+		} else { // if there is no connection to the server:
+			subject_data_worker.postMessage({ noConnectionToendExperimentAlertTime: new Date() }) // **
+			await dialog_helper.show(settings.text.noConnectionToEndExperiment, img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
+		}
 		return;
 	}
 

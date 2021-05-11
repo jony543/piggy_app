@@ -44,7 +44,7 @@ window.app_settings = {
 			long_training_parallel_manipulations: [3, 4, 5, 10, 11, 12],
 		}, // [2, 3, 4, 5, 8, 10, 12],
 		// option 2: relevant if hideOnlyUnderManipulationPeriods is false and toPersonalizedOutcomeHidingTime is true;
-		daysToBaseUponHidingTime:  { // detemine according to group name
+		daysToBaseUponHidingTime: { // detemine according to group name
 			short_training: [[2], [2], [2]],
 			long_training: [[9], [9], [9]],
 			long_training_parallel_manipulations: [[2], [2], [2], [9], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
@@ -127,6 +127,8 @@ window.app_settings = {
 				+ logic.calculateReward(subData, app_settings.coinCollectionTask, dayToFinishExperiment)
 				+ ' יחידות זהב!'
 		},
+		noConnectionToEndExperiment: 'לא מצליח להתחבר לשרת.' + '<br><br>' +
+			'נא לוודא חיבור לרשת ולנסות שוב.',
 		dialog_coinCollection: 'מצאת מערת זהב. במערה אבנים וזהב. כל נסיון לאסוף משהו (כלומר לחיצה) עולה 10 יחידות זהב. הזהב שייאסף יישמר במחסן במידה ויש בו מקום. מרגע שתיכנס/י אליה יש לך 5 שניות לשהות בה.',
 		loadingDataError: 'יש בעיה!' +
 			'<br><br>' +
