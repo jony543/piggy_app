@@ -23,7 +23,7 @@ async function runApp() {
 		// subject_data_worker.postMessage({ ...runData, crucialProblem: 'images_not_loaded', problematicTrialStartTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true }); // maybe use this to save a log of a problem but then I need to adjuct the data loading
 		console.log('Problem in image loading');
 		alert('היתה בעיה בטעינה. לאחר שתאשר/י האפליקציה תרענן את עצמה. אם זה לא נפתר תוך כמה נסיונות נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש לפחות פעמיים. אם זה לא עדיין לא נפתר נא לפנות לנסיינ/ית בפל: 050-5556733.')
-		// reload page after unregistering service worker and 
+		// reload page after unregistering service worker and
 		navigator.serviceWorker.getRegistration().then(function (reg) {
 			if (reg) {
 				reg.unregister().then(function () { clearCacheAndReload() });
@@ -85,6 +85,9 @@ async function runApp() {
 
 	// calculate run parameters
 	var runData = logic.initialize(subData, settings);
+
+	// try to resend missed messages again - this does not block execution
+	offline_data_manager.resendMissed();
 
 	// Giving a unique entry ID (should be assigned only once on each entry). Creating it as a global variable:
 	if (!subData.uniqueEntryID[subData.uniqueEntryID.length - 1]) {// should be assigned once every entry

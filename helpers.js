@@ -230,8 +230,11 @@ var data_helper = {
 			const messageId = 'm' + this.get_timestamp();
 			this.q.forEach(m => m.messageId = messageId)
 
+			var baseData = { localSessionId: this.localSessionId };
+			if (!!this.sessionId)
+				baseData._id = this.sessionId;
 			const dataToSend =
-				Object.assign({ _id: this.sessionId, localSessionId: this.localSessionId }, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
+				Object.assign({ }, baseData, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
 
 			// save sent message to temp storage before receipt confirmation arrives
 			offline_data_manager.stage(dataToSend.messageId, dataToSend);
@@ -358,6 +361,19 @@ var offline_data_manager = {
 	},
 	isAvailable: function () {
 		return !!local_storage_helper.get('data') && !!local_storage_helper.get('data').length; ////NEW
+	},
+	resendMissed: function () {
+		var missed = local_storage_helper.get('missed');
+
+		if (!missed || missed.length == 0)
+			return;
+
+		var url = data_helper.base_address + '/app/api/session?subId=' + data_helper.get_subject_id();
+		ajax_helper.post(url, missed).then(result => {
+			if (result.nModified + result.nInserted == missed.length) {
+				local_storage_helper.set('missed', []);
+			}
+		}).catch(console.log);
 	}
 }
 
@@ -508,7 +524,10 @@ var ajax_helper = {
 	get: function (url) {
 		return this.request("GET", url);
 	},
-	request: function (method, url) {
+	post: function (url, payload) {
+		return this.request("POST", url, payload);
+	},
+	request: function (method, url, payload) {
 		return new Promise(function (resolve, reject) {
 			let xhr = new XMLHttpRequest();
 
@@ -535,7 +554,12 @@ var ajax_helper = {
 			xhr.ontimeout = function (e) { reject(e); };
 			xhr.onabort = function (e) { reject(e); };
 
-			xhr.send();
+			if (!!payload) {
+				xhr.setRequestHeader('Content-Type', 'application/json')
+				xhr.send(JSON.stringify(payload));
+			}
+			else
+				xhr.send();
 		});
 	}
 };

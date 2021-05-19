@@ -101,7 +101,7 @@ function assignReward(rewardsData) {
   }
   else {
     let non_rounded_reward = Math.random() * (rewardsData.maxWinningSum - rewardsData.minWinningSum) + rewardsData.minWinningSum;
-    return Math.round(non_rounded_reward * 100) / 100; // just making it rounded to two decimal points.  
+    return Math.round(non_rounded_reward * 100) / 100; // just making it rounded to two decimal points.
   }
 }
 
@@ -152,7 +152,7 @@ function InitializeCost(cost_settings) {
       const n_costs = cost_settings.isCostPerPress ? app_settings.pressesRequired + 1 : 1;
       for (i = 0; i < n_costs; i++) {
         let non_rounded_cost = Math.random() * (cost_settings.maxCostSum - cost_settings.minCostSum) + cost_settings.minCostSum;
-        cost.push(Math.round(non_rounded_cost * 100) / 100); // just making it rounded to two decimal points.  
+        cost.push(Math.round(non_rounded_cost * 100) / 100); // just making it rounded to two decimal points.
       }
       return cost
     }
@@ -166,11 +166,11 @@ function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderMani
     if (isUnderManipulation && hideOutcome.hideOnlyUnderManipulationPeriods) { // If it's manipulation time and hiding is on only during manipulations.
       return true;
     } else if (!hideOutcome.hideOnlyUnderManipulationPeriods && hideOutcome.daysToHideAt[group].includes(dayOfExperiment)) {
-      if (hideOutcome.toPersonalizedOutcomeHidingTime) { // checking in the context of personalized times    
+      if (hideOutcome.toPersonalizedOutcomeHidingTime) { // checking in the context of personalized times
         const timeToHideOutcome = getManipulationStartingTime(subData, hideOutcome.daysToBaseUponHidingTime[group][hideOutcome.daysToHideAt[group].indexOf(dayOfExperiment)], hideOutcome.relativeTimeOfDayToStart, experimentalDayStartingHour) // according to the median time in specified days
         if (new Date() >= timeToHideOutcome) {
           return true;
-        } 
+        }
       } else { // checking according to pre-determined conditions (based on number of entries and/or time at day)
         const currentHour = (new Date()).getHours()
         if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in-1 || currentHour >= hideOutcome.hour_at_day_to_hideOutcome_anyway || currentHour < experimentalDayStartingHour){
@@ -204,7 +204,7 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   if (daysWithEntries !== possibleDaysWithEntries || String(subjects_exclude_online).includes(data_helper.get_subject_id())) {
     return true
   }
-  // Check if there was a day whree the MANIPULATION WAS NOT ACTIVATED: 
+  // Check if there was a day whree the MANIPULATION WAS NOT ACTIVATED:
   const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
   const daysToCheckManipulationActivated = daysOfManipulation.filter(x=>!!x && x<dayOfExperiment)
   const manipulationActivationdays = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
@@ -212,7 +212,7 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) {
       return true
   }
-    
+
   return false
 }
 
@@ -240,7 +240,7 @@ var logic = {
       }
       if (!isCalledFromInstructions && (noDataYet || !instructionCompletion)) {
         var dataToSave = {
-          subID: data_helper.get_subject_id(),
+          subId: data_helper.get_subject_id(),
           showInstructions: true,
         };
         return dataToSave;
@@ -252,7 +252,7 @@ var logic = {
     let isDemo = null;
     let demoTrialNum = null
 
-    if (settings.allowDemo) { // check if demo is available and set variables accordingly      
+    if (settings.allowDemo) { // check if demo is available and set variables accordingly
       if (isCalledFromInstructions) {  //check if demo;//if it's the first time the app is loaded for that subject or if it was demo the last time but the demo is still not completed
         isDemo = true;
 
@@ -267,7 +267,7 @@ var logic = {
       }
     }
     // CHECK IF THIS IS THE FIRST REAL TRIAL
-    // -------------------------------------------------------  
+    // -------------------------------------------------------
     if (settings.allowDemo) { // if there is no demo (and instructions)
       var isFirstTime = !noDataYet && ((subData.isDemo[subData.isDemo.length - 1] && !isCalledFromInstructions) || (subData.isFirstTime[subData.isFirstTime.length - 1] && !subData.endTime[subData.endTime.length - 1])) ? true : false;
     } else {
@@ -321,7 +321,7 @@ var logic = {
         // Reset container
         // ---------------------------
         var resetContainer = settings.rewards.notifyRewardContainerReset && dayOfExperiment > 1 && !endExperiment ? checkIfResetContainer(subData, dayOfExperiment) : false; // check if reset container
-        
+
         // Reset container
         // ---------------------------
         isWin = settings.rewards.enforceFirstEntryWinSecondEntryNoWin && resetContainer ? false : checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins, settings.rewards.enforceFirstEntryWinSecondEntryNoWin);
@@ -373,10 +373,10 @@ var logic = {
       }
     }
     let cost = InitializeCost(settings.cost)
-    let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not  
+    let reward = isWin ? assignReward(settings.rewards) : 0; // set reward value if winning, or set to 0 if not
 
     var dataToSave = {
-      subID: data_helper.get_subject_id(),
+      subId: data_helper.get_subject_id(),
       group: group,
       day: dayOfExperiment,
       isWin: isWin,
@@ -470,4 +470,3 @@ var logic = {
 
 
 //var person = prompt(app_settings.text.rewardContainerClearingMessage, "Harry Potter");
-
