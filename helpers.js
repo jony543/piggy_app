@@ -58,7 +58,7 @@ var dom_helper = {
 	}
 };
 
-function prepareSubjectData (subjectData) {
+function prepareSubjectData(subjectData) {
 	var data = {};
 	if (!!subjectData) {
 		// create one dictionnay for each line of data:
@@ -167,7 +167,7 @@ var data_helper = {
 			this.sessionId = '';
 			this.q = [];
 			this.localSessionId = 'session' + this.get_timestamp();
-			
+
 			offline_data_manager.clearStaged();
 		}
 
@@ -305,7 +305,7 @@ var offline_data_manager = {
 	clearStaged: function () {
 		var staged = [];
 
-		local_storage_helper.keys().forEach( k => {
+		local_storage_helper.keys().forEach(k => {
 			if (k.startsWith('msg_')) {
 				staged.push(local_storage_helper.get(k));
 				local_storage_helper.remove(k);
@@ -313,10 +313,10 @@ var offline_data_manager = {
 		});
 
 		var stagedByIds = staged.reduce(function (byIds, msg) {
-        byIds[msg.localSessionId] = byIds[msg.localSessionId] || [];
-        byIds[msg.localSessionId].push(msg);
-        return byIds;
-    }, {});
+			byIds[msg.localSessionId] = byIds[msg.localSessionId] || [];
+			byIds[msg.localSessionId].push(msg);
+			return byIds;
+		}, {});
 
 		var newMissedMsgs = Object.values(stagedByIds).map(g => Object.assign({}, ...g));
 

@@ -13,6 +13,9 @@ if (typeof recordIdentifier === 'undefined') {
 
 // initiate a variable that tracks if an app is running:
 appRunning = false; // used to determine whther a new session can start
+// initiate variables for the mechanism that handle running a new app instance:
+var firstAttemptToRunNewAppInstance = true;
+var funcCallTimer = 0;
 
 // First thing first:
 // ---------------------
@@ -159,8 +162,10 @@ window.onpagehide = onUserExit('pagehide_event');
 
 // save data when leaving the app:
 function onUserExit(initiatorInfo) {
-    // Add the current app instance to the cleaning list before openning a new instance:
-    identifiersToClean.push(recordIdentifier)
+    if (document.title === settings.App_HTML_title && !logic.isCalledFromInstructions()) { // if it's the main App (and not the instructions)
+        // Add the current app instance to the cleaning list before openning a new instance:
+        identifiersToClean.push(recordIdentifier)
+    }
 
     // assign meta data to send:
     var dataToSend = {};
@@ -215,17 +220,22 @@ async function refreshScreen() {
 
 function runNewAppInstance() {
     // a mechanism to check that the new instance of the app starts running (and if not then reload):
-    previousRunIdentifier = recordIdentifier
-    setTimeout(() => {
-        if (previousRunIdentifier === recordIdentifier) {
-            console.log('new app instance is did not start running... RELOADING page')
-            location.reload()
-        }
-    }, 3000);
-    if (typeof appRunning !== 'undefined' && appRunning) {
+    if (firstAttemptToRunNewAppInstance) {
+        funcCallTimer = new Date();
+        previousRunIdentifier = recordIdentifier
+        setTimeout(() => {
+            if (previousRunIdentifier === recordIdentifier) {
+                console.log('new app instance is did not start running... RELOADING page')
+                location.reload()
+            }
+        }, 3000);
+        firstAttemptToRunNewAppInstance = false
+    }
+    if (typeof appRunning !== 'undefined' && appRunning && ((new Date() - funcCallTimer) <= 2950)) {
         console.log('WAITING for previous instance to stop/complete.')
         setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
     } else {
+        firstAttemptToRunNewAppInstance = true // making it ready for the next instance
         //location.reload();
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
         container.innerHTML = content;
