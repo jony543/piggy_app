@@ -58,8 +58,16 @@ async function exitAppDemo(appDemoID) {
 	dom_helper.add_css_class(appDemoID, 'appClose');
 	wait(1000).then(() => dom_helper.hide(appDemoID));
 
+	// get last demoTrialNum:
+	var nonIntegratedDataMSG = localStorage[Object.keys(localStorage).find((x)=>x.includes(data_helper.get_subject_id() + '_msg'))]
+	if (!!nonIntegratedDataMSG) {
+		var previousDemoTrialNum = JSON.parse(nonIntegratedDataMSG).demoTrialNum;
+	} else {
+		var previousDemoTrialNum = subData.demoTrialNum[subData.demoTrialNum.length - 1];
+	}
+
 	// check if demo cycle is finished:
-	if (subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1)) { // checking that this is the last trial in the demo cycle;
+	if (previousDemoTrialNum % Object.keys(settings.demoCycle).length === (Object.keys(settings.demoCycle).length - 1)) { // checking that this is the last trial in the demo cycle;
 		dom_helper.removeElement(mainDemoTextDuplicateID) // remove demo text
 		mainDemoTextDuplicateID = "mainDemoTextBox" // initialize in case user choose another round
 		wait(500).then(() => removeSmartphoneApperance());
@@ -71,7 +79,7 @@ async function exitAppDemo(appDemoID) {
 		var oldMainDemoTextDuplicateID = mainDemoTextDuplicateID
 		mainDemoTextDuplicateID = dom_helper.duplicate(oldMainDemoTextDuplicateID);
 		dom_helper.removeElement(oldMainDemoTextDuplicateID)
-		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(subData.demoTrialNum[subData.demoTrialNum.length - 1] % Object.keys(settings.demoCycle).length) + 1])
+		dom_helper.set_text('mainDemoText', settings.demoCycleSupportingText[(previousDemoTrialNum % Object.keys(settings.demoCycle).length) + 1])
 		dom_helper.show(mainDemoTextDuplicateID)
 		// alow to load the app again:
 		document.getElementById('demoLoadButton').onclick = loadAppDemo;

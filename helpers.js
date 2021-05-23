@@ -113,7 +113,8 @@ var data_helper = {
 				return ajax_helper.get(url)
 					.then((function (subjectData) {
 						var allData = localData.concat(subjectData);
-						subjectData = Object.values(allData.toDict('created_at')); // remove double entries
+						subjectData = Object.values(allData.toDict('localSessionId')); // remove double entries
+						subjectData = subjectData.sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime)) // sort it before saving to the localStorage
 						offline_data_manager.set(subjectData);
 
 						if (!!asArray) {

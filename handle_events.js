@@ -223,7 +223,7 @@ function runNewAppInstance() {
     if (firstAttemptToRunNewAppInstance) {
         funcCallTimer = new Date();
         previousRunIdentifier = recordIdentifier
-        setTimeout(() => {
+        var timeoutReload = setTimeout(() => {
             if (previousRunIdentifier === recordIdentifier) {
                 console.log('new app instance is did not start running... RELOADING page')
                 location.reload()
@@ -233,8 +233,11 @@ function runNewAppInstance() {
     }
     if (typeof appRunning !== 'undefined' && appRunning && ((new Date() - funcCallTimer) <= 2950)) {
         console.log('WAITING for previous instance to stop/complete.')
-        setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
+        var timeoutCheckAgain = setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
     } else {
+        // removing related timeouts (may help for a rare bug);
+        if (typeof(timeoutReload) !== 'undefined') {clearTimeout(timeoutReload)}
+        if (typeof(timeoutCheckAgain) !== 'undefined') {clearTimeout(timeoutCheckAgain)}
         firstAttemptToRunNewAppInstance = true // making it ready for the next instance
         //location.reload();
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
@@ -259,7 +262,11 @@ async function closeInstructionsIFrame() {
             });
             // check if it is updated in the data that the instructinos were completed.
             var instructionCompletion = updatedData.completedInstructions.filter((x) => x !== undefined);
-            instructionCompletion = instructionCompletion[instructionCompletion.length - 1];
+            // support for offline:
+            var nonIntegratedDataMSGs = Object.keys(localStorage).filter((x) => x.includes(data_helper.get_subject_id() + '_msg'));
+            var isInstructionCompletionInLocalMessage = !!nonIntegratedDataMSGs.find((x) => JSON.parse(localStorage[x]).completedInstructions === true);
+            // test if instructions completed
+            instructionCompletion = instructionCompletion[instructionCompletion.length - 1] || isInstructionCompletionInLocalMessage;
         } while (!instructionCompletion)
     } catch (err) {
         console.log(err)
