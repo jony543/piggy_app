@@ -58,12 +58,9 @@ async function exitAppDemo(appDemoID) {
 	dom_helper.add_css_class(appDemoID, 'appClose');
 	wait(1000).then(() => dom_helper.hide(appDemoID));
 
-	// get last demoTrialNum:
-	var nonIntegratedDataMSG = localStorage[Object.keys(localStorage).find((x)=>x.includes(data_helper.get_subject_id() + '_msg'))]
-	if (!!nonIntegratedDataMSG) {
-		var previousDemoTrialNum = JSON.parse(nonIntegratedDataMSG).demoTrialNum;
-	} else {
-		var previousDemoTrialNum = subData.demoTrialNum[subData.demoTrialNum.length - 1];
+	if (firstPressOnExitButton) {
+		previousDemoTrialNum += 1;
+		firstPressOnExitButton = false;
 	}
 
 	// check if demo cycle is finished:
@@ -130,6 +127,8 @@ function createSmartphoneApperance() {
 	demoText.appendChild(document.createTextNode(''));
 	is_firstDemoScreen_SuportingInstructions_changed_1 = false;
 	is_firstDemoScreen_SuportingInstructions_changed_2 = false;
+	previousDemoTrialNum = -1;
+	firstPressOnExitButton = true;
 	// making the text box
 	demoTextBox = document.createElement('div');
 	demoTextBox.setAttribute("id", "mainDemoTextBox");
@@ -245,6 +244,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
 			document.getElementById('demoExitButton').style.borderColor = ''
+			firstPressOnExitButton = true;	
 		});
 	}
 
@@ -288,6 +288,8 @@ var firstAppOpennedDetection = null;
 var current_n_data_points = null; // used to navigate between embedded demo up states
 var target_n_data_points = null; // used to navigate between embedded demo up states
 var instructions_page = 1;
+var previousDemoTrialNum;
+var firstPressOnExitButton;
 var mainDemoTextDuplicateID = "mainDemoTextBox";
 var is_firstDemoScreen_SuportingInstructions_changed_1;
 var is_firstDemoScreen_SuportingInstructions_changed_2;
