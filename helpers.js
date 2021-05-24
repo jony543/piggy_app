@@ -226,7 +226,7 @@ var data_helper = {
 		return this.try_flush();
 	},
 	try_flush: function () {
-		if (!!this.ws.readyState && this.q.length) { // try flush only after session is initialized
+		if (this.q.length) { // try flush only after session is initialized
 			// generate new message id for all messages in q
 			const messageId = 'm' + this.get_timestamp();
 			this.q.forEach(m => m.messageId = messageId)
@@ -240,7 +240,7 @@ var data_helper = {
 			// save sent message to temp storage before receipt confirmation arrives
 			offline_data_manager.stage(dataToSend.messageId, dataToSend);
 
-			if (this.ws.readyState == 1 && this.sessionId) {
+			if (!!this.ws.readyState && this.ws.readyState == 1 && this.sessionId) {
 				// send to backend
 				this.ws.send(JSON.stringify(dataToSend));
 
@@ -250,7 +250,7 @@ var data_helper = {
 				return true;
 			} else {
 				console.log("waiting for connection...")
-				if (this.ws.readyState == 3) { // status CLOSED
+				if (!!this.ws.readyState && this.ws.readyState == 3) { // status CLOSED
 					this.init_session(this.sessionName, true);
 				}
 				return false;
