@@ -177,7 +177,7 @@ function onUserExit(initiatorInfo) {
         screenInitialOrientation: screenInitialOrientation,
         screenOrientationEvents: screenOrientationEvents,
     }
-    Object.assign(dataToSend, { screenOrientationData: screenOrientationData }, { touchData: touchData })
+    Object.assign(dataToSend, { subId: data_helper.get_subject_id() }, { screenOrientationData: screenOrientationData }, { touchData: touchData })
     if (initiatorInfo.includes('unload') || initiatorInfo.includes('visibilitychange') || initiatorInfo.includes('pagehide')) { Object.assign(dataToSend, { exitInitiatorEvent: initiatorInfo, userExitOrUnloadTime: new Date(), visibilityStateOnUserExitOrUnloadTime: document.visibilityState }) }
 
     // send meta data:
@@ -236,8 +236,8 @@ function runNewAppInstance() {
         var timeoutCheckAgain = setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
     } else {
         // removing related timeouts (may help for a rare bug);
-        if (typeof(timeoutReload) !== 'undefined') {clearTimeout(timeoutReload)}
-        if (typeof(timeoutCheckAgain) !== 'undefined') {clearTimeout(timeoutCheckAgain)}
+        if (typeof (timeoutReload) !== 'undefined') { clearTimeout(timeoutReload) }
+        if (typeof (timeoutCheckAgain) !== 'undefined') { clearTimeout(timeoutCheckAgain) }
         firstAttemptToRunNewAppInstance = true // making it ready for the next instance
         //location.reload();
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
