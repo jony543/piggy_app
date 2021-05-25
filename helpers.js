@@ -231,7 +231,10 @@ var data_helper = {
 			const messageId = 'm' + this.get_timestamp();
 			this.q.forEach(m => m.messageId = messageId)
 
-			var baseData = { localSessionId: this.localSessionId };
+			var baseData = {
+				localSessionId: this.localSessionId,
+				subId: this.get_subject_id(),
+			};
 			if (!!this.sessionId)
 				baseData._id = this.sessionId;
 			const dataToSend =
