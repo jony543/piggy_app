@@ -255,7 +255,7 @@ async function closeInstructionsIFrame() {
     // verify everything from instructions is saved ao on the next entry the game will begin (before refreshing)
     try {
         do {
-            await delay(1000);
+            await delay(100);
             var updatedData = await data_helper.get_subject_data(true).catch(function (e) {
                 console.log('error getting subject data');
                 console.log(e);
