@@ -460,7 +460,8 @@ Array.prototype.multiIndexOf = function (el) {
 
 Array.prototype.toDict = function (field) {
 	return this.reduce((d, el) => {
-		d[el[field]] = el;
+		//d[el[field]] = el;
+		d[el[field]] = Object.assign({}, d[el[field]], el, {...d[el[field]]}); // edited by Rani
 		return d;
 	}, {})
 };
