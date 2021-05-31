@@ -177,7 +177,7 @@ function onUserExit(initiatorInfo) {
         screenInitialOrientation: screenInitialOrientation,
         screenOrientationEvents: screenOrientationEvents,
     }
-    Object.assign(dataToSend, { subId: data_helper.get_subject_id() }, { screenOrientationData: screenOrientationData }, { touchData: touchData })
+    Object.assign(dataToSend, { screenOrientationData: screenOrientationData }, { touchData: touchData })
     if (initiatorInfo.includes('unload') || initiatorInfo.includes('visibilitychange') || initiatorInfo.includes('pagehide')) { Object.assign(dataToSend, { exitInitiatorEvent: initiatorInfo, userExitOrUnloadTime: new Date(), visibilityStateOnUserExitOrUnloadTime: document.visibilityState }) }
 
     // send meta data:

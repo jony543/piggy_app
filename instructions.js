@@ -331,7 +331,7 @@ var settings = Object.assign({}, app_settings);
 		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length - 1] + 1;
 	}
 
-	subject_data_worker.postMessage({ subId: data_helper.get_subject_id(), instructionsStartedFlag: true, instructionsStartTime: new Date(), commitSession: true }); // this is used to restart the demo cycle.
+	subject_data_worker.postMessage({ instructionsStartedFlag: true, instructionsStartTime: new Date(), commitSession: true }); // this is used to restart the demo cycle.
 	// intialize test questions stuff:
 	//---------------------------------
 	var question_index = 0;
