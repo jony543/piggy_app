@@ -244,7 +244,7 @@ async function monitorChangesInDemoAndReact(broadcastMessage) {
 			dom_helper.show('demoExitButton')
 			dom_helper.remove_css_class('demoExitButton', 'disabled');
 			document.getElementById('demoExitButton').style.borderColor = ''
-			firstPressOnExitButton = true;	
+			firstPressOnExitButton = true;
 		});
 	}
 

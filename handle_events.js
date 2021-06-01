@@ -236,8 +236,8 @@ function runNewAppInstance() {
         var timeoutCheckAgain = setTimeout(runNewAppInstance, 50);//wait 50 millisecnds then recheck
     } else {
         // removing related timeouts (may help for a rare bug);
-        if (typeof(timeoutReload) !== 'undefined') {clearTimeout(timeoutReload)}
-        if (typeof(timeoutCheckAgain) !== 'undefined') {clearTimeout(timeoutCheckAgain)}
+        if (typeof (timeoutReload) !== 'undefined') { clearTimeout(timeoutReload) }
+        if (typeof (timeoutCheckAgain) !== 'undefined') { clearTimeout(timeoutCheckAgain) }
         firstAttemptToRunNewAppInstance = true // making it ready for the next instance
         //location.reload();
         // an alternative to reloading step 1 that may be faster but needs more adaptations:
@@ -255,7 +255,7 @@ async function closeInstructionsIFrame() {
     // verify everything from instructions is saved ao on the next entry the game will begin (before refreshing)
     try {
         do {
-            await delay(1000);
+            await delay(100);
             var updatedData = await data_helper.get_subject_data(true).catch(function (e) {
                 console.log('error getting subject data');
                 console.log(e);

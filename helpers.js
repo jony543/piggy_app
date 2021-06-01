@@ -226,37 +226,38 @@ var data_helper = {
 		return this.try_flush();
 	},
 	try_flush: function () {
-		if (this.q.length) { // try flush only after session is initialized
+		if (this.q.length && !!this.localSessionId) { // try flush only after session is initialized
 			// generate new message id for all messages in q
 			const messageId = 'm' + this.get_timestamp();
 			this.q.forEach(m => m.messageId = messageId)
 
-			var baseData = {
-				localSessionId: this.localSessionId,
-				subId: this.get_subject_id(),
-			};
+			var baseData = { localSessionId: this.localSessionId, subId: this.get_subject_id() };
 			if (!!this.sessionId)
 				baseData._id = this.sessionId;
 			const dataToSend =
-				Object.assign({ }, baseData, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
+				Object.assign({}, baseData, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
 
 			// save sent message to temp storage before receipt confirmation arrives
 			offline_data_manager.stage(dataToSend.messageId, dataToSend);
 
-			if (!!this.ws.readyState && this.ws.readyState == 1 && this.sessionId) {
-				// send to backend
-				this.ws.send(JSON.stringify(dataToSend));
+			if (!!this.ws.readyState) {
+				if (this.ws.readyState == 1 && this.sessionId) {
+					// send to backend
+					this.ws.send(JSON.stringify(dataToSend));
 
-				console.log('readySatate = 1; data was saved. The data:')
-				console.log(dataToSend)
+					console.log('readySatate = 1; data was saved. The data:')
+					console.log(dataToSend)
 
-				return true;
-			} else {
-				console.log("waiting for connection...")
-				if (!!this.ws.readyState && this.ws.readyState == 3) { // status CLOSED
-					this.init_session(this.sessionName, true);
+					return true;
+				} else {
+					console.log("waiting for connection...")
+					if (this.ws.readyState == 3) { // status CLOSED
+						this.init_session(this.sessionName, true);
+					}
+					return false;
 				}
-				return false;
+			} else {
+				return true; // nothing to send - report success
 			}
 		} else {
 			return true; // nothing to send - report success
@@ -318,6 +319,24 @@ var offline_data_manager = {
 				local_storage_helper.remove(k);
 			}
 		});
+
+		var localData = this.get();
+		if (localData && localData.length > 0) {
+			staged = staged.filter(stagedElement => {
+				var item = { ...stagedElement };
+				delete item.messageId;
+				delete item.commitSession;
+				delete item.isDialogOn;
+				var localDataElement = (!!item['localSessionId']) ? localData.find(i => i['localSessionId'] == item['localSessionId']) : undefined;
+				if (localDataElement !== undefined) {
+					var containedInLocalData = !(Object.keys(item).every((k) => Object.keys(localDataElement).indexOf(k) > -1
+						&& (localDataElement[k] === item[k] || JSON.stringify(localDataElement[k]) === JSON.stringify(item[k]))));
+					return containedInLocalData;
+				} else {
+					return true
+				}
+			})
+		}
 
 		var stagedByIds = staged.reduce(function (byIds, msg) {
 			byIds[msg.localSessionId] = byIds[msg.localSessionId] || [];
@@ -463,7 +482,8 @@ Array.prototype.multiIndexOf = function (el) {
 
 Array.prototype.toDict = function (field) {
 	return this.reduce((d, el) => {
-		d[el[field]] = el;
+		//d[el[field]] = el;
+		d[el[field]] = Object.assign({}, d[el[field]], el, { ...d[el[field]] }); // edited by Rani
 		return d;
 	}, {})
 };
