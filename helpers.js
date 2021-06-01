@@ -338,6 +338,12 @@ var offline_data_manager = {
 			})
 		}
 
+		staged.sort((a, b) => {
+			if (a.messageId < b.messageId) return -1
+			if (a.messageId > b.messageId) return 1
+			return 0
+		})
+
 		var stagedByIds = staged.reduce(function (byIds, msg) {
 			byIds[msg.localSessionId] = byIds[msg.localSessionId] || [];
 			byIds[msg.localSessionId].push(msg);
