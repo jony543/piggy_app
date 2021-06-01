@@ -54,11 +54,31 @@ function recordPressData(event) {
         }
         firstTouchDetected = true;
     }
+    var touchEventData = {
+        pressTime: new Date(),
+        timeStamp: event.timeStamp,
+        type: event.type,
+    };
+    if (!!event.touches[0]) {
+        Object.assign(touchEventData, {
+            positionEtc: {
+                clientX: event.touches[0].clientX,
+                clientY: event.touches[0].clientY,
+                force: event.touches[0].force,
+                identifier: event.touches[0].identifier,
+                pageX: event.touches[0].pageX,
+                pageY: event.touches[0].pageY,
+                radiusX: event.touches[0].radiusX,
+                radiusY: event.touches[0].radiusY,
+                rotationAngle: event.touches[0].rotationAngle,
+                screenX: event.touches[0].screenX,
+                screenY: event.touches[0].screenY,
+                target: event.touches[0].target.outerHTML
+            }
+        })
+    }
 
-    event.touches.pressTime = new Date();
-    event.touches.timeStamp = event.timeStamp;
-    event.touches.type = event.type;
-    pressEvents.push(event.touches);
+    pressEvents.push(touchEventData);
 }
 
 // ****************************************************************************************

@@ -4,10 +4,27 @@ async function run_coin_collection(settings, runData, identifier) {
 	// ========================================================
 	function elementClickedFunc(event) {
 		caveElements.filter((el) => el.clone_id === this.id)[0].clickTime.push(new Date()); // record the pressing time
-
 		hits_count++;
-		event.clickTime = new Date();
-		hits_events.push(event);
+		hitEventData = {
+			clickTime: new Date(),
+			timeStamp: event.timeStamp,
+			type: event.type,
+			position: {
+				clientX: event.clientX,
+				clientY: event.clientY,
+				layerX: event.layerX,
+				layerY: event.layerY,
+				offsetX: event.offsetX,
+				offsetY: event.offsetY,
+				pageX: event.pageX,
+				pageY: event.pageY,
+				screenX: event.screenX,
+				screenY: event.screenY,
+				x: event.x,
+				y: event.y,	
+			}
+		}
+		hits_events.push(hitEventData);
 		subject_data_worker.postMessage({
 			coins_task_caveElements_state: caveElements,
 			coins_task_hits_count: hits_count,
@@ -23,8 +40,26 @@ async function run_coin_collection(settings, runData, identifier) {
 
 	function missedClick(event) {
 		misses_count++;
-		event.clickTime = new Date();
-		misses_events.push(event);
+		missEventData = {
+			clickTime: new Date(),
+			timeStamp: event.timeStamp,
+			type: event.type,
+			position: {
+				clientX: event.clientX,
+				clientY: event.clientY,
+				layerX: event.layerX,
+				layerY: event.layerY,
+				offsetX: event.offsetX,
+				offsetY: event.offsetY,
+				pageX: event.pageX,
+				pageY: event.pageY,
+				screenX: event.screenX,
+				screenY: event.screenY,
+				x: event.x,
+				y: event.y,
+			}
+		};
+		misses_events.push(missEventData);
 		subject_data_worker.postMessage({
 			coins_task_misses_count: misses_count,
 			coins_task_misses_events: misses_events,
