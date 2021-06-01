@@ -326,6 +326,7 @@ var offline_data_manager = {
 				var item = { ...stagedElement };
 				delete item.messageId;
 				delete item.commitSession;
+				delete item.isDialogOn;
 				var localDataElement = (!!item['localSessionId']) ? localData.find(i => i['localSessionId'] == item['localSessionId']) : undefined;
 				if (localDataElement !== undefined) {
 					var containedInLocalData = !(Object.keys(item).every((k) => Object.keys(localDataElement).indexOf(k) > -1
