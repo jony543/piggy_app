@@ -217,6 +217,13 @@ var data_helper = {
 					this.on_broadcast(data);
 			}
 		}).bind(this);
+
+		// when init session is done, append stashed information to current sessionName
+		var stash = offline_data_manager.stash.get();
+		if (!!stash) {
+			this.append_subject_data(stash);
+			offline_data_manager.stash.clear();
+		}
 	},
 	on_broadcast: undefined,
 	append_subject_data: function (data) {
@@ -303,6 +310,20 @@ var offline_data_manager = {
 	},
 	stage: function (messageId, data) {
 		local_storage_helper.set('msg_' + messageId, data);
+	},
+	stash: {
+		append: function (data) {
+			var stash = local_storage_helper.get('stash') ?? {};
+			local_storage_helper.set('stash', Objec.assign(stash, data));
+		},
+		get: function () {
+			return local_storage_helper.get('stash');
+		},
+		clear: function () {
+			var stash = local_storage_helper.get('stash');
+			local_storage_helper.remove('stash');
+			return stash;
+		}
 	},
 	commit: function (messageId) {
 		const data = local_storage_helper.get('msg_' + messageId);
