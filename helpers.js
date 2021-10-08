@@ -238,7 +238,7 @@ var data_helper = {
 				Object.assign({}, baseData, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
 
 			// save sent message to temp storage before receipt confirmation arrives
-			offline_data_manager.stage(dataToSend.messageId, dataToSend);
+			offline_data_manager.stage(dataToSend.messageId, {...dataToSend, touchData: undefined});
 
 			if (!!this.ws.readyState) {
 				if (this.ws.readyState == 1 && this.sessionId) {
