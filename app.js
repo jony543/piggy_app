@@ -97,6 +97,9 @@ async function runApp() {
 		uniqueEntryID = subData.uniqueEntryID[subData.uniqueEntryID.length - 1] + 1;
 	}
 
+	// when we have uniqueEntryID, append stashed information to current sessionName
+	data_helper.appendStashedData();
+
 	// Save the data and refer to instructions if relevant:
 	if (runData.showInstructions) {
 		subject_data_worker.postMessage({ ...runData, startInstructionsTime: startTime, dataLoadingTime: (new Date) - startTime, visibilityStateOnFirstDataSaving: document.visibilityState, commitSession: true });

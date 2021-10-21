@@ -217,8 +217,8 @@ var data_helper = {
 					this.on_broadcast(data);
 			}
 		}).bind(this);
-
-		// when init session is done, append stashed information to current sessionName
+	},
+	appendStashedData: function () {
 		var stash = offline_data_manager.stash.get();
 		if (!!stash) {
 			this.append_subject_data(stash);
@@ -314,7 +314,7 @@ var offline_data_manager = {
 	stash: {
 		append: function (data) {
 			var stash = local_storage_helper.get('stash') ?? {};
-			local_storage_helper.set('stash', Objec.assign(stash, data));
+			local_storage_helper.set('stash', Object.assign(stash, data));
 		},
 		get: function () {
 			return local_storage_helper.get('stash');
