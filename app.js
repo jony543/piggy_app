@@ -12,6 +12,7 @@ async function runApp() {
 		offline_data_manager.stash.append({appLoadTimes: [startTime]});
 	} else {
 		stash.appLoadTimes.push(startTime);
+		offline_data_manager.stash.append({appLoadTimes: stash.appLoadTimes})
 	}
 
 	if (document.visibilityState !== 'visible') { return } // Stop if from some reason initiated when app is not visible
