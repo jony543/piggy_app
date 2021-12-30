@@ -183,8 +183,7 @@ function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderMani
 }
 
 function checkIfResetContainer(subData, dayOfExperiment) {
-  if (!subData.day.filter((day) => day === dayOfExperiment).length || // if there were no entries today (i.e., it's the first one)
-    subData.resetContainer[subData.resetContainer.length - 1] && !subData.endTime[subData.endTime.length - 1]) { // or there were entries but the trial was not finished
+  if (!subData.endTime.filter((x, i) => !!x && subData.day[i] === dayOfExperiment).length) { // if there were no completed entries today
     return true
   } else {
     return false
