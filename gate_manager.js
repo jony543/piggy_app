@@ -81,6 +81,8 @@ async function checkAndHandlePWA() {
                 console.log('error getting subject data');
                 console.log(e);
             });
+            //if (!!subData.uniqueEntryID.length && subData.subId[subData.subId.length-1]!==313) {
+            //if (!!subData.uniqueEntryID.length && subData.subId[subData.subId.length-1]!==131 && subData.subId[subData.subId.length-1]!==239) {
             if (!!subData.uniqueEntryID.length) {
                 location.replace('./used_link.html')
             } else {
