@@ -11,18 +11,19 @@ window.app_settings = {
 	pressesRequired: 2,
 	forceDeval: null, // for debugging purposes
 	// optional stuff for counterbalance:
-	optionalDaysForFirstDeval: [3, 4, 5], // The day not chosen for devaluation will be used as a comparable valued day
-	dayToFinishExperiment_ShortTraining: 6,
-	optionalDaysForLastDeval: [10, 11, 12], // The day not chosen for devaluation will be used as a comparable valued day
-	dayToFinishExperiment_LongTraining: 13,
+	// * [Currently it works such that the day in the middle will be assigned with devaluation and the othe with control manipulations]
+	optionalDaysForFirstDeval: [2, 3, 4], // The day not chosen for devaluation will be used as a comparable valued day
+	dayToFinishExperiment_ShortTraining: 5,
+	optionalDaysForLastDeval: [9, 10, 11], // The day not chosen for devaluation will be used as a comparable valued day
+	dayToFinishExperiment_LongTraining: 12,
 	// Determine when to induce maniplations:
 	toPersonalizedManpulationTime: false,
 	// for non-personalized time of manipulation:
 	entry_to_manipulate_in: 5, // manipulation will occur on the entry_to_manipulate_in, namely entry_to_manipulate_in - 1 will have to be completed
 	hour_at_day_to_manipulate_anyway: 14,
 	// for personalized time of manipulation:
-	daysToBaseUponFirstDeval: [2], // days to base upon first devluation/control manipulation time
-	daysToBaseUponLastDeval: [9], //[6, 7], // days to base upon last devluation/control manipulation time
+	daysToBaseUponFirstDeval: [1], // days to base upon first devluation/control manipulation time
+	daysToBaseUponLastDeval: [8], //[6, 7], // days to base upon last devluation/control manipulation time
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 
 	manipulationImageID: function (manipulationType) {
@@ -39,15 +40,15 @@ window.app_settings = {
 		hideOnlyUnderManipulationPeriods: false, // if false will hide every day from what we set in daysToHideAt
 		// for options 2 and 3:
 		daysToHideAt: { // detemine according to group name
-			short_training: [3, 4, 5],
-			long_training: [10, 11, 12],
-			long_training_parallel_manipulations: [3, 4, 5, 10, 11, 12],
+			short_training: [2, 3, 4],
+			long_training: [9, 10, 11],
+			long_training_parallel_manipulations: [2, 3, 4, 9, 10, 11],
 		}, // [2, 3, 4, 5, 8, 10, 12],
 		// option 2: relevant if hideOnlyUnderManipulationPeriods is false and toPersonalizedOutcomeHidingTime is true;
 		daysToBaseUponHidingTime: { // detemine according to group name
-			short_training: [[2], [2], [2]],
-			long_training: [[9], [9], [9]],
-			long_training_parallel_manipulations: [[2], [2], [2], [9], [9], [9]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
+			short_training: [[1], [1], [1]],
+			long_training: [[8], [8], [8]],
+			long_training_parallel_manipulations: [[1], [1], [1], [8], [8], [8]], // [[1], [1, 2], [2, 3], [3], [5, 6, 7], [9], [10, 11]], // This should specify an array for each value in daysToHideAt
 		}, // [2, 3, 4, 5, 8, 10, 12],
 		relativeTimeOfDayToStart: 0.25, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 		// option 3: relevant if hideOnlyUnderManipulationPeriods is false and toPersonalizedOutcomeHidingTime is false
