@@ -405,7 +405,7 @@ var offline_data_manager = {
 			// Added by Rani in Dec21 to minimize data saved locally:
 			if (!!item['resetContainer'] && !!item['uniqueEntryID'] && !!item['day'] && item['day'] > 1 && // if there is a resetContainet (i.e., first daily trial) and uniqueID and a day in the item to save and it is not the first day
 				localData.map(el => el['day']).filter(el => el === (item['day'] - 1)).length > app_settings.minDailyDataPointsToStoreLocally) {// get the number of entries on the day before
-				
+
 				// items to remove according to min daily points defined to keep localy (in minDailyDataPointsToStoreLocall):
 				let prevDayIndicesToRemove = localData.map(el => el['day']).multiIndexOf(item['day'] - 1).slice(app_settings.minDailyDataPointsToStoreLocally)
 
@@ -414,14 +414,14 @@ var offline_data_manager = {
 				if (!!localData.filter(el => el['day'] === (item['day'] - 1))[0]['manipulationToday']) { // check if there was a manipulation yesterday
 					prevDayFirstIndexWithManipulationConfirmationTime = localData.map(el => el['day'] === (item['day'] - 1) && !!el['manipulationConfirmationTime']).multiIndexOf(true)[0];
 				}
-				if (!prevDayFirstIndexWithManipulationConfirmationTime) {prevDayFirstIndexWithManipulationConfirmationTime=null} // if doesn't exist has to be null for the Math.max below to work
-				
+				if (!prevDayFirstIndexWithManipulationConfirmationTime) { prevDayFirstIndexWithManipulationConfirmationTime = null } // if doesn't exist has to be null for the Math.max below to work
+
 				// get the first trial with endTime - to keep it in (the rare) case that the minDailyDataPointsToStoreLocall do not include trials with endTime:
 				let prevDayFirstIndexWithEndTime = localData.map(el => el['day'] === (item['day'] - 1) && !!el['endTime']).multiIndexOf(true)[0]
-				if (!prevDayFirstIndexWithEndTime) {prevDayFirstIndexWithEndTime=null} // if doesn't exist has to be null for the Math.max below to work
-				
+				if (!prevDayFirstIndexWithEndTime) { prevDayFirstIndexWithEndTime = null } // if doesn't exist has to be null for the Math.max below to work
+
 				// calculate the first and last indices to remove
-				firstIndexToRemove = Math.max(prevDayIndicesToRemove[0],prevDayFirstIndexWithManipulationConfirmationTime + 1, prevDayFirstIndexWithEndTime + 1)
+				firstIndexToRemove = Math.max(prevDayIndicesToRemove[0], prevDayFirstIndexWithManipulationConfirmationTime + 1, prevDayFirstIndexWithEndTime + 1)
 				n_items_ToRemove = prevDayIndicesToRemove.filter(val => val >= firstIndexToRemove).length
 				// Cut the local data before saving
 				localData.splice(firstIndexToRemove, n_items_ToRemove)
@@ -430,7 +430,7 @@ var offline_data_manager = {
 			localData.push(item);
 		}
 
-		localData[localData.length-1]['n_localDataPoints'] = localData.length // This line was added by Rani in Dec21 to follow locally stored data points at each moment.
+		localData[localData.length - 1]['n_localDataPoints'] = localData.length // This line was added by Rani in Dec21 to follow locally stored data points at each moment.
 		this.set(localData);
 		return localData;
 	},
