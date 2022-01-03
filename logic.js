@@ -60,7 +60,7 @@ function getTimeFromLastEntryInSec(timePoint) {
 function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayIfMultipleNonWins, enforceFirstEntryWinSecondEntryNoWin) {
   if (enforceFirstEntryWinSecondEntryNoWin &&
     ((subData.resetContainer[subData.resetContainer.length - 1] && !!subData.endTime[subData.endTime.length - 1]) ||
-    (subData.isFirstTime[subData.isFirstTime.length - 1] && !!subData.endTime[subData.endTime.length - 1])) &&
+      (subData.isFirstTime[subData.isFirstTime.length - 1] && !!subData.endTime[subData.endTime.length - 1])) &&
     (!subData.isWin[subData.isWin.length - 1])) { // check first if it's the second entry today (where a reward must be given). [* the last line is just for the case of when a manipulation is initiated on the first entry that day and isWin is True.]
     return true
   }
@@ -173,7 +173,7 @@ function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderMani
         }
       } else { // checking according to pre-determined conditions (based on number of entries and/or time at day)
         const currentHour = (new Date()).getHours()
-        if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in-1 || currentHour >= hideOutcome.hour_at_day_to_hideOutcome_anyway || currentHour < experimentalDayStartingHour){
+        if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in - 1 || currentHour >= hideOutcome.hour_at_day_to_hideOutcome_anyway || currentHour < experimentalDayStartingHour) {
           return true
         }
       }
@@ -200,16 +200,16 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   // Check if the participant entered EVERY DAY:
   const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i]).filter((v, i, a) => a.indexOf(v) === i).length;
   const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].length;
-  if (daysWithEntries !== possibleDaysWithEntries || (typeof(subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id()))) {
+  if (daysWithEntries !== possibleDaysWithEntries || (typeof (subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id()))) {
     return true
   }
   // Check if there was a day whree the MANIPULATION WAS NOT ACTIVATED:
   const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
-  const daysToCheckManipulationActivated = daysOfManipulation.filter(x=>!!x && x<dayOfExperiment)
-  const manipulationActivationdays = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
-  const manipulationActivationdays2 = subData.day.filter((x,i)=> daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x,i,s)=>s.indexOf(x) === i) // the last part just takes the unique values
+  const daysToCheckManipulationActivated = daysOfManipulation.filter(x => !!x && x < dayOfExperiment)
+  const manipulationActivationdays = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
+  const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
   if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) {
-      return true
+    return true
   }
 
   return false
@@ -347,14 +347,18 @@ var logic = {
             if (new Date() >= timeToManipulate) { inManipulationPeriod = true }
           } else { // namely devaluation is determined globally for all participants according to conditions we pre-determined (e.g., number of entries and/or time of day)
             const currentHour = (new Date()).getHours()
-            if (completeEntriesToday >= settings.entry_to_manipulate_in-1 || currentHour >= settings.hour_at_day_to_manipulate_anyway || currentHour < settings.experimentalDayStartingHour) { inManipulationPeriod = true } // i.e., this is the [pettentialy complete] 5th entry, or if it's after the pre-determined hour of day
+            if (completeEntriesToday >= settings.entry_to_manipulate_in - 1 || currentHour >= settings.hour_at_day_to_manipulate_anyway || currentHour < settings.experimentalDayStartingHour) { inManipulationPeriod = true } // i.e., this is the [pettentialy complete] 5th entry, or if it's after the pre-determined hour of day
           }
           if (inManipulationPeriod) {
             // check if this is the first time the outcome should be devalued that day
-            if (!subData.activateManipulation.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.endTime[i]).length) {// There was no trial with ACTIVATION on this DAY that ENDED (the user got to the end of the trial)
+            // if (!subData.activateManipulation.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.endTime[i]).length) { // There was no trial with ACTIVATION on this DAY that ENDED (the user got to the end of the trial)
+            if (!subData.activateManipulation.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.manipulationConfirmationTime[i]).length) { // There was no trial with ACTIVATION on this DAY that was confirmed by the user
               activateManipulation = true;
               consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...
+            } else if (!subData.consumptionTest.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.foundCaveConfirmationTime[i]).length) {
+              consumptionTest = true;
+              isUnderManipulation = true;
             } else {
               isUnderManipulation = true;
             };
@@ -412,19 +416,19 @@ var logic = {
       .concat(subData.cost.filter((x, i) => !subData.isDemo[i] && subData.press2Time[i] && x !== undefined && subData.day[i] < dayToFinishExperiment && !subData.endExperiment[i]).map((x => x[2])))
       .filter((x) => !!x).reduce((a, b) => a + b, 0);
     // coins task:
-    var coinsTaskStillValued =                subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
-    var coinsTaskDevalued =                   subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
-    var coinsTaskStillValued_PostDeval =      subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued_post_deval')
+    var coinsTaskStillValued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued')
+    var coinsTaskDevalued = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'devaluation')
+    var coinsTaskStillValued_PostDeval = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued_post_deval')
     var coinsTaskStillValued_ReplacingDeval = subData.coin_task_finish_status.filter((x, i) => x !== undefined && !subData.isDemo[i] && !!subData.activateManipulation[i] && !!subData.endTime[i] && subData.manipulationToday[i] === 'still_valued_replacing_devaluation')
     const rewardFromCoinTasks = (coinsTaskStillValued.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0) +
-                                 coinsTaskStillValued_PostDeval.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0) +
-                                 coinsTaskStillValued_ReplacingDeval.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0)) *
-                                 coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
+      coinsTaskStillValued_PostDeval.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0) +
+      coinsTaskStillValued_ReplacingDeval.map((x) => x.total_gold_collected).reduce((total, num) => total + num, 0)) *
+      coinCollectionTask.rewardPerCoinStash(); // Only from the 'still-valued' counts;
     const costFromCoinsTasks = (coinsTaskStillValued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) +
-                                coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) +
-                                coinsTaskStillValued_PostDeval.map((x) => x.total_presses).reduce((total, num) => total + num, 0) +
-                                coinsTaskStillValued_ReplacingDeval.map((x) => x.total_presses).reduce((total, num) => total + num, 0)) *
-                                coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
+      coinsTaskDevalued.map((x) => x.total_presses).reduce((total, num) => total + num, 0) +
+      coinsTaskStillValued_PostDeval.map((x) => x.total_presses).reduce((total, num) => total + num, 0) +
+      coinsTaskStillValued_ReplacingDeval.map((x) => x.total_presses).reduce((total, num) => total + num, 0)) *
+      coinCollectionTask.costPerPress; // From both the 'still-valued' and 'devaluation' counts;
 
     return accumulatedValidReward + rewardFromCoinTasks - totalCost - costFromCoinsTasks
   },

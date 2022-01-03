@@ -463,7 +463,8 @@ var offline_data_manager = {
 		firstIndexToRemove = Math.max(thisDayIndicesToRemove[0], thisDayFirstIndexWithManipulationConfirmationTime + 1, thisvDayFirstIndexWithEndTime + 1)
 		n_items_ToRemove = thisDayIndicesToRemove.filter(val => val >= firstIndexToRemove).length
 		// Cut the data before saving
-		return data.splice(firstIndexToRemove, n_items_ToRemove)
+		data.splice(firstIndexToRemove, n_items_ToRemove)
+		return data
 	}
 }
 
