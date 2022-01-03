@@ -7,6 +7,7 @@ window.app_settings = {
 		base_address: 'https://experiments.schonberglab.org',
 		ws_base_address: 'wss://experiments.schonberglab.org',
 	},
+	downloadAllToLocalStorage: false, // this refers to the case where the data need to be downloaded again to the local storage (e.g., after reinstalling the app because of a problem)
 	minDailyDataPointsToStoreLocally: 20,
 	experimentalDayStartingHour: 5, // Possiblie assignments are 0-23. Assign 0 to simply seperate between days.  Relevant for example to determine the time at day to empty container according to a 24h watch. 
 	pressesRequired: 2,
