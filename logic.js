@@ -59,12 +59,12 @@ function getTimeFromLastEntryInSec(timePoint) {
 
 function checkWinning(subData, isRatioSchedule, winningChancePerUnit, winAnywayIfMultipleNonWins, enforceFirstEntryWinSecondEntryNoWin) {
   if (enforceFirstEntryWinSecondEntryNoWin &&
-    ((subData.resetContainer[subData.resetContainer.length - 1] && !!subData.endTime[subData.endTime.length - 1]) ||
+    ((subData.resetContainer[subData.resetContainer.length - 1] && !!subData.resetContainerConfirmationTime[subData.resetContainerConfirmationTime.length - 1]) ||
       (subData.isFirstTime[subData.isFirstTime.length - 1] && !!subData.endTime[subData.endTime.length - 1])) &&
     (!subData.isWin[subData.isWin.length - 1])) { // check first if it's the second entry today (where a reward must be given). [* the last line is just for the case of when a manipulation is initiated on the first entry that day and isWin is True.]
     return true
   }
-  if (isRatioSchedule) { // RI schedule
+  if (isRatioSchedule) { // VR schedule
     if (winAnywayIfMultipleNonWins && subData.endTime && subData.endTime.length >= app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning()) { // If sure win following no wins is on and it's not the beginning check last wins
       const indicesWithEndTime = subData.endTime.map((x) => !!x).multiIndexOf(true)
       const relevantIndicesToCheck = indicesWithEndTime.slice(length - app_settings.rewards.RelativeNonWinUnitsBeforeSureWinning())
