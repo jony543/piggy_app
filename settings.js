@@ -272,7 +272,7 @@ window.app_settings = {
 	instructions_main_HTML_element: "instructions_iframe",
 	App_HTML_title: 'Space Gold',
 	App_main_HTML_element: "main_container",
-	dataVarList: ["serial", "uniqueEntryID", "subId", "day", "isWin", "reward", "cost", "resetContainer", "manipulationToday", "activateManipulation", "isUnderManipulation", "consumptionTest", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status", "endExperiment", "manipulationConfirmationTime", "foundCaveConfirmationTime", "localSessionId"],
+	dataVarList: ["serial", "uniqueEntryID", "subId", "day", "isWin", "reward", "cost", "resetContainer", "resetContainerConfirmationTime", "manipulationToday", "activateManipulation", "isUnderManipulation", "consumptionTest", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status", "endExperiment", "manipulationConfirmationTime", "foundCaveConfirmationTime", "localSessionId"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }
