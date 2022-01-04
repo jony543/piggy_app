@@ -356,7 +356,7 @@ var logic = {
               activateManipulation = true;
               consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...
-            } else if (!subData.consumptionTest.filter((x, i) => x === true && subData.day[i] === dayOfExperiment && !!subData.foundCaveConfirmationTime[i]).length) {
+            } else if (subData.foundCaveAlertTime.filter((x, i) => !!x && subData.day[i] === dayOfExperiment && !subData.foundCaveConfirmationTime[i]).length < settings.nTimesToShowCaveIfNotEntering) {
               consumptionTest = true;
               isUnderManipulation = true;
             } else {
