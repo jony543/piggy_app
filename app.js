@@ -9,10 +9,10 @@ async function runApp() {
 	// log the app entry time immeditaly to stash
 	var stash = offline_data_manager.stash.get() || {};
 	if (!stash.appLoadTimes) {
-		offline_data_manager.stash.append({appLoadTimes: [startTime]});
+		offline_data_manager.stash.append({ appLoadTimes: [startTime] });
 	} else {
 		stash.appLoadTimes.push(startTime);
-		offline_data_manager.stash.append({appLoadTimes: stash.appLoadTimes})
+		offline_data_manager.stash.append({ appLoadTimes: stash.appLoadTimes })
 	}
 
 	if (document.visibilityState !== 'visible') { return } // Stop if from some reason initiated when app is not visible
@@ -280,7 +280,7 @@ async function runApp() {
 		});
 		if (new Date(updatedSubData.startTime[updatedSubData.startTime.length - 1]).getTime() === startTime.getTime()) { // making sure the data was sent to the server by comparing the start times.
 			subject_data_worker.postMessage({ endExperimentAlertTime: new Date() }) // **
-			await dialog_helper.show(settings.text.endExperiment(subData), img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
+			await dialog_helper.show(settings.text.endExperiment(runData.baselineAccumulatedReward), img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);
 		} else { // if there is no connection to the server:
 			subject_data_worker.postMessage({ noConnectionToendExperimentAlertTime: new Date() }) // **
 			await dialog_helper.show(settings.text.noConnectionToEndExperiment, img_id = '', confirmation = '', delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = false, preventFeedBack = true);

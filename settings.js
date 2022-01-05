@@ -124,10 +124,11 @@ window.app_settings = {
 		confirmationCodeTextMessage: '\nכדי לאשר שקראת יש לכתוב את האותיות: ',
 		completeDemo: 'ההדגמה הסתיימה. אם ברצונך לסיים חלק זה ולהתחיל במשחק האמיתי יש לכתוב yes.\n כל דבר אחר. כדי לבצע סיבוב הדגמה נוסף יש ללחוץ על',
 		realGameBegins: 'המשחק האמיתי מתחיל עכשיו.<br>הזהב שתצבור/תצברי מעכשיו שווה כסף אמיתי.<br><br>בהצלחה!',
-		endExperiment: function (subData) {
+		endExperiment: function (baselineAccumulatedReward) {
 			return 'המשחק נגמר. תודה רבה שהשתתפת!' + '<br><br>' +
 				'הצלחת להביא לכדור הארץ כ-'
-				+ logic.calculateReward(subData, app_settings.coinCollectionTask, dayToFinishExperiment)
+				+ baselineAccumulatedReward // This was designed to replace the line below.
+				// + logic.calculateReward(subData, app_settings.coinCollectionTask, dayToFinishExperiment)
 				+ ' יחידות זהב!'
 		},
 		noConnectionToEndExperiment: 'לא מצליח להתחבר לשרת.' + '<br><br>' +
@@ -272,7 +273,7 @@ window.app_settings = {
 	instructions_main_HTML_element: "instructions_iframe",
 	App_HTML_title: 'Space Gold',
 	App_main_HTML_element: "main_container",
-	dataVarList: ["serial", "uniqueEntryID", "subId", "day", "isWin", "reward", "cost", "resetContainer", "resetContainerConfirmationTime", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status", "endExperiment", "manipulationConfirmationTime", "foundCaveAlertTime", "foundCaveConfirmationTime", "localSessionId"],
+	dataVarList: ["serial", "uniqueEntryID", "subId", "day", "isWin", "reward", "cost", "baselineAccumulatedReward", "resetContainer", "resetContainerConfirmationTime", "manipulationToday", "activateManipulation", "isUnderManipulation", "hideOutcome", "isFirstTime", "startTime", "press1Time", "press2Time", "outcomeTime", "endTime", "manipulationAlertTime", "showInstructions", "instructionsStartedFlag", "completedInstructions", "isDemo", "demoTrialNum", "isDialogOn", "coin_task_finish_status", "endExperiment", "manipulationConfirmationTime", "foundCaveAlertTime", "foundCaveConfirmationTime", "localSessionId"],
 	// maybe remove unecessary ones (affects the list that is formed to work with in logic, not what is saved).
 	// NOTE: the completedInstructions is assigned during the instructions upon success.
 }

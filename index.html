@@ -78,24 +78,24 @@
         media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
         rel="apple-touch-startup-image" />
 
-    <!-- iPhone 12 mini (1080px x 2340px V) -->
+    <!-- iPhone 12/13 mini (1080px x 2340px V) -->
     <link href="splashscreens/iphone_12_mini_splash.png"
         media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3)"
         rel="apple-touch-startup-image" />
-    <!-- iPhone 12, 12 pro (1170px x 2532px) V -->
+    <!-- iPhone 12/13, 12/13 pro (1170px x 2532px) V -->
     <link href="splashscreens/iphone_12_and_12_pro_splash.png"
         media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
         rel="apple-touch-startup-image" />
-    <!-- iPhone 12 pro max (1284px x 2778px) V -->
+    <!-- iPhone 12/13 pro max (1284px x 2778px) V -->
     <link href="splashscreens/iphone_12_pro_max_splash.png"
         media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)"
         rel="apple-touch-startup-image" />
     <!------------------------------------------------------------------>
     <script>
         // check app loading after the page is loaded
-        checkIfAppStartedRunning = setTimeout(()=>{
-                console.log('app not loading... RELOADING page')
-                location.reload()
+        checkIfAppStartedRunning = setTimeout(() => {
+            console.log('app not loading... RELOADING page')
+            location.reload()
         }, 7000)
     </script>
     <script src="app.js"></script>
@@ -117,7 +117,8 @@
 
     <!-- App installation guide -->
     <img id="installation_guide" />
-    <div id="installationProblem" style="width: 90%; background-color: #666666ff; z-index:999;" class="centered error_message hidden">
+    <div id="installationProblem" style="width: 90%; background-color: #666666ff; z-index:999;"
+        class="centered error_message hidden">
         <h2 id='installationProblemMessage'></h2>
     </div>
 
