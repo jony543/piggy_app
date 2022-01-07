@@ -442,26 +442,32 @@ var offline_data_manager = {
 		}).catch(console.log);
 	},
 	minimizeSelectedDayDataPoints: function (data, day) {
-		// items to remove according to min daily points defined to keep localy (in minDailyDataPointsToStoreLocall):
-		let thisDayIndicesToRemove = data.map(el => el['day']).multiIndexOf(day).slice(app_settings.minDailyDataPointsToStoreLocally)
+		try {
+			// items to remove according to min daily points defined to keep localy (in minDailyDataPointsToStoreLocall):
+			let thisDayIndicesToRemove = data.map(el => el['day']).multiIndexOf(day).slice(app_settings.minDailyDataPointsToStoreLocally)
 
-		// check if there was a manipulation this day (and if there was, get the first index with manipulation confirmation time):
-		let thisDayFirstIndexWithManipulationConfirmationTime; // if doesn't exist has to be null for the Math.max below to work;
-		if (!!data.filter(el => el['day'] === (day))[0]['manipulationToday']) { // check if there was a manipulation yesterday
-			thisDayFirstIndexWithManipulationConfirmationTime = data.map(el => el['day'] === (day) && !!el['manipulationConfirmationTime']).multiIndexOf(true)[0];
+			// check if there was a manipulation this day (and if there was, get the first index with manipulation confirmation time):
+			let thisDayFirstIndexWithManipulationConfirmationTime; // if doesn't exist has to be null for the Math.max below to work;
+			if (!!data.filter(el => el['day'] === (day))[0]['manipulationToday']) { // check if there was a manipulation yesterday
+				thisDayFirstIndexWithManipulationConfirmationTime = data.map(el => el['day'] === (day) && !!el['manipulationConfirmationTime']).multiIndexOf(true)[0];
+			}
+			if (!thisDayFirstIndexWithManipulationConfirmationTime) { thisDayFirstIndexWithManipulationConfirmationTime = null } // if doesn't exist has to be null for the Math.max below to work
+
+			// get the first trial with endTime - to keep it in (the rare) case that the minDailyDataPointsToStoreLocall do not include trials with endTime:
+			let thisvDayFirstIndexWithEndTime = data.map(el => el['day'] === (day) && !!el['endTime']).multiIndexOf(true)[0]
+			if (!thisvDayFirstIndexWithEndTime) { thisvDayFirstIndexWithEndTime = null } // if doesn't exist has to be null for the Math.max below to work
+
+			// calculate the first and last indices to remove
+			firstIndexToRemove = Math.max(thisDayIndicesToRemove[0], thisDayFirstIndexWithManipulationConfirmationTime + 1, thisvDayFirstIndexWithEndTime + 1)
+			n_items_ToRemove = thisDayIndicesToRemove.filter(val => val >= firstIndexToRemove).length
+			// Cut the data before saving
+			data.splice(firstIndexToRemove, n_items_ToRemove)
+			return data
+
+		} catch (error) {
+			console.error(error);
+			return data
 		}
-		if (!thisDayFirstIndexWithManipulationConfirmationTime) { thisDayFirstIndexWithManipulationConfirmationTime = null } // if doesn't exist has to be null for the Math.max below to work
-
-		// get the first trial with endTime - to keep it in (the rare) case that the minDailyDataPointsToStoreLocall do not include trials with endTime:
-		let thisvDayFirstIndexWithEndTime = data.map(el => el['day'] === (day) && !!el['endTime']).multiIndexOf(true)[0]
-		if (!thisvDayFirstIndexWithEndTime) { thisvDayFirstIndexWithEndTime = null } // if doesn't exist has to be null for the Math.max below to work
-
-		// calculate the first and last indices to remove
-		firstIndexToRemove = Math.max(thisDayIndicesToRemove[0], thisDayFirstIndexWithManipulationConfirmationTime + 1, thisvDayFirstIndexWithEndTime + 1)
-		n_items_ToRemove = thisDayIndicesToRemove.filter(val => val >= firstIndexToRemove).length
-		// Cut the data before saving
-		data.splice(firstIndexToRemove, n_items_ToRemove)
-		return data
 	}
 }
 
