@@ -253,9 +253,6 @@ var data_helper = {
 			const dataToSend =
 				Object.assign({}, baseData, ...this.q, typeof uniqueEntryID === 'undefined' ? {} : { uniqueEntryID: uniqueEntryID }) // uniqueEntryID added by Rani **
 
-			// Added by Rani Dec21:
-			typeof uniqueEntryID === 'undefined' ? null : local_storage_helper.set('LS_uniqueEntryID', uniqueEntryID)
-
 			// save sent message to temp storage before receipt confirmation arrives
 			offline_data_manager.stage(dataToSend.messageId, { ...dataToSend, touchData: undefined });
 
