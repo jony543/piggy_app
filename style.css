@@ -358,7 +358,7 @@ user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge,
   animation-fill-mode: forwards;
 }
 @keyframes goUpOutcome_animation {
-  0%   { padding: 0px 0px 0px 0px; opacity:0.0; }
+  0%   { padding: 0px 0px 0% 0px; opacity:0.0; }
   100% { padding: 0px 0px 20% 0px; opacity:1.0; }
 }
 
