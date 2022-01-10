@@ -870,10 +870,12 @@ h1 {
 .dialog button {
   border-width: 1px;
   background: rgb(200,200,200);
+  color: black;
   font-size: 5vw;
   padding: 1.2vh;
   margin-bottom: 2vh;
   border-radius: 2.5vw;
+  border-color: black;
   outline: none;
 }
 
