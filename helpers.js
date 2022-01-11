@@ -407,18 +407,21 @@ var offline_data_manager = {
 				Object.assign(element, item);
 			} else {
 				localData.push(item);
+				// This lines were added by Rani in Dec21 to follow locally stored data points at each moment.
+				subject_data_worker.postMessage({ n_localDataPoints: localData.length });
 			}
 			// Added by Rani in Dec21 to minimize data saved locally:
 			if (!!item['resetContainer'] && !!item['uniqueEntryID'] && !!item['day'] && item['day'] > 1 && // if there is a resetContainet (i.e., first daily trial) and uniqueID and a day in the item to save and it is not the first day
 				localData.map(el => el['day']).filter(el => el === (item['day'] - 1)).length > app_settings.minDailyDataPointsToStoreLocally) {// get the number of entries on the day before
 				// remove locally kept data from the previous day
 				localData = this.minimizeSelectedDayDataPoints(localData, item['day'] - 1)
+
+				subject_data_worker.postMessage({ n_localDataPoints: localData.length }); // update the nummber of locally stored data points.
 			}
 		} else {
 			localData.push(item);
 		}
 
-		localData[localData.length - 1]['n_localDataPoints'] = localData.length // This line was added by Rani in Dec21 to follow locally stored data points at each moment.
 		this.set(localData);
 		return localData;
 	},
