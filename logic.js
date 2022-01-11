@@ -400,7 +400,8 @@ var logic = {
               activateManipulation = true;
               consumptionTest = true;
               isWin = true; // On the devaluation indication time there is a certain win...
-            } else if (subData.foundCaveAlertTime.filter((x, i) => !!x && subData.day[i] === dayOfExperiment && !subData.foundCaveConfirmationTime[i]).length < settings.nTimesToShowCaveIfNotEntering) {
+            } else if (!subData.foundCaveConfirmationTime.filter((x, i) => !!x && subData.day[i] === dayOfExperiment).length && // if there is no confirmation of found the cave today
+              subData.foundCaveAlertTime.filter((x, i) => !!x && subData.day[i] === dayOfExperiment).length < settings.nTimesToShowCaveIfNotEntering) { // and there was a presentation of the cave that do not exceed a nTimesToShowCaveIfNotEntering.
               consumptionTest = true;
               isUnderManipulation = true;
             } else {
