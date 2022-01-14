@@ -766,8 +766,9 @@ if ('serviceWorker' in navigator) {
 			.register('sw.js')
 			.then(reg => {
 				console.log('Service Worker: Registered')
+				swRegObject = reg // Extract a global variable of the registered service worker (to chekc for updates on each trial.
 				reg.addEventListener('updatefound', () => {
-					console.log('UPDATE FOUND')
+					console.log('Service Worker: UPDATE FOUND')
 					subject_data_worker.postMessage({ newServiceWorkerDetected: new Date, commitSession: true });
 					//reg.update()
 					// A wild service worker has appeared in reg.installing!
@@ -782,13 +783,23 @@ if ('serviceWorker' in navigator) {
 					//                replaced by a newer version
 
 					newWorker.addEventListener('statechange', () => {
-						console.log('STATE CHANGED')
+						console.log('Service Worker: STATE CHANGED')
 						console.log(newWorker.state)
 						// newWorker.state has changed
 					});
 				});
 			})
 			.catch(err => console.log(`Service Worker: Error: ${err}`))
+	})
+}
+
+// detect controller change and refresh the page
+if ('serviceWorker' in navigator) {
+	console.log('Service Worker: Listening to controllerchange')
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		console.log('Service Worker: Controller change detected. RELOADING PAGE!')
+		//alert('האפליקציה צריכה להיטען מחדש. לחצ/י כדי להמשיך.')
+		window.location.reload()
 	})
 }
 

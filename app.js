@@ -23,6 +23,16 @@ async function runApp() {
 	if (!isPWA) { return }
 	// ********************************************************
 
+	// NEW - IN TEST //////////////////
+	if (typeof swRegObject !== 'undefined') { console.log('Service Worker: checkig for update'); swRegObject.update(); };
+
+	// Here below is an alternative methods that do the update before data is saved - but it takes more time (~200 ms), and if the app is reload when the new Service worker takes action it still creates another trial () so if I'll want to use it I'll need to tackle this (probabely can be done using navigator.serviceWorker.getRegistration() as used in the app.js).
+	// try {console.log('Service Worker: checkig for update'); var swRegObjectAfterUpdateQuery = await swRegObject.update();
+	// if (!!swRegObjectAfterUpdateQuery.installing) {return}; } catch (error) { console.error(error); }
+
+	/////// *** If i'll choose this second (faster) option I'll need to ignore trials with newServiceWorker, or delete it from the localData or any other solution... I can maybe also make a trial after one with service workers with no visible coste/spaceship but this might be an overkill.
+	///////////////////////////////////////
+
 	// make sure all images were appropriately loaded:
 	// ********************************************************
 	await Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = resolve; }))).then(() => {
@@ -31,7 +41,7 @@ async function runApp() {
 	if (!!Array.from(document.images).filter(img => img.id !== "installation_guide" && img.naturalHeight === 0).length) { // check that all images were successfully loaded - detects if there was an error in loading an image
 		// subject_data_worker.postMessage({ ...runData, crucialProblem: 'images_not_loaded', problematicTrialStartTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true }); // maybe use this to save a log of a problem but then I need to adjuct the data loading
 		console.log('Problem in image loading');
-		alert('היתה בעיה בטעינה. לאחר שתאשר/י האפליקציה תרענן את עצמה. אם זה לא נפתר תוך כמה נסיונות נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש לפחות פעמיים. אם זה לא עדיין לא נפתר נא לפנות לנסיינ/ית בפל: 050-5556733.')
+		alert('היתה בעיה בטעינה. לאחר שתאשר/י האפליקציה תרענן את עצמה. אם זה לא נפתר תוך כמה נסיונות נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש לפחות פעמיים. אם זה עדיין לא נפתר נא לפנות לנסיינ/ית בפל: 050-5556733.')
 		// reload page after unregistering service worker and
 		navigator.serviceWorker.getRegistration().then(function (reg) {
 			if (reg) {
@@ -42,7 +52,6 @@ async function runApp() {
 		});
 	}
 	// ********************************************************
-
 	dom_helper.show('main_container')
 
 	// Define variables used to prevent two instances of the app running in simultaniously when reloading

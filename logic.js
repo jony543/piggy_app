@@ -101,32 +101,31 @@ function assignReward(rewardsData) {
   }
   else {
     let non_rounded_reward = Math.random() * (rewardsData.maxWinningSum - rewardsData.minWinningSum) + rewardsData.minWinningSum;
-    return Math.round(non_rounded_reward * 100) / 100; // just making it rounded to two decimal points.
+    return Math.round(non_rounded_reward * 100) / 100 // just making it rounded to two decimal points.
   }
 }
 
 function getBaselineAccumulatedReward(subData, settings) {
   try {
     if (!!subData.baselineAccumulatedReward) {
-      let li = subData.baselineAccumulatedReward.lastIndexOf(subData.baselineAccumulatedReward.filter((x) => x !== undefined && x !== null).slice().reverse()[0]) // get the last valid index (that had)
+      let relevantTrials = subData.baselineAccumulatedReward.filter((x, i) => x !== undefined && x !== null && subData.isDemo[i] === false);
+      if (!relevantTrials.length) { return 0 }; // return 0 in case there are no relevant trials.
+      let li = subData.baselineAccumulatedReward.lastIndexOf(relevantTrials.slice().reverse()[0]) // get the last valid index (that had)
       // if it is the first time there is an endExperiment message just use the same value.
       if (!!subData['endExperiment'][li]) {
-        return subData.baselineAccumulatedReward
+        return subData.baselineAccumulatedReward[li];
       }
       // calculate reward accounting for previous trial
       // --------------------------------------------------------
       let accumulator = subData.baselineAccumulatedReward[li]
-      console.log('accumulator: ' + accumulator)
 
       // handle COST [may need adaptation if cost is splited to entry and each press]:
       !!subData['cost'][li] ? accumulator -= subData['cost'][li].reduce((a, b) => a + b, 0) : null;
-      console.log('with cost: ' + accumulator)
 
       // handle REWARD:
       if (!!subData['endTime'][li] && !(!!subData.isUnderManipulation[li] && subData.manipulationToday[li] === 'devaluation')) {
         accumulator += subData['reward'][li];
       }
-      console.log('with reward: ' + accumulator)
 
       // handle CAVE:
       if (!!subData['endTime'][li] && !!subData.coin_task_finish_status[li]) {
