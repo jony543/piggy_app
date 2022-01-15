@@ -793,16 +793,6 @@ if ('serviceWorker' in navigator) {
 	})
 }
 
-// detect controller change and refresh the page
-if ('serviceWorker' in navigator) {
-	console.log('Service Worker: Listening to controllerchange')
-	navigator.serviceWorker.addEventListener('controllerchange', () => {
-		console.log('Service Worker: Controller change detected. RELOADING PAGE!')
-		//alert('האפליקציה צריכה להיטען מחדש. לחצ/י כדי להמשיך.')
-		window.location.reload()
-	})
-}
-
 function clearCacheAndReload() {
 	caches.keys().then(cacheNames => {
 		return Promise.all(
@@ -812,4 +802,17 @@ function clearCacheAndReload() {
 			})
 		);
 	}).then(window.location.reload())
+}
+
+// Identify and indicate that a new service worker has been installed (to then handle the necessary refresh for subsequent trial [if it's a trial without full app reload]))
+// ------------------------------------------------------------------
+// Define a global var to be used in the app.js file (but should be initiated once every app full reload)
+reloadDueToNew_sw_installed = false;
+// detect controller change and refresh the page
+if ('serviceWorker' in navigator) {
+	console.log('Service Worker: Listening to controllerchange');
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		console.log('Service Worker: Controller change detected. RELOADING PAGE!');
+		reloadDueToNew_sw_installed = true;
+	})
 }

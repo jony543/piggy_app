@@ -23,15 +23,11 @@ async function runApp() {
 	if (!isPWA) { return }
 	// ********************************************************
 
-	// NEW - IN TEST //////////////////
-	if (typeof swRegObject !== 'undefined') { console.log('Service Worker: checkig for update'); swRegObject.update(); };
-
-	// Here below is an alternative methods that do the update before data is saved - but it takes more time (~200 ms), and if the app is reload when the new Service worker takes action it still creates another trial () so if I'll want to use it I'll need to tackle this (probabely can be done using navigator.serviceWorker.getRegistration() as used in the app.js).
-	// try {console.log('Service Worker: checkig for update'); var swRegObjectAfterUpdateQuery = await swRegObject.update();
-	// if (!!swRegObjectAfterUpdateQuery.installing) {return}; } catch (error) { console.error(error); }
-
-	/////// *** If i'll choose this second (faster) option I'll need to ignore trials with newServiceWorker, or delete it from the localData or any other solution... I can maybe also make a trial after one with service workers with no visible coste/spaceship but this might be an overkill.
-	///////////////////////////////////////
+	// Check and Handle service worker updates (the methods will cause a full implementatin of the changes on the 2nd trial following the change in code):
+	// ********************************************************
+	if (!!reloadDueToNew_sw_installed) { window.location.reload(); return } // reload if service worker was updated ():
+	if (typeof swRegObject !== 'undefined') { console.log('Service Worker: checkig for update'); swRegObject.update(); }; // check for update in sw if it's not the first trial after app (full) reload (in app full reload it is anyway set to check for new updates)
+	// ********************************************************
 
 	// make sure all images were appropriately loaded:
 	// ********************************************************
