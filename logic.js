@@ -349,7 +349,7 @@ var logic = {
         const expStartingTime = new Date(subData["startTime"].find((x) => !!x)); // finds the first element with a valid IDBCursorWithValue.
         daysFromBeginning = dateDiff(expStartingTime, new Date(), settings.experimentalDayStartingHour); // "new Date()" is getting the current time.
         dayOfExperiment = daysFromBeginning + 1;
-        completeEntriesToday = subData.endTime.filter((x, i) => !!x & subData.day[i] === dayOfExperiment).length; // number of entries TODAY that got to the END [* reffers to the experimental day 24h - could be form 5:00 to 5:00 for example]
+        completeEntriesToday = subData.endTime.filter((x, i) => (!!x || !!subData.outcomeTime[i]) && subData.day[i] === dayOfExperiment).length; // number of entries TODAY that got to the END [* reffers to the experimental day 24h - could be form 5:00 to 5:00 for example]
         devalueToday = (dayOfExperiment === firstDevalDay && group !== "long_training_parallel_manipulations") || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
         comparableValuedInsteadOfShortDeval = (dayOfExperiment === firstDevalDay && group === "long_training_parallel_manipulations") ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
         comparableValuedToday = dayOfExperiment === firstComparableValDay || dayOfExperiment === lastComparableValDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
