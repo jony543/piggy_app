@@ -812,7 +812,7 @@ reloadDueToNew_sw_installed = false;
 if ('serviceWorker' in navigator) {
 	console.log('Service Worker: Listening to controllerchange');
 	navigator.serviceWorker.addEventListener('controllerchange', () => {
-		console.log('Service Worker: Controller change detected. RELOADING PAGE!');
+		console.log('Service Worker: Controller change detected. WILL RELOAD PAGE ON NEXT TRIAL!');
 		reloadDueToNew_sw_installed = true;
 	})
 }

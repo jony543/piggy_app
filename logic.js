@@ -233,9 +233,11 @@ function checkIfResetContainer(subData, dayOfExperiment) {
   }
 }
 
-function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
+function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, nTrialsBeforeNotifyGameOver) {
+
+  var n_entriesToday = subData.day.filter((x, i) => x == dayOfExperiment && !!subData.endTime[i]).length
   // Check if the experiment is over
-  if (dayOfExperiment >= dayToFinishExperiment) {
+  if (dayOfExperiment >= dayToFinishExperiment && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
     return true
   }
   // Exclusions:
@@ -243,7 +245,7 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   // Check if the participant entered EVERY DAY:
   const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i]).filter((v, i, a) => a.indexOf(v) === i).length;
   const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].length;
-  if (daysWithEntries !== possibleDaysWithEntries || (typeof (subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id()))) {
+  if ((daysWithEntries !== possibleDaysWithEntries || (typeof (subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id()))) && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
     return true
   }
   // Check if there was a day where the MANIPULATION WAS NOT ACTIVATED:
@@ -251,7 +253,7 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment) {
   const daysToCheckManipulationActivated = daysOfManipulation.filter(x => !!x && x < dayOfExperiment)
   const manipulationActivationdays = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
   const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
-  if (daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) {
+  if ((daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
     return true
   }
 
@@ -358,7 +360,7 @@ var logic = {
 
         // End experiment & Exclusions
         // ---------------------------
-        var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment);
+        var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, settings.nTrialsBeforeNotifyGameOver);
 
         // Reset container
         // ---------------------------
