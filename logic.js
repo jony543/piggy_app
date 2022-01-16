@@ -215,10 +215,9 @@ function checkIfToHideOutcome(subData, hideOutcome, dayOfExperiment, isUnderMani
           return true;
         }
       } else { // checking according to pre-determined conditions (based on number of entries and/or time at day)
-        const currentHour = (new Date()).getHours()
-        if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in - 1 || currentHour >= hideOutcome.hour_at_day_to_hideOutcome_anyway || currentHour < experimentalDayStartingHour) {
-          return true
-        }
+        // const currentHour = (new Date()).getHours()
+        // if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in - 1 || currentHour >= hideOutcome.hour_at_day_to_hideOutcome_anyway || currentHour < experimentalDayStartingHour) { return true }
+        if (completeEntriesToday >= hideOutcome.entry_to_hideOutcome_in - 1) { return true }
       }
     }
   }
@@ -391,8 +390,9 @@ var logic = {
             const timeToManipulate = getManipulationStartingTime(subData, daysToBaseUponManipulation, settings.referenceDayPrecentileForManipulation, settings.experimentalDayStartingHour) // according to the median time in specified days
             if (new Date() >= timeToManipulate) { inManipulationPeriod = true }
           } else { // namely devaluation is determined globally for all participants according to conditions we pre-determined (e.g., number of entries and/or time of day)
-            const currentHour = (new Date()).getHours()
-            if (completeEntriesToday >= settings.entry_to_manipulate_in - 1 || currentHour >= settings.hour_at_day_to_manipulate_anyway || currentHour < settings.experimentalDayStartingHour) { inManipulationPeriod = true } // i.e., this is the [pettentialy complete] 5th entry, or if it's after the pre-determined hour of day
+            // const currentHour = (new Date()).getHours()
+            // if (completeEntriesToday >= settings.entry_to_manipulate_in - 1 || currentHour >= settings.hour_at_day_to_manipulate_anyway || currentHour < settings.experimentalDayStartingHour) { inManipulationPeriod = true } // i.e., this is the [pettentialy complete] 5th entry, or if it's after the pre-determined hour of day
+            if (completeEntriesToday >= settings.entry_to_manipulate_in - 1) { inManipulationPeriod = true } // i.e., this is the [pettentialy complete] 5th entry
           }
           if (inManipulationPeriod) {
             // check if this is the first time the outcome should be devalued that day
