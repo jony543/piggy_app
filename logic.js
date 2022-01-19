@@ -241,14 +241,16 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, nTria
   }
   // Exclusions:
   // -------------------------------------------
-  // Check if the participant entered EVERY DAY:
-  const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i]).filter((v, i, a) => a.indexOf(v) === i).length;
-  const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].length;
-  if ((daysWithEntries !== possibleDaysWithEntries || (typeof (subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id()))) && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
-    return true
-  }
+  // // Check if the participant entered EVERY DAY:
+  // const daysWithEntries = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && !!subData.endTime[i]).filter((v, i, a) => a.indexOf(v) === i).length;
+  // const possibleDaysWithEntries = [...Array(dayOfExperiment - 1).keys()].length;
+  // if ((daysWithEntries !== possibleDaysWithEntries || (typeof (subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id()))) && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
+  //   return true
+  // }
+
   // Check if there was a day where the MANIPULATION WAS NOT ACTIVATED:
-  const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
+  //const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
+  const daysOfManipulation = subData.group.includes('short_training') ? [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval] : [lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval];
   const daysToCheckManipulationActivated = daysOfManipulation.filter(x => !!x && x < dayOfExperiment)
   const manipulationActivationdays = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
   const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
