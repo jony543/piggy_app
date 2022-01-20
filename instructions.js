@@ -577,6 +577,7 @@ var settings = Object.assign({}, app_settings);
 			const relevantData = jsPsych.data.get().filterCustom(x => x.trial_index > lastTrialIndex - n_questions)
 			testPassed = !(relevantData.filter({ trialType: 'test_question', correct: false }).count() > 0)
 			if (testPassed) {
+				subject_data_worker.postMessage({ completedInstructions: true, commitSession: true });
 				msg = 'ענית נכון על כל השאלות.<br><br> \
 				החל מרגע זה תוכל/י להיכנס לאפליקציה כדי לנסות להשיג זהב (ולהרוויח כסף).<br><br> \
 				 לאחר שתצא/י כעת מהאפליקציה הכניסות הבאות יהיה כבר חלק מהמשחק.<br><br> \
