@@ -236,9 +236,10 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, nTria
 
   var n_entriesToday = subData.day.filter((x, i) => x == dayOfExperiment && !!subData.endTime[i]).length
   // Check if the experiment is over
-  if (dayOfExperiment >= dayToFinishExperiment && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
-    return true
-  }
+  // if (dayOfExperiment >= dayToFinishExperiment && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
+  if (dayOfExperiment >= dayToFinishExperiment) { return true }
+  if (subData["endExperiment"].includes(true)) { return true } // If there was already a notification about the game ending.
+
   // Exclusions:
   // -------------------------------------------
   // // Check if the participant entered EVERY DAY:
@@ -343,13 +344,16 @@ var logic = {
       var activateManipulation = false;
       var consumptionTest = false;
 
+      // Get the day of the experiment:
+      const expStartingTime = new Date(subData["startTime"].find((x) => !!x)); // finds the first element with a valid IDBCursorWithValue.
+      daysFromBeginning = !isNaN(expStartingTime.getTime()) ? dateDiff(expStartingTime, new Date(), settings.experimentalDayStartingHour) : 0; // "new Date()" is getting the current time.
+      dayOfExperiment = daysFromBeginning + 1;
+      console.log(`DAY OF EXPERIMENT: ${dayOfExperiment}`)
+
       if (!isFirstTime) { // if there is some data for this subject (i.e., not the first entry)
 
         // DEVALUATION / STILL-VALUED tests(check and set)
         // -------------------------------------------------------
-        const expStartingTime = new Date(subData["startTime"].find((x) => !!x)); // finds the first element with a valid IDBCursorWithValue.
-        daysFromBeginning = dateDiff(expStartingTime, new Date(), settings.experimentalDayStartingHour); // "new Date()" is getting the current time.
-        dayOfExperiment = daysFromBeginning + 1;
         completeEntriesToday = subData.endTime.filter((x, i) => (!!x || !!subData.outcomeTime[i]) && subData.day[i] === dayOfExperiment).length; // number of entries TODAY that got to the END [* reffers to the experimental day 24h - could be form 5:00 to 5:00 for example]
         devalueToday = (dayOfExperiment === firstDevalDay && group !== "long_training_parallel_manipulations") || dayOfExperiment === lastDevalDay ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
         comparableValuedInsteadOfShortDeval = (dayOfExperiment === firstDevalDay && group === "long_training_parallel_manipulations") ? true : false; // [NOTE] beforehand I used daysFromBeginning instead of dayOfExperiment
@@ -419,7 +423,7 @@ var logic = {
 
       } else { // if it is the first entry
         isWin = settings.rewards.enforceFirstEntryWinSecondEntryNoWin ? false : checkWinning(subData, settings.rewards.isRatioSchedule, settings.rewards.winningChancePerUnit(), settings.rewards.winAnywayIfMultipleNonWins);
-        dayOfExperiment = 1;
+        // dayOfExperiment = 1;
         var resetContainer = false;
       }
     }
