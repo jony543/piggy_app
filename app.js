@@ -334,8 +334,25 @@ async function runApp() {
 	var manipulationOption = logic.isManipulation(runData, settings); // Check if and which manipulation
 	if (manipulationOption) { // activate manipulation notification:
 		subject_data_worker.postMessage({ manipulationAlertTime: new Date() }) // **
+
+		// recored the time passed since presentation and if the app is open (made to decide if to include if there is no confirmation time):
+		let manipulationConfirmed = false
+		let timeFromManipulationMessage = 0
+		var timeRecorder = setInterval(() => {
+			if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
+			if (!manipulationConfirmed) { // if manipulation w not confirmed yet but the process is in action
+				timeFromManipulationMessage += settings.msToRecordTimeSinceManipulationActivation
+				console.log(`Saving ${timeFromManipulationMessage}`)
+				subject_data_worker.postMessage({ recordedTimePassedFromManipulaitonAlert_in_ms: timeFromManipulationMessage }) // **
+			} else {
+				console.log(`stopping`)
+				clearInterval(timeRecorder) // stop the timeRecorder
+			}// Stop running the function in the app is reloaded (and thus a new instance started)
+		}, settings.msToRecordTimeSinceManipulationActivation);
+
 		await dialog_helper.random_code_confirmation(msg = settings.text.manipulationMessage(manipulationOption), img_id = settings.manipulationImageID(manipulationOption), delayBeforeClosing = 0, resolveOnlyAfterDelayBeforeClosing = true);
 		subject_data_worker.postMessage({ manipulationConfirmationTime: new Date() }) // **
+		manipulationConfirmed = true
 	}
 
 	// activate consumption test:
