@@ -35,9 +35,17 @@ async function runApp() {
 		console.log('images finished loading');
 	});
 	if (!!Array.from(document.images).filter(img => img.id !== "installation_guide" && img.naturalHeight === 0).length) { // check that all images were successfully loaded - detects if there was an error in loading an image
-		// subject_data_worker.postMessage({ ...runData, crucialProblem: 'images_not_loaded', problematicTrialStartTime: startTime, dataLoadingTime: (new Date) - startTime, commitSession: true }); // maybe use this to save a log of a problem but then I need to adjuct the data loading
 		console.log('Problem in image loading');
-		alert('היתה בעיה בטעינה. לאחר שתאשר/י האפליקציה תרענן את עצמה. אם זה לא נפתר תוך כמה נסיונות נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש לפחות פעמיים. אם זה עדיין לא נפתר נא לפנות לנסיינ/ית בפל: 050-5556733.')
+
+		// log problem with image loading to stash
+		if (!stash.imgLoadingProblem) {
+			offline_data_manager.stash.append({ imgLoadingProblem: [new Date()] });
+		} else {
+			stash.imgLoadingProblem.push(new Date());
+			offline_data_manager.stash.append({ imgLoadingProblem: stash.imgLoadingProblem })
+		}
+
+		// alert('היתה בעיה בטעינה. לאחר שתאשר/י האפליקציה תרענן את עצמה. אם זה לא נפתר תוך כמה נסיונות נסה/י לסגור את האפליקציה לגמרי ולפתוח מחדש לפחות פעמיים. אם זה עדיין לא נפתר נא לפנות לנסיינ/ית בפל: 050-5556733.')
 		// reload page after unregistering service worker and
 		navigator.serviceWorker.getRegistration().then(function (reg) {
 			if (reg) {
@@ -46,6 +54,7 @@ async function runApp() {
 				clearCacheAndReload()
 			}
 		});
+		return
 	}
 	// ********************************************************
 	dom_helper.show('main_container')
@@ -342,10 +351,8 @@ async function runApp() {
 			if (identifiersToClean.includes(identifier)) { appRunning = false; return }; // Stop running the function in the app is reloaded (and thus a new instance started)
 			if (!manipulationConfirmed) { // if manipulation w not confirmed yet but the process is in action
 				timeFromManipulationMessage += settings.msToRecordTimeSinceManipulationActivation
-				console.log(`Saving ${timeFromManipulationMessage}`)
 				subject_data_worker.postMessage({ recordedTimePassedFromManipulaitonAlert_in_ms: timeFromManipulationMessage }) // **
 			} else {
-				console.log(`stopping`)
 				clearInterval(timeRecorder) // stop the timeRecorder
 			}// Stop running the function in the app is reloaded (and thus a new instance started)
 		}, settings.msToRecordTimeSinceManipulationActivation);
