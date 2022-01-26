@@ -233,12 +233,15 @@ function checkIfResetContainer(subData, dayOfExperiment) {
 }
 
 function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, nTrialsBeforeNotifyGameOver) {
+  // *** I DECIDED NOT TO EXCLUDE AT ALL BUT RATHER CREATED A NEW FUNCTION BELOW THAT WILL TELL US IF THE SUBJECT SHOULD HAVE BEEN EXCLUDED ***
 
-  var n_entriesToday = subData.day.filter((x, i) => x == dayOfExperiment && !!subData.endTime[i]).length
+  // var n_entriesToday = subData.day.filter((x, i) => x == dayOfExperiment && !!subData.endTime[i]).length
+
   // Check if the experiment is over
   // if (dayOfExperiment >= dayToFinishExperiment && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
   if (dayOfExperiment >= dayToFinishExperiment) { return true }
-  if (subData["endExperiment"].includes(true)) { return true } // If there was already a notification about the game ending.
+  if (typeof (subjects_exclude_online) !== "undefined" && String(subjects_exclude_online).includes(data_helper.get_subject_id())) { return true } // for online manual exclusions
+  // if (subData["endExperiment"].includes(true)) { return true } // If there was already a notification about the game ending.
 
   // Exclusions:
   // -------------------------------------------
@@ -249,18 +252,45 @@ function finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, nTria
   //   return true
   // }
 
-  // Check if there was a day where the MANIPULATION WAS NOT ACTIVATED:
-  //const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
-  const daysOfManipulation = subData.group.includes('short_training') ? [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval] : [lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval];
-  const daysToCheckManipulationActivated = daysOfManipulation.filter(x => !!x && x < dayOfExperiment)
-  const manipulationActivationdays = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
-  // const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
-  const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationAlertTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
-  if ((daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
-    return true
-  }
+  // // Check if there was a day where the MANIPULATION WAS NOT ACTIVATED:
+  // //const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
+  // const daysOfManipulation = subData.group.includes('short_training') ? [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval] : [lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval];
+  // const daysToCheckManipulationActivated = daysOfManipulation.filter(x => !!x && x < dayOfExperiment)
+  // const manipulationActivationdays = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
+  // // const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
+  // const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationAlertTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
+  // if ((daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length) && n_entriesToday >= nTrialsBeforeNotifyGameOver) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
+  //   return true
+  // }
 
   return false
+}
+
+function recordIfShouldBeExcluded(subData, dayOfExperiment, dayToFinishExperiment, nDailyEntriesRequired) {
+  let shouldBeExcluded = false;
+  let exclusionReason = [];
+  if (dayOfExperiment < dayToFinishExperiment) {
+    // Check if the participant entered EVERY DAY:
+    const entriesByDay = subData.day.filter((x, i, self) => !!x && x < dayOfExperiment && (!!subData.outcomeTime[i] || !!subData.endTime[i]))
+    const possibleDaysWithEntries = Array.from({ length: dayOfExperiment - 1 }, (_, i) => i + 1)
+    const countsPerDAY = possibleDaysWithEntries.map(val => entriesByDay.reduce((a, v) => (v === val ? a + 1 : a), 0))
+    if (countsPerDAY.some(x => x < nDailyEntriesRequired)) {
+      exclusionReason.push(`No${nDailyEntriesRequired}EntriesEveryDay`);
+      shouldBeExcluded = true;
+    }
+
+    // Check if there was a day where the MANIPULATION WAS NOT ACTIVATED:
+    const daysOfManipulation = [firstComparableValDay, firstDevalDay, firstComparableValDay_PostDeval, lastComparableValDay, lastDevalDay, lastComparableValDay_PostDeval]
+    const daysToCheckManipulationActivated = daysOfManipulation.filter(x => !!x && x < dayOfExperiment)
+    const manipulationActivationdays = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.endTime[i])
+    // const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationConfirmationTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
+    const manipulationActivationdays2 = subData.day.filter((x, i) => daysToCheckManipulationActivated.includes(x) && subData.activateManipulation[i] == true && !!subData.manipulationAlertTime[i]).filter((x, i, s) => s.indexOf(x) === i) // the last part just takes the unique values
+    if ((daysToCheckManipulationActivated.length !== manipulationActivationdays.length && daysToCheckManipulationActivated.length !== manipulationActivationdays2.length)) { // added the latter to show game over only after a few entries (to allow online fixes when necessary [and before game ver message is shown])
+      exclusionReason.push(`DidNotSeeAllManipulatinos`);
+      shouldBeExcluded = true;
+    }
+  }
+  return { shouldBeExcluded: shouldBeExcluded, exclusionReason: exclusionReason };
 }
 
 // ****************************************************************
@@ -336,6 +366,9 @@ var logic = {
       var resetContainer = demoVars.resetContainer;
       var group = 'irrelevant';
       var endExperiment = false;
+      var shouldBeExcluded = false;
+      var exclusionReason = [];
+
     } else {
 
       // Get counter-balanced stuff and Initialize variables:
@@ -367,6 +400,10 @@ var logic = {
         // End experiment & Exclusions
         // ---------------------------
         var endExperiment = finishExperiment(subData, dayOfExperiment, dayToFinishExperiment, settings.nTrialsBeforeNotifyGameOver);
+
+        // Check if the subject should have been excluded (Was added when I decided not to use ongoing exclusions)
+        // ----------------------------------------------
+        var { shouldBeExcluded, exclusionReason } = recordIfShouldBeExcluded(subData, dayOfExperiment, dayToFinishExperiment, settings.nDailyEntriesRequired())
 
         // Reset container
         // ---------------------------
@@ -451,6 +488,8 @@ var logic = {
       showInstructions: false,
       isDemo: isDemo,
       demoTrialNum: demoTrialNum,
+      shouldBeExcluded: shouldBeExcluded,
+      exclusionReason: exclusionReason,
     };
     return dataToSave;
   },

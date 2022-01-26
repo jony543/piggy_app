@@ -29,6 +29,7 @@ window.app_settings = {
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	nTimesToShowCaveIfNotEntering: 2,
 	nTrialsBeforeNotifyGameOver: 3,
+	nDailyEntriesRequired: function () { return this.entry_to_manipulate_in; },
 	manipulationImageID: function (manipulationType) {
 		if (manipulationType == 'devaluation') {
 			return 'warehouse_full';
