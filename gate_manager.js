@@ -55,7 +55,7 @@ async function checkAndHandlePWA() {
     var isInWebAppChrome =
         // window.matchMedia("(display-mode: fullscreen)").matches || //***** UNCOMMENT FOR DEBUGGING PURPOSES ON MAC/PC ******
         window.matchMedia("(display-mode: standalone)").matches;
-        //window.matchMedia("(display-mode: minimal-ui)").matches;
+    //window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // if app PWA:
     if (isInWebAppiOS || isInWebAppChrome) {
