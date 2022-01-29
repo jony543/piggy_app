@@ -28,6 +28,7 @@ window.app_settings = {
 	daysToBaseUponLastDeval: [8], //[6, 7], // days to base upon last devluation/control manipulation time
 	referenceDayPrecentileForManipulation: 0.5, // if referenceDayPrecentile=0.5 it will take the median, 0.25 quarter of the presses in a day etc.
 	nTimesToShowCaveIfNotEntering: 2,
+	maxSecsToShowCaveAgainIfNotEntering: 30,
 	nTrialsBeforeNotifyGameOver: 3,
 	nDailyEntriesRequired: function () { return this.entry_to_manipulate_in; },
 	manipulationImageID: function (manipulationType) {
